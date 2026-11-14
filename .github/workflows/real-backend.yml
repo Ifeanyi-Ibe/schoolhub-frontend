@@ -1,0 +1,78 @@
+name: real-backend
+
+# Nightly journeys against the SchoolHub .NET API with its development seed (docs/TESTING.md).
+# Separate from pull-request CI: it needs Docker and the backend repository.
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: real-backend
+  cancel-in-progress: false
+
+jobs:
+  real-backend:
+    name: F1 journeys against the real backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      E2E_BFF_KEY: ${{ secrets.E2E_BFF_KEY }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_DEV_SEED_PASSWORD }}
+      E2E_PLATFORM_PASSWORD: ${{ secrets.E2E_DEV_SEED_PASSWORD }}
+      E2E_PLATFORM_TOTP_SECRET: ${{ secrets.E2E_PLATFORM_TOTP_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.BACKEND_REPOSITORY }}
+          token: ${{ secrets.BACKEND_CHECKOUT_TOKEN }}
+          path: backend
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version-file: backend/global.json
+      - name: Start the backend's database, log and mail services
+        working-directory: backend
+        run: docker compose up -d
+      - name: Migrate, seed and start the API in Development with relaxed limits
+        working-directory: backend
+        run: |
+          set -a; . ./.env; set +a
+          make migrate
+          ASPNETCORE_ENVIRONMENT=Development dotnet run --no-launch-profile --project src/SchoolHub.Api -- seed-demo
+          ASPNETCORE_ENVIRONMENT=Development E2E__RelaxLimits=true Bff__Keys__0="$E2E_BFF_KEY" \
+            nohup dotnet run --no-launch-profile --project src/SchoolHub.Api --urls http://localhost:5152 > api.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://localhost:5152/health/live >/dev/null 2>&1 && exit 0; sleep 2; done
+          echo "API did not become healthy"; tail -50 api.log; exit 1
+      - run: npm ci
+      - name: Write the e2e environment (git-ignored) from the template and secrets
+        run: |
+          cp .env.e2e.example .env.e2e
+          sed -i "s|^E2E_BFF_KEY=.*|E2E_BFF_KEY=${E2E_BFF_KEY}|" .env.e2e
+          sed -i "s|^E2E_ADMIN_PASSWORD=.*|E2E_ADMIN_PASSWORD=${E2E_ADMIN_PASSWORD}|" .env.e2e
+          sed -i "s|^E2E_PLATFORM_PASSWORD=.*|E2E_PLATFORM_PASSWORD=${E2E_PLATFORM_PASSWORD}|" .env.e2e
+          sed -i "s|^E2E_PLATFORM_TOTP_SECRET=.*|E2E_PLATFORM_TOTP_SECRET=${E2E_PLATFORM_TOTP_SECRET}|" .env.e2e
+          sed -i "s|^E2E_PARENT_PHONE=.*|E2E_PARENT_PHONE=${{ vars.E2E_PARENT_PHONE }}|" .env.e2e
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run test:real
+      - name: Stop the API and the backend services
+        if: always()
+        working-directory: backend
+        run: |
+          pkill -f "SchoolHub.Api" || true
+          docker compose down || true
+      - name: Upload the API log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-log
+          path: backend/api.log
