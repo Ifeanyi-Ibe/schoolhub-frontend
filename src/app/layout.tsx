@@ -7,6 +7,7 @@ import Script from "next/script";
 import type { ReactNode } from "react";
 import { Providers } from "@/components/providers";
 import { OnlineIndicator } from "@/components/ui/offline-status";
+import { CspNonce } from "@/components/security/csp-nonce";
 import { inter, plusJakarta } from "./fonts";
 import "./globals.css";
 
@@ -42,6 +43,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         {/* Feature detection before the app loads (ADR 0008). Carries the request nonce. */}
         <Script src="/browser-check.js" strategy="beforeInteractive" nonce={nonce} />
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <CspNonce nonce={nonce} />
           <Providers>
             <OnlineIndicator />
             {children}
