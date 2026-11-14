@@ -1,0 +1,74 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "retry": "Try again",
+    "copyErrorDetails": "Copy error details",
+    "errorDetailsCopied": "Error details copied",
+    "errorDetailsCopyFailed": "Could not copy. Select the text and copy it manually.",
+    "traceId": "Trace ID",
+    "errorCode": "Error code",
+    "emptyTitle": "Nothing here yet",
+    "more": "More"
+  },
+  "status": {
+    "success": "Success",
+    "warning": "Attention",
+    "danger": "Problem",
+    "info": "Info",
+    "neutral": "Inactive"
+  },
+  "network": {
+    "offlineTitle": "You are offline",
+    "offlineBody": "You can keep working. Anything that needs the network will wait until you reconnect.",
+    "online": "Back online"
+  },
+  "pwa": {
+    "updateTitle": "A new version is available",
+    "updateBody": "Refresh to get the latest version. Your unsaved changes are kept safe.",
+    "updateAction": "Refresh now",
+    "offlinePage": "You are offline"
+  },
+  "palette": {
+    "open": "Open command palette",
+    "placeholder": "Search pages and actions",
+    "empty": "No matches",
+    "label": "Command palette"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "sessionEnded": "Your session has ended. Please sign in again.",
+    "billingSuspended": "This school's account is suspended. You can view data but cannot make changes."
+  },
+  "styleguide": {
+    "title": "Styleguide",
+    "intro": "Development-only reference for design tokens and shared components. Not available in production.",
+    "tokens": "Tokens",
+    "components": "Components",
+    "states": "States",
+    "buttons": "Buttons",
+    "inputs": "Inputs",
+    "badges": "Status badges",
+    "money": "Money",
+    "cards": "Cards and tables",
+    "feedback": "Feedback and dialogs",
+    "sample": {
+      "name": "Name",
+      "class": "Class",
+      "balance": "Balance",
+      "status": "Status",
+      "student": "Adaeze Okafor",
+      "classValue": "JSS 2 Gold",
+      "pending": "Pending"
+    },
+    "inputLabel": "Full name",
+    "inputHint": "As it appears on the admission form",
+    "inputError": "Enter a full name",
+    "openDialog": "Open dialog",
+    "dialogTitle": "Confirm this action?",
+    "dialogBody": "This example dialog shows focus management and the destructive pattern.",
+    "toast": "Show toast"
+  }
+}
