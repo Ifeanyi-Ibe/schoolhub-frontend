@@ -21,9 +21,9 @@ function headers(bearer?: string, tenant?: string): Record<string, string> {
   };
 }
 
-/** A unique, non-real address for accounts this run creates (example.com is reserved for documentation). */
+/** A unique, non-real address for an account this run creates. The local part starts with e2e-. */
 export function runAddress(label: string): string {
-  return `e2e.${label}.${Date.now().toString(36)}.${Math.random().toString(36).slice(2, 6)}@example.com`;
+  return `e2e-${label}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}@example.com`;
 }
 
 /** Sign in as the seeded school administrator through the backend, to act as the school. */

@@ -15,8 +15,6 @@ import {
   latestMessage,
   platformAccessToken,
   runAddress,
-  setSchoolStatus,
-  tenantIdBySlug,
   unlockUser,
   userAccessToken,
 } from "./support/admin";
@@ -68,26 +66,14 @@ test.describe("a school the token does not belong to", () => {
   });
 });
 
+// The seeded school is never suspended by a test. The read-only state is checked against the
+// dedicated suspended school, which the backend's seed does not hold yet. Until it does, this journey is
+// skipped (the browser suite covers the banner and the disabled writes against the test double).
 test.describe("a suspended school", () => {
-  test("a signed-in user sees the read-only banner, and the school is reactivated afterwards", async ({
-    page,
-    request,
-  }) => {
-    await signIn(page, e2e.adminIdentifier, e2e.adminPassword);
-    await page.waitForURL("**/home");
-
-    const platform = await platformAccessToken(request);
-    const demoId = await tenantIdBySlug(request, platform, e2e.schoolSlug);
-    await setSchoolStatus(request, platform, demoId, "suspend");
-    try {
-      await page.goto("/profile");
-      await expect(page.getByText("Read-only: this school's account is suspended")).toBeVisible();
-      // Writes are switched off: the contact request cannot be sent.
-      await expect(page.getByRole("button", { name: "Send code" })).toBeDisabled();
-    } finally {
-      await setSchoolStatus(request, platform, demoId, "reactivate");
-    }
-  });
+  // Not run: the seed has no dedicated suspended school yet. When it does, sign in to that school's host
+  // with its administrator, assert the banner and the disabled writes, and never suspend the seeded school.
+  test.skip("a signed-in user of the dedicated suspended school sees the read-only banner", async () =>
+    undefined);
 });
 
 test.describe.serial("a spare account this run invites", () => {

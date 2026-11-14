@@ -71,6 +71,12 @@ npm run test:real
 
 `.env.e2e` holds the BFF key, the seeded credentials and the TOTP secret. Nothing is hardcoded in the tests, and the committed template holds placeholders only.
 
+### Disposable database (nightly)
+
+The nightly job recreates the backend's database for every run: `docker compose down -v` removes the volumes, so the migrations and the seed start from empty. A local run against a database that has accumulated test data is fine, but it is not the nightly guarantee. Test-created data uses names that start with `e2e-` (accounts, schools, roles), so it is easy to find and to remove when a database is kept. There is no tenant-delete API; a disposable database is the cleanup.
+
+The seeded school is never changed by a journey. The suspended-school read-only check waits for the seed's dedicated suspended school, and that journey is skipped until it exists.
+
 ### Nightly CI job
 
 `.github/workflows/real-backend.yml` runs the same steps on a schedule. It checks out the backend repository (`BACKEND_REPOSITORY` variable, with the `BACKEND_CHECKOUT_TOKEN` secret if private), starts its compose stack, seeds it, writes `.env.e2e` from repository secrets, and runs `npm run test:real`. It is separate from the pull-request pipeline because it needs Docker and a second repository. This workflow has not run on GitHub yet: it needs the repository variables and secrets set first.

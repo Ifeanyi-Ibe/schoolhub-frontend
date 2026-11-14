@@ -39,9 +39,11 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version-file: backend/global.json
-      - name: Start the backend's database, log and mail services
+      - name: Recreate the backend's database, log and mail services from empty volumes
         working-directory: backend
-        run: docker compose up -d
+        run: |
+          docker compose down -v --remove-orphans
+          docker compose up -d
       - name: Migrate, seed and start the API in Development with relaxed limits
         working-directory: backend
         run: |
