@@ -5,7 +5,7 @@
 // Any mismatch is recorded; the global teardown fails the run if one was recorded.
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import Ajv2020 from "ajv/dist/2020";
+import Ajv2020 from "ajv/dist/2020.js";
 
 export interface Violation {
   method: string;

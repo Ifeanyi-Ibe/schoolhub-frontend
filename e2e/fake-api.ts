@@ -4,7 +4,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { contractProblems, violations } from "./contract";
+import { contractProblems, violations } from "./contract.ts";
 
 export const FAKE_API_PORT = Number(process.env.FAKE_API_PORT ?? 5999);
 export const FAKE_API_URL = `http://127.0.0.1:${FAKE_API_PORT}`;
