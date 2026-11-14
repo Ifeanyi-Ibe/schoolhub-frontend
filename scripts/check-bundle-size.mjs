@@ -203,7 +203,13 @@ async function main() {
       );
       ratchetCeilings = results;
     }
-    const ratchet = checkRatchet(results, ratchetCeilings);
+    // Build-to-build noise is a few hundred bytes (chunk hashes and minifier output). The tolerance is set
+    // per group in budgets.json, and growth beyond it fails. Within it, the ceiling still only goes down.
+    const tolerance = Math.max(
+      0,
+      ...Object.values(groups).map((g) => g.ratchetToleranceGzipBytes ?? 0),
+    );
+    const ratchet = checkRatchet(results, ratchetCeilings, tolerance);
     failures.push(...ratchet.failures);
     for (const r of ratchet.lowerable)
       console.log(

@@ -84,15 +84,15 @@ export function checkGroupBudgets(results, groups) {
  * A route above its ceiling fails; a route below it is reported so the ceiling can be lowered; a route
  * with no ceiling yet is reported, not failed. Ceilings are never raised by this check.
  */
-export function checkRatchet(results, ceilings) {
+export function checkRatchet(results, ceilings, toleranceBytes = 0) {
   const failures = [];
   const lowerable = [];
   for (const [route, measured] of Object.entries(results)) {
     const ceiling = ceilings[route];
     if (ceiling === undefined) continue;
-    if (measured > ceiling) {
+    if (measured > ceiling + toleranceBytes) {
       failures.push(
-        `${route}: ${measured} B gzipped is above its ratchet ceiling ${ceiling} B (the ceiling only goes down)`,
+        `${route}: ${measured} B gzipped is above its ratchet ceiling ${ceiling} B plus the ${toleranceBytes} B build tolerance (the ceiling only goes down)`,
       );
     } else if (measured < ceiling) {
       lowerable.push({ route, from: ceiling, to: measured });

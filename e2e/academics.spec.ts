@@ -31,28 +31,32 @@ test.describe("class levels for an administrator", () => {
     await expect(page.getByRole("link", { name: "Academics" })).toBeVisible();
     await page.goto("/academics/levels");
     await expect(page.getByRole("heading", { name: "Class levels", exact: true })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "Junior Secondary 1" })).toBeVisible();
+    await expect(page.locator("td", { hasText: "Junior Secondary 1" })).toBeVisible();
   });
 
   test("choosing a level shows its arms, and the level is in the URL", async ({ page }) => {
     await page.goto("/academics/levels");
-    await page.getByRole("button", { name: "Arms" }).first().click();
+    await page
+      .locator("tr", { hasText: "Junior Secondary 1" })
+      .getByRole("button", { name: "Arms" })
+      .click();
     await expect(page).toHaveURL(/\?level=/);
     await expect(page.getByRole("heading", { name: "Arms in Junior Secondary 1" })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "A", exact: true })).toBeVisible();
+    await expect(page.locator("td", { hasText: /^A$/ })).toBeVisible();
   });
 
   test("a new level is saved and appears in the list", async ({ page }) => {
+    const name = "Junior Secondary " + Math.random().toString(36).slice(2, 8);
     await page.goto("/academics/levels");
     await page.getByRole("button", { name: "Add a level" }).click();
     const dialog = page.getByRole("dialog", { name: "Add a class level" });
-    await dialog.getByLabel("Code").fill("JSS2");
-    await dialog.getByLabel("Name").fill("Junior Secondary 2");
+    await dialog.getByLabel("Code").fill("J" + name.slice(-4));
+    await dialog.getByLabel("Name").fill(name);
     await dialog.getByLabel("Section").selectOption("JuniorSecondary");
     await dialog.getByLabel("Order").fill("2");
     await dialog.getByRole("button", { name: "Save level" }).click();
     await expect(page.getByText("Class level saved", { exact: true })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "Junior Secondary 2" })).toBeVisible();
+    await expect(page.locator("td", { hasText: name })).toBeVisible();
   });
 
   test("a level with a missing code or a non-numeric order says what to fix, and sends nothing", async ({
@@ -71,15 +75,19 @@ test.describe("class levels for an administrator", () => {
   });
 
   test("an arm is added to the chosen level", async ({ page }) => {
+    const arm = "B" + Math.random().toString(36).slice(2, 6);
     await page.goto("/academics/levels");
-    await page.getByRole("button", { name: "Arms" }).first().click();
+    await page
+      .locator("tr", { hasText: "Junior Secondary 1" })
+      .getByRole("button", { name: "Arms" })
+      .click();
     await page.getByRole("button", { name: "Add an arm" }).click();
     const dialog = page.getByRole("dialog", { name: "Add an arm to Junior Secondary 1" });
-    await dialog.getByLabel("Arm").fill("B");
+    await dialog.getByLabel("Arm").fill(arm);
     await dialog.getByLabel("Capacity").fill("35");
     await dialog.getByRole("button", { name: "Add arm" }).click();
     await expect(page.getByText("Arm added", { exact: true })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "B", exact: true })).toBeVisible();
+    await expect(page.locator("td", { hasText: arm })).toBeVisible();
   });
 
   test("the levels and arms screen passes axe at 360px and on desktop", async ({ page }) => {

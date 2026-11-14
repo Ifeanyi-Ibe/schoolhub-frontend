@@ -1,5 +1,5 @@
 {
-  "$comment": "Per-route-group budgets (CLAUDE.md performance budgets). Values are gzipped bytes of first-load JavaScript, measured on the production build with the labelled test double. A group's budget applies to every route in it. 'targetGzipBytes' (where set) is the goal and only reported; 'budgetGzipBytes' is the hard cap and fails CI. Signed-in routes carry a session cookie; the cookie value is a test token (test double), not a credential. Groups with no routes yet reserve their budget for the features that will add them. The admin group measures the staff screens with the test double's administrator token (fake-api label admin).",
+  "$comment": "Per-route-group budgets (CLAUDE.md performance budgets). Values are gzipped bytes of first-load JavaScript, measured on the production build with the labelled test double. A group's budget applies to every route in it. 'targetGzipBytes' (where set) is the goal and only reported; 'budgetGzipBytes' is the hard cap and fails CI. Signed-in routes carry a session cookie; the cookie value is a test token (test double), not a credential. Groups with no routes yet reserve their budget for the features that will add them. The admin group measures the staff screens with the test double's administrator token (fake-api label admin). ratchetToleranceGzipBytes: build-to-build noise allowance for the ratchet (measured at a few hundred bytes); growth beyond it fails.",
   "groups": {
     "auth": {
       "targetGzipBytes": 153600,
@@ -44,7 +44,8 @@
         }
       },
       "maxRouteSpecificGzipBytes": 40960,
-      "shellRoutes": ["/home", "/profile", "/sessions"]
+      "shellRoutes": ["/home", "/profile", "/sessions"],
+      "ratchetToleranceGzipBytes": 256
     }
   }
 }

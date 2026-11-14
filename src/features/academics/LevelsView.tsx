@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -16,7 +16,9 @@ import type { components } from "@/lib/api/schema";
 import { ApiError } from "@/lib/api/unwrap";
 import { PERMISSION, holdsAny } from "@/features/staff/rules";
 import { armsQuery, levelsQuery } from "./api";
-import { ArmDialog, LevelDialog } from "./LevelDialogs";
+// The forms (react-hook-form) load when a dialog opens, not with the list (see the budgets).
+const LevelDialog = lazy(() => import("./LevelDialogs").then((m) => ({ default: m.LevelDialog })));
+const ArmDialog = lazy(() => import("./LevelDialogs").then((m) => ({ default: m.ArmDialog })));
 import { CLASS_SECTIONS } from "./rules";
 
 type Level = components["schemas"]["LevelView"];
@@ -191,23 +193,25 @@ export function LevelsView() {
         </Card>
       )}
 
-      {editing !== null ? (
-        <LevelDialog
-          level={editing === "new" ? null : editing}
-          onOpenChange={(open) => {
-            if (!open) setEditing(null);
-          }}
-        />
-      ) : null}
-      {addingArm !== null ? (
-        <ArmDialog
-          levelId={addingArm.id}
-          levelName={addingArm.name}
-          onOpenChange={(open) => {
-            if (!open) setAddingArm(null);
-          }}
-        />
-      ) : null}
+      <Suspense fallback={null}>
+        {editing !== null ? (
+          <LevelDialog
+            level={editing === "new" ? null : editing}
+            onOpenChange={(open) => {
+              if (!open) setEditing(null);
+            }}
+          />
+        ) : null}
+        {addingArm !== null ? (
+          <ArmDialog
+            levelId={addingArm.id}
+            levelName={addingArm.name}
+            onOpenChange={(open) => {
+              if (!open) setAddingArm(null);
+            }}
+          />
+        ) : null}
+      </Suspense>
     </div>
   );
 }
