@@ -35,8 +35,22 @@ The run asserts on `__Host-sh_at` and `__Host-sh_rt`, so the prefixed names are 
 
 ### Other engines
 
-- `npm run test:e2e:engines` runs WebKit and Firefox on the critical journeys (sign-in, the signed-in shell, offline, installability). It is not part of `npm run gate`, see the status in `docs/OPEN_ITEMS.md`.
-- WebKit on this machine (macOS 14, Playwright 1.65.1): every page fails in setup with `Protocol error (Page.overrideSetting): Unknown setting: PushAPIEnabled`. This is the Playwright WebKit build, not the app. It needs a run on a Linux runner.
+- `npm run test:e2e:engines` runs WebKit and Firefox on the critical journeys. It is not part of `npm run gate`. The Linux CI job `e2e-engines` (`.github/workflows/ci.yml`) runs it in the official Playwright image.
+- **WebKit on macOS cannot run pages here.** Playwright 1.65.1's WebKit build on macOS 14 fails every page in setup with `Protocol error (Page.overrideSetting): Unknown setting: PushAPIEnabled`. Run WebKit in the official image instead:
+
+  ```sh
+  npm run build   # on the host, or let the container build it
+  docker run --rm --ipc=host \
+    --add-host greenfield.localhost:127.0.0.1 --add-host other.localhost:127.0.0.1 \
+    -v "$PWD":/src:ro mcr.microsoft.com/playwright:v1.65.1-noble \
+    bash -lc 'mkdir -p /work && cd /src && tar --exclude=./node_modules --exclude=./.next --exclude=./.git -cf - . | (cd /work && tar -xf -) && cd /work && npm ci && npm run build && npx playwright test --project=webkit'
+  ```
+
+  The copy keeps the host's `node_modules` (macOS binaries) out of the container. `--add-host` lets WebKit resolve the school hosts. The image tag must match the `@playwright/test` version in `package.json`.
+
+- **Firefox (version 159, Playwright 1.65.1):**
+  - _Offline navigation._ Playwright's offline mode does not stop a service worker's own network fetches in Firefox. With `context.setOffline(true)` the worker still reached the running server, so `/profile` returned the real page. With the server stopped, Firefox shows the offline page, as Chromium does (checked with the server killed). The offline journey is skipped in Firefox for this reason.
+  - _Axe crash._ The content process crashes when axe runs on the sign-in form after text has been typed into it. It reproduces with any typing method and with any single field. It does not reproduce on a bare page with one input, with a script-set value (no input event), or with the page's stylesheets disabled. The sign-in error journey that runs axe is skipped in Firefox for this reason. The root cause is not known; a report to the engine is the next step.
 
 ## Real backend (`npm run test:real`)
 

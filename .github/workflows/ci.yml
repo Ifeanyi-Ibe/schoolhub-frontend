@@ -73,6 +73,29 @@ jobs:
           path: playwright-report
           retention-days: 7
 
+  e2e-engines:
+    name: WebKit and Firefox critical journeys (official Playwright image, Linux)
+    # WebKit cannot run pages on macOS (Playwright 1.65.1 build). The official image pins the browsers and fonts.
+    needs: quality
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test:e2e:engines
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-engines
+          path: playwright-report
+          retention-days: 7
+
   lighthouse:
     name: Lighthouse (sign-in and signed-in shell, mobile, throttled)
     needs: build

@@ -17,7 +17,10 @@ test("sign-in page", async ({ page }) => {
   await expectNoViolations(page);
 });
 
-test("sign-in page with a visible error", async ({ page }) => {
+test("sign-in page with a visible error", async ({ page, browserName }) => {
+  // Firefox 159 crashes its content process when axe runs after text is typed into the sign-in form (not on a
+  // bare page, and not with the page styles disabled). Reproduced in docs/TESTING.md, "Other engines".
+  test.skip(browserName === "firefox", "Firefox content-process crash under axe after typing");
   await page.goto("/login");
   await page.getByLabel(/Email or phone/).fill("x@test.invalid");
   await page.getByLabel(/^Password/).fill("wrong-password-9999");

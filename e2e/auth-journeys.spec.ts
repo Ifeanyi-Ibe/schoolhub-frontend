@@ -265,6 +265,13 @@ test.describe("headers, browser support and offline", () => {
 
   test.describe("offline", () => {
     test.use({ allowOfflineNetwork: true });
+    // Firefox: Playwright's offline mode does not reach a service worker's own fetches, so the worker still
+    // gets the page from the running server. Verified separately: with the server stopped, Firefox shows the
+    // offline page (docs/TESTING.md, "Other engines").
+    test.skip(
+      ({ browserName }) => browserName === "firefox",
+      "Playwright offline mode does not stop service-worker fetches in Firefox",
+    );
     test("offline: the shell says so, and a reload shows the offline page", async ({
       page,
       context,
