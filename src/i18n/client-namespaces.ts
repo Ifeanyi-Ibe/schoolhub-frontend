@@ -3,7 +3,7 @@
 // signed-in pages do not load sign-in strings. Anything else stays on the server.
 export const SHARED_NAMESPACES = ["common", "network", "pwa", "retry"] as const;
 export const AUTH_NAMESPACES = ["auth", "retry"] as const;
-export const APP_NAMESPACES = ["shell", "home", "profile", "sessions"] as const;
+export const APP_NAMESPACES = ["shell", "home", "profile", "sessions", "staff"] as const;
 
 export function pickNamespaces<T extends Record<string, unknown>>(
   messages: T,

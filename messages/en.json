@@ -163,7 +163,9 @@
     "nav": {
       "home": "Home",
       "profile": "Profile",
-      "sessions": "Devices and sessions"
+      "sessions": "Devices and sessions",
+      "people": "People",
+      "roles": "Roles"
     },
     "billingTitle": "Read-only: this school's account is suspended",
     "billingBody": "You can view information, but changes are turned off. Ask your school administrator to restore the account.",
@@ -248,6 +250,118 @@
       "void": "Void",
       "draft": "Draft",
       "other": "Unknown status"
+    }
+  },
+  "staff": {
+    "people": {
+      "title": "People",
+      "intro": "Staff accounts for this school. Invite people, and see who can sign in.",
+      "search": "Search by name",
+      "searchSubmit": "Search",
+      "invite": "Invite a person",
+      "caption": "Staff accounts",
+      "columns": {
+        "name": "Name",
+        "contact": "Email or phone",
+        "roles": "Roles",
+        "mfa": "Two-step sign-in",
+        "status": "Status"
+      },
+      "mfaOn": "On",
+      "mfaOff": "Off",
+      "emptyTitle": "No people yet",
+      "emptyBody": "Invite the first member of staff to get started.",
+      "noMatch": "No people match this search.",
+      "loading": "Loading people",
+      "errorTitle": "We could not load people",
+      "errorBody": "Check your connection and try again.",
+      "retry": "Try again",
+      "noAccessTitle": "You do not have access to people",
+      "noAccessBody": "Ask your school administrator for permission to manage people.",
+      "previous": "Previous page",
+      "next": "Next page",
+      "pageStatus": "Page {page} of {total}",
+      "readOnlyHint": "This school's account is suspended, so people cannot be invited."
+    },
+    "invite": {
+      "title": "Invite a person",
+      "description": "They receive a link to set a password. The link expires after 72 hours.",
+      "name": "Full name",
+      "nameRequired": "Enter the person's full name",
+      "email": "Email (optional)",
+      "phone": "Phone (optional)",
+      "contactRequired": "Enter an email address or a phone number",
+      "roles": "Roles",
+      "rolesHint": "You can give only roles whose permissions you hold yourself.",
+      "roleNotGrantable": "Not available: this role has permissions you do not hold",
+      "noRoles": "No roles to choose from.",
+      "submit": "Send invitation",
+      "cancel": "Cancel",
+      "sent": "Invitation sent to {name}",
+      "emailTaken": "Another account already uses this email address.",
+      "phoneTaken": "Another account already uses this phone number.",
+      "contactInvalid": "Check the email address or phone number.",
+      "forbidden": "You do not have permission to invite people.",
+      "failed": "The invitation could not be sent. Try again.",
+      "sending": "Sending invitation"
+    },
+    "roles": {
+      "title": "Roles",
+      "intro": "A role is a named set of permissions. A person has the permissions of every role they hold.",
+      "caption": "Roles in this school",
+      "columns": {
+        "name": "Role",
+        "description": "Description",
+        "members": "People",
+        "permissions": "Permissions",
+        "type": "Type"
+      },
+      "builtIn": "Built in",
+      "custom": "Custom",
+      "newRole": "New role",
+      "lockedHint": "Custom roles are not in this school's plan. Built-in roles can still be viewed.",
+      "emptyTitle": "No roles yet",
+      "emptyBody": "Roles appear here once the school's permissions are set up.",
+      "open": "Open",
+      "noAccessTitle": "You do not have access to roles",
+      "noAccessBody": "Ask your school administrator for permission to manage roles.",
+      "loading": "Loading roles",
+      "errorTitle": "We could not load roles",
+      "errorBody": "Check your connection and try again.",
+      "retry": "Try again"
+    },
+    "role": {
+      "title": "Role: {name}",
+      "back": "Back to roles",
+      "permissionsTitle": "Permissions",
+      "permissionsHint": "You can add or remove only the permissions you hold yourself.",
+      "notHeld": "You do not hold this permission",
+      "lockedHint": "Built-in roles can be changed only when custom roles are in this school's plan.",
+      "save": "Save permissions",
+      "saved": "Permissions saved",
+      "failed": "The permissions could not be saved. Try again.",
+      "forbidden": "You do not have permission to change roles.",
+      "notFound": "This role was not found. It may have been removed.",
+      "loading": "Loading role",
+      "errorTitle": "We could not load this role",
+      "errorBody": "Check your connection and try again.",
+      "builtIn": "Built in",
+      "custom": "Custom"
+    },
+    "createRole": {
+      "title": "New role",
+      "description": "Choose the permissions this role gives. You can give only permissions you hold yourself.",
+      "name": "Role name",
+      "nameRequired": "Enter a name for the role",
+      "descriptionLabel": "Description",
+      "submit": "Create role",
+      "cancel": "Cancel",
+      "created": "Role created",
+      "failed": "The role could not be created. Try again.",
+      "forbidden": "You do not have permission to create roles."
+    },
+    "permissionArea": {
+      "label": "Permission"
     }
   }
 }

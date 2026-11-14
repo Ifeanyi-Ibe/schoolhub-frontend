@@ -2,6 +2,7 @@
 // Identifiers end in .invalid and passwords are fixed test values; none is a real account.
 // It records the headers it receives so tests can assert what the BFF forwards.
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
+import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { contractProblems, violations } from "./contract.ts";
@@ -81,6 +82,91 @@ const branding = {
   supportEmail: null,
   supportPhone: null,
 };
+
+// Staff fixtures for the people and roles screens. Names are invented and identifiers are fixed.
+const PERMISSION_CATALOG = [
+  {
+    area: "Students",
+    permissions: [{ name: "students.read", isPlatform: false }],
+  },
+  {
+    area: "Users",
+    permissions: [
+      { name: "users.invite", isPlatform: false },
+      { name: "users.manage", isPlatform: false },
+    ],
+  },
+  {
+    area: "Roles",
+    permissions: [
+      { name: "roles.assign", isPlatform: false },
+      { name: "roles.manage", isPlatform: false },
+    ],
+  },
+];
+
+const ROLES = [
+  {
+    id: "0190a6c2-0000-7000-8000-000000000101",
+    name: "SchoolAdmin",
+    description: "Every permission in this school",
+    isSystem: true,
+    permissions: ["students.read", "users.invite", "users.manage", "roles.assign", "roles.manage"],
+    memberCount: 1,
+  },
+  {
+    id: "0190a6c2-0000-7000-8000-000000000102",
+    name: "Registrar",
+    description: "Students and admissions",
+    isSystem: true,
+    permissions: ["students.read"],
+    memberCount: 2,
+  },
+  {
+    id: "0190a6c2-0000-7000-8000-000000000103",
+    name: "Finance clerk",
+    description: "Reads student records for billing",
+    isSystem: false,
+    permissions: ["students.read"],
+    memberCount: 0,
+  },
+];
+
+const USERS = [
+  {
+    id: "0190a6c2-0000-7000-8000-000000000201",
+    displayName: "Ada Okafor",
+    email: "ada@test.invalid",
+    phone: null,
+    type: "Staff",
+    status: "Active",
+    mfaEnabled: true,
+    roles: ["SchoolAdmin"],
+    lastLoginAt: null,
+  },
+  {
+    id: "0190a6c2-0000-7000-8000-000000000202",
+    displayName: "Tunde Bello",
+    email: null,
+    phone: "+2348000000002",
+    type: "Staff",
+    status: "Invited",
+    mfaEnabled: false,
+    roles: ["Registrar"],
+    lastLoginAt: null,
+  },
+  {
+    id: "0190a6c2-0000-7000-8000-000000000203",
+    displayName: "Ngozi Eze",
+    email: "ngozi@test.invalid",
+    phone: null,
+    type: "Staff",
+    status: "Disabled",
+    mfaEnabled: false,
+    roles: [],
+    lastLoginAt: null,
+  },
+];
 
 function tokens(label: string, n = 1) {
   return {
@@ -295,7 +381,17 @@ export function startFakeApi(): Promise<Server> {
         tenantStatus: label === "suspended" ? "Suspended" : "Active",
         tenantPastDue: false,
         roles: ["Test role"],
-        permissions: ["me.profile"],
+        permissions:
+          label === "admin"
+            ? [
+                "me.profile",
+                "users.invite",
+                "users.manage",
+                "roles.assign",
+                "roles.manage",
+                "students.read",
+              ]
+            : ["me.profile"],
       });
     }
 
@@ -303,7 +399,7 @@ export function startFakeApi(): Promise<Server> {
       return send(res, 200, {
         planCode: "standard",
         planName: "Standard",
-        entitlements: [],
+        entitlements: label === "admin" ? ["customRoles"] : [],
         limits: { maxStudents: 100, maxStaff: 10, smsCreditsMonthly: 0 },
         usage: { students: 0, staff: 1, smsCreditsUsed: 0 },
         status: label === "suspended" ? "Suspended" : "Active",
@@ -347,6 +443,59 @@ export function startFakeApi(): Promise<Server> {
 
     if (path === "/api/v1/me/contact/request") return res.writeHead(204).end();
     if (path === "/api/v1/me/contact/confirm") return res.writeHead(204).end();
+
+    if (path === "/api/v1/permissions") {
+      return send(res, 200, PERMISSION_CATALOG);
+    }
+
+    if (path === "/api/v1/roles" && req.method === "GET") return send(res, 200, ROLES);
+    if (path === "/api/v1/roles" && req.method === "POST") {
+      const role = {
+        id: randomUUID(),
+        name: body.name ?? "",
+        description: body.description ?? "",
+        isSystem: false,
+        permissions: (body as unknown as { permissions?: string[] }).permissions ?? [],
+        memberCount: 0,
+      };
+      ROLES.push(role);
+      return send(res, 201, role);
+    }
+    const rolePerms = /^\/api\/v1\/roles\/([^/]+)\/permissions$/.exec(path);
+    if (rolePerms && req.method === "PUT") {
+      const role = ROLES.find((r) => r.id === rolePerms[1]);
+      if (!role) return send(res, 404, problem("roles.not_found", "Role not found"));
+      return send(res, 200, { ...role, permissions: body.permissions ?? [] });
+    }
+
+    if (path === "/api/v1/users" && req.method === "GET") {
+      const q = (url.searchParams.get("q") ?? "").toLowerCase();
+      const status = url.searchParams.get("status");
+      const page = Number(url.searchParams.get("page") ?? "1");
+      const pageSize = Number(url.searchParams.get("pageSize") ?? "20");
+      const matched = USERS.filter(
+        (u) =>
+          (q === "" || u.displayName.toLowerCase().includes(q)) &&
+          (status === null || status === "" || u.status === status),
+      );
+      const items = matched.slice((page - 1) * pageSize, page * pageSize);
+      return send(res, 200, {
+        items,
+        page,
+        pageSize,
+        totalCount: matched.length,
+        totalPages: Math.max(1, Math.ceil(matched.length / pageSize)),
+      });
+    }
+
+    if (path === "/api/v1/users/invite" && req.method === "POST") {
+      return send(res, 201, {
+        id: "0190a6c2-0000-7000-8000-00000000000b",
+        displayName: body.displayName ?? "",
+        status: "Invited",
+        expiresAt: new Date(Date.now() + 72 * 3600_000).toISOString(),
+      });
+    }
 
     if (path === "/api/v1/students" && req.method === "POST") {
       return send(res, 201, { created: true, echo: body });
