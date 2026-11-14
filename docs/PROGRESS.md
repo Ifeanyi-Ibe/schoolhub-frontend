@@ -92,7 +92,7 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 
 ## F1: auth and app shell (checkpoint evidence, 2026-11-14)
 
-- Gate (last full run): typecheck, lint, format, API drift, audit (0), 233 unit tests, production build, budgets (/login 171,542 B; /home 162,504 B; limit 174,080 B), 88 e2e checks against the production build and the labelled test double.
+- Gate (last full run): typecheck, lint, format, API drift, audit (0), 236 unit tests, production build, budgets (/login 171,542 B; /home 162,504 B; limit 174,080 B), 88 e2e checks against the production build and the labelled test double.
 - Lighthouse, mobile throttled: sign-in performance 100, accessibility 100, best practices 100, SEO 100, LCP 766 ms. Signed-in shell performance 98, accessibility 100, best practices 100, SEO 100, LCP 1,855 ms (the school name is rendered on the server).
 - Real backend (development seed): see OPEN_ITEMS.md, "Verified end to end". Found and fixed two real bugs: the BFF's logout and refresh calls sent no JSON content type, so the API answered 415 and the session was not revoked. A regression test and a test double that enforces JSON now cover it.
 - Not verified end to end: see OPEN_ITEMS.md.
