@@ -4,27 +4,28 @@ Findings from reading `docs/openapi/v1.json` against `docs/backend/FEATURE_SPEC.
 
 **Backend fix status (owner, 2026-11-14):** the backend is fixing these in parallel. Tier 1: branding (B-01, B-02), ProblemDetails schema (B-04), refresh 409 docs (B-07), trusted BFF tenant passing and client IP forwarding (B-08), typed responses (B-03, B-11), If-Match (B-05), camelCase params (B-10), machine-readable permissions, and spec export. The frontend regenerates from the new spec when it lands. Each entry's status below reflects the STEP 0 read; it is updated as fixes land. Until then, the frontend uses only the design-arounds listed here and the temporary contract patches in `src/lib/api/contract-patches/`.
 
-### Status after Tier 1 (2026-11-14)
+### Status after the dev seed and the F1 probes (2026-11-14)
 
-The interim contract is now the backend's live spec (backend repo `School-Management` HEAD `66a8158`, "frontend contract tier 1"). Snapshot `docs/openapi/v1.json`, sha256 `1fdc3e…`, 269 operations. The Development-only `X-Tenant` parameter is stripped from the generated types only. The backend's committed Staging export will replace this file when Batch A lands. The drift check will show that diff.
+Interim contract: the backend's live spec (repo `School-Management`, HEAD `56f7c43` includes the dev seed). Checked against `docs/openapi/v1.json` (sha256 `1fdc3e…`, 269 operations).
 
-| Gap                                             | Status     | Evidence                                                                                                                                                                                        |
-| ----------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| B-01 public branding                            | **Landed** | `GET /api/v1/public/tenants/{slug}/branding` (typed `SchoolBrandingView`), `/logo`, ETag. Anonymous. ADR 0028.                                                                                  |
-| B-02 branding for signed-in users               | **Landed** | `/me/tenant` carries the same `branding` object (backend change).                                                                                                                               |
-| B-03 typed settings responses                   | Open       | `settings/*` still `type: object` in the interim contract.                                                                                                                                      |
-| B-04 ProblemDetails `code`, `traceId`, `errors` | **Landed** | Required `code` and `traceId`; `errors` documented. ADR 0027.                                                                                                                                   |
-| B-05 `If-Match`                                 | Open       | 0 operations declare it.                                                                                                                                                                        |
-| B-06 idempotency coverage                       | Open       | 23 declared; the five spec-only operations are still undeclared.                                                                                                                                |
-| B-07 refresh 409 documented                     | **Landed** | `auth.refresh_in_flight`: wait `Retry-After`, nothing revoked. ADR 0008 (backend).                                                                                                              |
-| B-08 trusted BFF headers                        | **Landed** | `X-Bff-Key` (≥32 chars, two keys for rotation), `X-Tenant` in every environment, first `X-Forwarded-For` entry, `X-Client-User-Agent`. Invalid key → `401 bff.key_invalid`. ADR 0026 (backend). |
-| B-09 download URLs                              | Open       | `download-url` returns `{url, method}` only. The BFF streams downloads, so no signed URL is needed.                                                                                             |
-| B-10 camelCase query params                     | Open       | Audit params still PascalCase.                                                                                                                                                                  |
-| B-11 typed 2xx responses                        | Open       | 48 operations still untyped.                                                                                                                                                                    |
-| machine-readable permissions (`x-*`)            | Open       | No `x-*` extensions. The manifest reads prose.                                                                                                                                                  |
-| B-13 to B-16 (unbuilt features)                 | Unchanged  | Not in the contract.                                                                                                                                                                            |
-
-Documented responses now also cover the login 429 (`auth.account_locked` or rate limit).
+| Gap                                             | Status                  | Evidence                                                                                                                             |
+| ----------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| B-01 public branding                            | **Landed**              | Typed `SchoolBrandingView`, `/logo`. Verified: `demo` branding 200; the sign-in page shows "Demo Academy" from it.                   |
+| B-02 branding for signed-in users               | **Landed**              | `TenantSummaryView.branding` in the interim contract. The shell reads it.                                                            |
+| B-03 typed settings responses                   | Open                    | Settings responses are still `{"type":"object"}` (checked).                                                                          |
+| B-04 ProblemDetails `code`, `traceId`, `errors` | **Landed**              | Verified at runtime: `code` and `traceId` on every error seen (login, refresh, tenancy, key).                                        |
+| B-05 `If-Match`                                 | Open                    | 0 operations declare it (checked).                                                                                                   |
+| B-06 idempotency coverage                       | Open                    | 23 declared (checked).                                                                                                               |
+| B-07 refresh 409 documented and real            | **Landed and verified** | Two concurrent refreshes with one token: 200, then 409 `auth.refresh_in_flight` with `Retry-After: 1`. The BFF follows the contract. |
+| B-08 trusted BFF headers                        | **Landed and verified** | With no key configured, a wrong key gets `401 bff.key_invalid`. With the configured key, trusted calls are accepted.                 |
+| B-09 download URLs                              | Open                    | `download-url` returns `{url, method}` only. The BFF streams downloads.                                                              |
+| B-10 camelCase query params                     | Open                    | Audit params still PascalCase (checked).                                                                                             |
+| B-11 typed 2xx responses                        | Open                    | Untyped 2xx operations remain (checked in the interim contract).                                                                     |
+| machine-readable permissions (`x-*`)            | Open                    | 0 `x-*` extensions (checked).                                                                                                        |
+| Login 429                                       | **Verified**            | Real OTP request: `429` with `Retry-After: 600`; the page shows the countdown.                                                       |
+| Uniform sign-in errors                          | **Verified**            | Wrong password and unknown account: identical `auth.invalid_credentials` bodies (differ only in trace ID).                           |
+| Logout revokes the session                      | **Verified**            | After `POST /auth/logout`, the refresh token is refused with `401 auth.token_invalid`.                                               |
+| B-13 to B-16 (unbuilt features)                 | Unchanged               | Not in the contract.                                                                                                                 |
 
 Status key: **Blocking** = the feature cannot be built as specified. **Design-around** = we build with a workaround and need confirmation. **Info** = naming or shape drift; we follow the contract.
 
