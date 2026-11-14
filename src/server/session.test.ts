@@ -3,7 +3,9 @@ import {
   cookieNames,
   accessTokenNeedsRefresh,
   clearSessionCookieHeaders,
+  enrollmentChallengeCookieHeader,
   jwtExpiryMs,
+  mfaChallengeCookieHeader,
   parseCookieHeader,
   serializeCookie,
   sessionCookieHeaders,
@@ -69,5 +71,29 @@ describe("access token timing", () => {
     expect(accessTokenNeedsRefresh("garbage", now)).toBe(true);
     expect(accessTokenNeedsRefresh(jwtWithExp(now / 1000 + 600), now)).toBe(false);
     expect(accessTokenNeedsRefresh(jwtWithExp(now / 1000 + 30), now)).toBe(true);
+  });
+});
+
+describe("challenge cookies (sh_mfa, sh_enr)", () => {
+  it("live five minutes, httpOnly, SameSite=Lax, and carry the __Host- prefix over https", () => {
+    const mfa = mfaChallengeCookieHeader("mfa-token-value-1234", { secure: true });
+    const enr = enrollmentChallengeCookieHeader("enr-token-value-1234", { secure: true });
+    for (const c of [mfa, enr]) {
+      expect(c).toContain("Max-Age=300");
+      expect(c).toContain("HttpOnly");
+      expect(c).toContain("SameSite=Lax");
+      expect(c).toContain("Secure");
+      expect(c).toContain("Path=/");
+      expect(c).not.toContain("Domain=");
+    }
+    expect(mfa.startsWith("__Host-sh_mfa=")).toBe(true);
+    expect(enr.startsWith("__Host-sh_enr=")).toBe(true);
+  });
+
+  it("uses the plain names over http, with the same lifetime", () => {
+    expect(mfaChallengeCookieHeader("t", { secure: false })).toMatch(/^sh_mfa=t;.*Max-Age=300/);
+    expect(enrollmentChallengeCookieHeader("t", { secure: false })).toMatch(
+      /^sh_enr=t;.*Max-Age=300/,
+    );
   });
 });

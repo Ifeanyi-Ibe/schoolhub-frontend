@@ -385,4 +385,40 @@ describe("logout when the API cannot revoke", () => {
       true,
     );
   });
+
+  it("counts an unreachable API as a failed revoke too, with no status to report", async () => {
+    const logs: Array<[string, Record<string, unknown>]> = [];
+    const api = fakeApi(() => {
+      throw new TypeError("fetch failed");
+    });
+    const d = {
+      ...deps(api),
+      logger: (level: string, fields: Record<string, unknown>) => void logs.push([level, fields]),
+    };
+    const res = await handleLogout(
+      post("/api/bff/auth/logout", {}, { headers: { Cookie: "__Host-sh_rt=r-live" } }),
+      d,
+    );
+    expect(res.status).toBe(204);
+    const event = logs.find(([, f]) => f.event === "bff.logout_not_revoked");
+    expect(event?.[1]).toEqual({ event: "bff.logout_not_revoked", status: null });
+  });
+
+  it("logs the event with a status only, never the refresh token", async () => {
+    const logs: Array<[string, Record<string, unknown>]> = [];
+    const api = fakeApi(() => json(500, { code: "server.error" }));
+    const d = {
+      ...deps(api),
+      logger: (level: string, fields: Record<string, unknown>) => void logs.push([level, fields]),
+    };
+    await handleLogout(
+      post("/api/bff/auth/logout", {}, { headers: { Cookie: "__Host-sh_rt=r-live-secret-value" } }),
+      d,
+    );
+    expect(JSON.stringify(logs)).not.toContain("r-live-secret-value");
+    expect(logs.find(([, f]) => f.event === "bff.logout_not_revoked")?.[1]).toEqual({
+      event: "bff.logout_not_revoked",
+      status: 500,
+    });
+  });
 });
