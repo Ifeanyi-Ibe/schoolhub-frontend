@@ -7,6 +7,8 @@ export const PERMISSION = {
   manageUsers: "users.manage",
   assignRoles: "roles.assign",
   manageRoles: "roles.manage",
+  academicsRead: "academics.read",
+  academicsManage: "academics.manage",
 } as const;
 
 export const PEOPLE_PAGE_SIZE = 20;

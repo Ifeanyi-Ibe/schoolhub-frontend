@@ -188,3 +188,10 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - Operations with no 2xx schema (B-11).
 - Operations with `Idempotency-Key` do not match the spec's `[I]` list (B-06).
 - Only `localhost:5152` appears under `servers`. The production base URL is an env setting (OI-02).
+
+### B-22 — Class level section is a free string in the contract, but an enum on the server
+
+- **Contract:** `LevelRequest.section` and `LevelView.section` are `{"type":"string"}`. The contract lists no allowed values.
+- **Server:** the backend parses `section` as its `ClassSection` enum (`SchoolHub.Modules.Academics/Domain/ClassStructure.cs`): `Creche`, `Nursery`, `Primary`, `JuniorSecondary`, `SeniorSecondary`. Any other text is refused with `academics.invalid` (seen on the real backend with a free-text section).
+- **Design-around:** the class-level screen offers exactly those five values, from `CLASS_SECTIONS` in `src/features/academics/rules.ts`, with a comment pointing here. The real-backend journey creates a level with one of them.
+- **Status:** Open. Ask the backend to document the enum in the contract (an `enum` on both schemas). Remove the constant then, and generate the options from the contract.

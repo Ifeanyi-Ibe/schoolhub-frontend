@@ -165,7 +165,8 @@
       "profile": "Profile",
       "sessions": "Devices and sessions",
       "people": "People",
-      "roles": "Roles"
+      "roles": "Roles",
+      "academics": "Academics"
     },
     "billingTitle": "Read-only: this school's account is suspended",
     "billingBody": "You can view information, but changes are turned off. Ask your school administrator to restore the account.",
@@ -365,6 +366,86 @@
     },
     "permissionArea": {
       "label": "Permission"
+    }
+  },
+  "academics": {
+    "levels": {
+      "title": "Class levels",
+      "intro": "Levels (for example JSS 1) and the arms (classes) inside each level.",
+      "add": "Add a level",
+      "edit": "Edit",
+      "arms": "Arms",
+      "open": "Show arms",
+      "caption": "Class levels",
+      "columns": {
+        "code": "Code",
+        "name": "Name",
+        "section": "Section",
+        "order": "Order"
+      },
+      "emptyTitle": "No class levels yet",
+      "emptyBody": "Add the first level to start the school's structure.",
+      "loading": "Loading class levels",
+      "errorTitle": "We could not load class levels",
+      "errorBody": "Check your connection and try again.",
+      "noAccessTitle": "You do not have access to class levels",
+      "noAccessBody": "Ask your school administrator for permission to manage academics.",
+      "readOnlyHint": "This school's account is suspended, so changes are turned off.",
+      "armsTitle": "Arms in {level}",
+      "addArm": "Add an arm",
+      "noArms": "No arms in this level yet.",
+      "armColumns": {
+        "name": "Arm",
+        "capacity": "Capacity",
+        "formTeacher": "Form teacher"
+      },
+      "notAssigned": "Not assigned yet",
+      "armsCaption": "Arms in this level",
+      "chooseLevel": "Choose a level to see its arms."
+    },
+    "levelDialog": {
+      "addTitle": "Add a class level",
+      "editTitle": "Edit class level",
+      "description": "The code and name appear on reports. The order sets the sequence of levels.",
+      "code": "Code",
+      "name": "Name",
+      "order": "Order",
+      "codeRequired": "Enter a code",
+      "nameRequired": "Enter a name",
+      "sectionRequired": "Choose a section",
+      "orderInvalid": "Enter the order as a whole number, zero or more",
+      "submit": "Save level",
+      "cancel": "Cancel",
+      "saving": "Saving level",
+      "saved": "Class level saved",
+      "forbidden": "You do not have permission to change class levels.",
+      "refused": "The school system refused this change (code {code}). Nothing was saved.",
+      "failed": "The class level could not be saved. Try again.",
+      "sectionChoose": "Select a section",
+      "sections": {
+        "Creche": "Creche",
+        "Nursery": "Nursery",
+        "Primary": "Primary",
+        "JuniorSecondary": "Junior secondary",
+        "SeniorSecondary": "Senior secondary"
+      },
+      "sectionLabel": "Section",
+      "section": "Section"
+    },
+    "armDialog": {
+      "title": "Add an arm to {level}",
+      "description": "An arm is one class inside the level, such as A or B. A form teacher can be assigned later.",
+      "name": "Arm",
+      "capacity": "Capacity",
+      "nameRequired": "Enter a name for the arm",
+      "capacityInvalid": "Enter the capacity as a whole number, zero or more",
+      "submit": "Add arm",
+      "cancel": "Cancel",
+      "saving": "Adding arm",
+      "added": "Arm added",
+      "forbidden": "You do not have permission to change class levels.",
+      "refused": "The school system refused this arm (code {code}). Nothing was saved.",
+      "failed": "The arm could not be added. Try again."
     }
   }
 }

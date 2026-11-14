@@ -23,6 +23,13 @@ describe("visibleNav", () => {
 
   it("only lists pages that exist in F1", () => {
     for (const item of NAV_ITEMS)
-      expect(["/home", "/profile", "/sessions", "/people", "/roles"]).toContain(item.href);
+      expect([
+        "/home",
+        "/profile",
+        "/sessions",
+        "/people",
+        "/roles",
+        "/academics/levels",
+      ]).toContain(item.href);
   });
 });

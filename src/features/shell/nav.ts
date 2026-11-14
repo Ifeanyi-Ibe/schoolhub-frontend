@@ -26,6 +26,12 @@ export const NAV_ITEMS: readonly NavItem[] = [
     labelKey: "shell.nav.roles",
     anyOf: ["roles.assign", "roles.manage"],
   },
+  {
+    id: "academics",
+    href: "/academics/levels",
+    labelKey: "shell.nav.academics",
+    anyOf: ["academics.read", "academics.manage"],
+  },
 ];
 
 /** The items this user may see, given their effective permissions from GET /me. */

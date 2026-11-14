@@ -83,6 +83,32 @@ const branding = {
   supportPhone: null,
 };
 
+// Academic fixtures: class levels and their arms.
+const LEVELS: Array<{ id: string; code: string; name: string; order: number; section: string }> = [
+  {
+    id: "0190a6c2-0000-7000-8000-000000000301",
+    code: "JSS1",
+    name: "Junior Secondary 1",
+    order: 1,
+    section: "Junior",
+  },
+];
+const ARMS: Array<{
+  id: string;
+  levelId: string;
+  name: string;
+  capacity: number;
+  formTeacherStaffId: null;
+}> = [
+  {
+    id: "0190a6c2-0000-7000-8000-000000000401",
+    levelId: "0190a6c2-0000-7000-8000-000000000301",
+    name: "A",
+    capacity: 30,
+    formTeacherStaffId: null,
+  },
+];
+
 // Staff fixtures for the people and roles screens. Names are invented and identifiers are fixed.
 const PERMISSION_CATALOG = [
   {
@@ -390,6 +416,8 @@ export function startFakeApi(): Promise<Server> {
                 "roles.assign",
                 "roles.manage",
                 "students.read",
+                "academics.read",
+                "academics.manage",
               ]
             : ["me.profile"],
       });
@@ -466,6 +494,49 @@ export function startFakeApi(): Promise<Server> {
       const role = ROLES.find((r) => r.id === rolePerms[1]);
       if (!role) return send(res, 404, problem("roles.not_found", "Role not found"));
       return send(res, 200, { ...role, permissions: body.permissions ?? [] });
+    }
+
+    if (path === "/api/v1/class-levels" && req.method === "GET") return send(res, 200, LEVELS);
+    if (path === "/api/v1/class-levels" && req.method === "POST") {
+      const level = {
+        id: randomUUID(),
+        code: body.code ?? "",
+        name: body.name ?? "",
+        order: Number(body.order ?? 0),
+        section: body.section ?? "",
+      };
+      LEVELS.push(level);
+      return send(res, 201, level);
+    }
+    const levelById = /^\/api\/v1\/class-levels\/([^/]+)$/.exec(path);
+    if (levelById && req.method === "PUT") {
+      const level = LEVELS.find((l) => l.id === levelById[1]);
+      if (!level) return send(res, 404, problem("levels.not_found", "Level not found"));
+      Object.assign(level, {
+        code: body.code ?? level.code,
+        name: body.name ?? level.name,
+        order: Number(body.order ?? level.order),
+        section: body.section ?? level.section,
+      });
+      return send(res, 200, level);
+    }
+    const levelArms = /^\/api\/v1\/class-levels\/([^/]+)\/arms$/.exec(path);
+    if (levelArms && req.method === "GET")
+      return send(
+        res,
+        200,
+        ARMS.filter((a) => a.levelId === levelArms[1]),
+      );
+    if (levelArms && req.method === "POST") {
+      const arm = {
+        id: randomUUID(),
+        levelId: levelArms[1] ?? "",
+        name: body.name ?? "",
+        capacity: Number(body.capacity ?? 0),
+        formTeacherStaffId: null,
+      };
+      ARMS.push(arm);
+      return send(res, 201, arm);
     }
 
     if (path === "/api/v1/users" && req.method === "GET") {
