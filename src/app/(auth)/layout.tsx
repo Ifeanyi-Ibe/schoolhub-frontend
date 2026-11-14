@@ -1,14 +1,12 @@
 // Sign-in layout: the school's own branding, read on the server from the host. The school comes
 // from the Host header only. Colours pass the contrast guard before they are applied.
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { createBffDeps } from "@/server/deps";
 import { getEnv } from "@/server/env";
 import { loadBranding, type SchoolBranding } from "@/server/branding";
 import { resolveTenant } from "@/server/tenant";
-import { guardBrandColor } from "@/lib/theme/contrast";
 
 export default async function AuthLayout({ children }: { children: ReactNode }) {
   const env = getEnv();
@@ -44,18 +42,24 @@ function Branded({
   branding: SchoolBranding;
   children: ReactNode;
 }) {
-  const brand = guardBrandColor(branding.primaryColor, { textOn: "white" });
-  const style = { "--brand": brand.accent, "--on-brand": brand.onAccent } as CSSProperties;
   return (
-    <div style={style} className="min-h-dvh bg-background">
+    <div className="tenant-brand min-h-dvh bg-background">
+      {/* Same-origin stylesheet: the school's colours, validated by the route. See tenant-brand.css/route.ts. */}
+      {/* A per-tenant stylesheet cannot be imported statically, so this is the one manual link. */}
+      {/* eslint-disable-next-line @next/next/no-css-tags */}
+      <link rel="stylesheet" href="/tenant-brand.css" precedence="default" />
       <header className="mx-auto flex max-w-md items-center gap-3 px-4 pt-8">
         {branding.logoUrl ? (
-          <Image
+          // A plain <img>: next/image adds an inline style attribute, which the CSP does not allow.
+          // The logo is a tenant asset served by the BFF, with fixed dimensions.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={`/api/bff/api/v1/public/tenants/${slug}/logo`}
             alt={`${branding.name} logo`}
             width={48}
             height={48}
-            unoptimized
+            loading="eager"
+            decoding="async"
             className="size-12 rounded-control object-contain"
           />
         ) : null}

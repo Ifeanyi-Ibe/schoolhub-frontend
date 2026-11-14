@@ -44,3 +44,12 @@ describe("proxy matcher", () => {
     expect(matches("/_next/static/chunks/x.js")).toBe(false);
   });
 });
+
+describe("style policy", () => {
+  it("allows styles only from the stylesheet with the nonce or from our own files, never as inline attributes", () => {
+    const csp = buildCsp("nonce-value", false);
+    expect(csp).toContain("style-src 'self' 'nonce-nonce-value'");
+    expect(csp).not.toContain("style-src-attr");
+    expect(csp).not.toContain("unsafe-inline");
+  });
+});

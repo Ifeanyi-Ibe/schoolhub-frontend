@@ -19,10 +19,16 @@ test.describe("sign-in page", () => {
   test("shows the school's own name and brand colour, read on the server", async ({ page }) => {
     await page.goto("/login");
     await expect(page.getByText("Greenfield Academy", { exact: true })).toBeVisible();
-    const brand = await page.evaluate(() =>
-      document.querySelector<HTMLElement>("[style*='--brand']")?.style.getPropertyValue("--brand"),
-    );
-    expect(brand).toBeTruthy();
+    // The colour comes from the same-origin /tenant-brand.css stylesheet, so the computed value is the check.
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          getComputedStyle(document.querySelector(".tenant-brand") as Element)
+            .getPropertyValue("--brand")
+            .trim(),
+        ),
+      )
+      .toMatch(/^#[0-9a-f]{6}$/);
   });
 
   test("a wrong password and an unknown account read exactly the same", async ({ page }) => {
