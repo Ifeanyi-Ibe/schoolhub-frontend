@@ -1,0 +1,76 @@
+# Testing and gates
+
+Written for: engineers who run or change the test suites. Decisions behind these choices are in `docs/adr/`.
+
+## Gates
+
+| Command             | Runs                                                                       | When                               |
+| ------------------- | -------------------------------------------------------------------------- | ---------------------------------- |
+| `npm run gate:fast` | typecheck, lint, format check, unit and component tests, production build  | before **every** commit            |
+| `npm run gate`      | fast gate, API drift check, production audit, bundle budgets, Chromium e2e | once per phase and before any push |
+
+Check unpushed history with `git rebase --root -x "npm run gate:fast"`. Any commit that fails is reported.
+
+## Unit and component tests (Vitest)
+
+- `src/**/*.test.{ts,tsx}`, `scripts/**/*.test.mjs` and `e2e/**/*.test.ts` (the request validator).
+- Run with `npm test`.
+
+## Browser journeys (Playwright)
+
+- `npm run test:e2e` runs Chromium (desktop and 360px mobile) against the **production build** and the labelled test double (`e2e/fake-api.ts`).
+- Every journey uses `e2e/fixtures.ts`, which fails the test on any console error, uncaught page error or CSP violation. The only tolerated errors are the browser's log of a deliberate BFF 4xx, and network errors in the offline journey.
+- **The test double validates every request** against `docs/openapi/v1.json` (`e2e/contract.ts`): the operation exists, required query and header parameters are present, the content type is declared, the body matches the declared schema, and `Idempotency-Key` or `If-Match` appear only where the operation declares them. A mismatch is recorded and fails the run in the global teardown. Tests must send contract-valid bodies.
+- Known gap: `/api/v1/dev/messages/latest` (the Development message route) is not in the spec, so the double does not validate it.
+
+### HTTPS run (cookies with the `__Host-` prefix)
+
+```sh
+npm run test:e2e:https
+```
+
+`scripts/e2e-https.mjs` creates a one-day self-signed certificate for `localhost`, `greenfield.localhost` and `demo.localhost` in a temporary directory (it needs `openssl`, which ships with macOS). It starts a small TLS proxy on port 4443 in front of the production server on port 3000, sets `APP_ORIGIN` to the `https` origin, and runs the Chromium desktop journeys. Playwright ignores the certificate error, and Chromium is started with `--ignore-certificate-errors` because service-worker fetches ignore `ignoreHTTPSErrors`. Nothing is installed system-wide, so `mkcert` was not used: it would add a certificate authority to the system trust store.
+
+The run asserts on `__Host-sh_at` and `__Host-sh_rt`, so the prefixed names are exercised end to end.
+
+### Other engines
+
+- `npm run test:e2e:engines` runs WebKit and Firefox on the critical journeys (sign-in, the signed-in shell, offline, installability). It is not part of `npm run gate`, see the status in `docs/OPEN_ITEMS.md`.
+- WebKit on this machine (macOS 14, Playwright 1.65.1): every page fails in setup with `Protocol error (Page.overrideSetting): Unknown setting: PushAPIEnabled`. This is the Playwright WebKit build, not the app. It needs a run on a Linux runner.
+
+## Real backend (`npm run test:real`)
+
+These journeys run against the SchoolHub .NET API with its development seed (`docs/backend/DEV_SEED.md`). They are the only tests that exercise the real API, the real rate limits and the real TOTP replay rule.
+
+### Start the backend from the backend repository
+
+```sh
+docker compose up -d                 # postgres, seq, minio, mailpit
+make migrate                         # the schema must exist first
+set -a; . ./.env; set +a             # database connection strings
+ASPNETCORE_ENVIRONMENT=Development \
+E2E__RelaxLimits=true \
+Bff__Keys__0="$(cat /path/to/bff-key.txt)" \
+dotnet run --no-launch-profile --project src/SchoolHub.Api --urls http://localhost:5152
+```
+
+Then seed it once (idempotent; a second run changes nothing):
+
+```sh
+ASPNETCORE_ENVIRONMENT=Development dotnet run --no-launch-profile --project src/SchoolHub.Api -- seed-demo
+```
+
+`E2E__RelaxLimits=true` lifts the sign-in, one-time-code and API rate limits for local runs. It is refused in Staging and Production. It does not lift the account lockout, which is a domain rule.
+
+### Configure the frontend
+
+```sh
+cp .env.e2e.example .env.e2e    # git-ignored; fill in from the seed doc and the BFF key above
+npm run test:real
+```
+
+`.env.e2e` holds the BFF key, the seeded credentials and the TOTP secret. Nothing is hardcoded in the tests, and the committed template holds placeholders only.
+
+### Nightly CI job
+
+`.github/workflows/real-backend.yml` runs the same steps on a schedule. It checks out the backend repository (`BACKEND_REPOSITORY` variable, with the `BACKEND_CHECKOUT_TOKEN` secret if private), starts its compose stack, seeds it, writes `.env.e2e` from repository secrets, and runs `npm run test:real`. It is separate from the pull-request pipeline because it needs Docker and a second repository. This workflow has not run on GitHub yet: it needs the repository variables and secrets set first.
