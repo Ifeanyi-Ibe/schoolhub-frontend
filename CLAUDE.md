@@ -13,7 +13,10 @@ Production frontend (Next.js PWA) for a multi-tenant school management system us
 
 - Plan each phase, then implement it completely (loading, empty, error, offline, validation, permission gating, a11y, tests). Stop at every CHECKPOINT for review.
 - No stubs, no TODOs in work marked done. Never skip or weaken a test to get green.
-- Local gate before every commit, reported with a short result summary: `typecheck`, `lint`, unit/component tests, production build, bundle-size check.
+- Two-tier local gate, reported with a short result summary:
+  - `npm run gate:fast` (typecheck, lint, format check, unit/component tests, production build) runs before **every** commit. Every commit must pass it.
+  - `npm run gate` (fast gate, then API drift check, production audit, bundle budgets, Playwright e2e) runs **once per phase** and **before any push**.
+  - Check unpushed history with `git rebase --root -x "npm run gate:fast"`. Report any commit that fails.
 - Conventional commits, one concern per commit. Commit only when asked. Never commit secrets.
 - Verify package versions and framework APIs against the installed version or current docs. Do not work from memory.
 - Never invent endpoints, fields or hand-written API types. Types come from the generated client. If the UI needs something the API lacks, log it in `docs/BACKEND_GAPS.md` and design around it.
