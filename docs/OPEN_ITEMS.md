@@ -74,8 +74,8 @@ See B-14, B-15 and B-16 in `docs/BACKEND_GAPS.md`.
 - **Password change and contact verification:** would change seeded account state. Verified against the test double only.
 - **Invitation acceptance and password reset with real tokens:** no real tokens are available without sending mail. Verified against the test double only.
 - **Offline shell:** verified with a route-level network failure against the production build; not on a real device.
-- **Chromium only:** no Safari or Firefox runs; the floor is a claim until tested (OI-14).
-- **\__Host- cookie prefix end to end:** the e2e suites run over http, so the prefixed names are covered by unit tests only.
+- **Other engines (superseded by the F1 fixes section below):** WebKit could not run on this machine, and Firefox runs with two open failures. The browser floor is a claim until WebKit runs on Linux CI (OI-14).
+- **\__Host- cookie prefix end to end:** covered by the HTTPS run (`npm run test:e2e:https`, see the F1 fixes section).
 
 ## F1 fixes (2026-11-14)
 
