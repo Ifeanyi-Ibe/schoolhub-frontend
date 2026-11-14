@@ -45,10 +45,11 @@ export async function inviteUser(
   adminToken: string,
   displayName: string,
   email: string,
+  roleIds: string[] | null = null,
 ): Promise<string> {
   const res = await request.post(url("/api/v1/users/invite"), {
     headers: { ...headers(adminToken, e2e.schoolSlug), "Idempotency-Key": randomUUID() },
-    data: { displayName, email, phone: null, roleIds: null },
+    data: { displayName, email, phone: null, roleIds },
     failOnStatusCode: false,
   });
   const body = (await res.json()) as { id?: string; code?: string };

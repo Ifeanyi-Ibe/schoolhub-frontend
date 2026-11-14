@@ -49,8 +49,14 @@ export function CreateRoleDialog({
       onOpenChange(false);
       router.push(`/roles/${role.id}`);
     } catch (err) {
-      const status = err instanceof ApiError ? err.problem.status : 0;
-      setMessage(status === 403 ? t("forbidden") : t("failed"));
+      const problem = err instanceof ApiError ? err.problem : null;
+      setMessage(
+        problem?.status === 403
+          ? t("forbidden")
+          : problem?.code
+            ? t("refused", { code: problem.code })
+            : t("failed"),
+      );
     }
   }
 

@@ -71,6 +71,7 @@ export function InviteDialog({
       const contact = code !== null ? CONTACT_CODES[code] : undefined;
       if (contact) setMessage(t(contact));
       else if (problem?.status === 403) setMessage(t("forbidden"));
+      else if (code !== null) setMessage(t("refused", { code }));
       else setMessage(t("failed"));
     }
   }
@@ -138,7 +139,11 @@ export function InviteDialog({
         <fieldset className="flex flex-col gap-2">
           <legend className="text-sm font-medium">{t("roles")}</legend>
           <p className="text-sm text-muted-foreground">{t("rolesHint")}</p>
-          {roles.data === undefined ? null : roles.data.length === 0 ? (
+          {roles.data === undefined ? (
+            roles.isError ? (
+              <p className="text-sm text-muted-foreground">{t("noRoles")}</p>
+            ) : null
+          ) : roles.data.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t("noRoles")}</p>
           ) : (
             roles.data.map((role) => {

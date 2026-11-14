@@ -303,7 +303,8 @@
       "contactInvalid": "Check the email address or phone number.",
       "forbidden": "You do not have permission to invite people.",
       "failed": "The invitation could not be sent. Try again.",
-      "sending": "Sending invitation"
+      "sending": "Sending invitation",
+      "refused": "The school system refused this invitation (code {code}). Check the details and try again."
     },
     "roles": {
       "title": "Roles",
@@ -346,7 +347,8 @@
       "errorTitle": "We could not load this role",
       "errorBody": "Check your connection and try again.",
       "builtIn": "Built in",
-      "custom": "Custom"
+      "custom": "Custom",
+      "refused": "The school system refused this change (code {code}). Nothing was saved."
     },
     "createRole": {
       "title": "New role",
@@ -358,7 +360,8 @@
       "cancel": "Cancel",
       "created": "Role created",
       "failed": "The role could not be created. Try again.",
-      "forbidden": "You do not have permission to create roles."
+      "forbidden": "You do not have permission to create roles.",
+      "refused": "The school system refused this role (code {code}). Nothing was created."
     },
     "permissionArea": {
       "label": "Permission"

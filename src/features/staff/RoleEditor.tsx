@@ -108,8 +108,14 @@ function RoleForm({
       setMessage({ tone: "success", text: t("saved") });
       toast({ tone: "success", title: t("saved") });
     } catch (err) {
-      const status = err instanceof ApiError ? err.problem.status : 0;
-      setMessage({ tone: "error", text: status === 403 ? t("forbidden") : t("failed") });
+      const problem = err instanceof ApiError ? err.problem : null;
+      const text =
+        problem?.status === 403
+          ? t("forbidden")
+          : problem?.code
+            ? t("refused", { code: problem.code })
+            : t("failed");
+      setMessage({ tone: "error", text });
     } finally {
       setSaving(false);
     }
