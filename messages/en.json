@@ -237,5 +237,17 @@
   },
   "fields": {
     "required": "This field is required"
+  },
+  "fees": {
+    "invoiceState": {
+      "paid": "Paid",
+      "partPaid": "Part-paid",
+      "partPaidOverdue": "Part-paid, overdue",
+      "overdue": "Overdue",
+      "issued": "Issued",
+      "void": "Void",
+      "draft": "Draft",
+      "other": "Unknown status"
+    }
   }
 }
