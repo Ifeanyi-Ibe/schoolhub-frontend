@@ -3,12 +3,14 @@
 Production frontend (Next.js PWA) for a multi-tenant school management system used by private schools in Lagos, Nigeria. The .NET backend is the source of truth. Long specs live in `docs/`; this file holds the rules.
 
 ## Read first
+
 - `docs/openapi/v1.json`: the only source for endpoints, fields and types.
 - `docs/backend/CLAUDE.md`, `docs/backend/FEATURE_SPEC.md`: backend rules and feature status.
 - `docs/API_OVERVIEW.md`: auth, tenancy, error, idempotency and concurrency conventions in one place.
 - `docs/FRONTEND_PLAN.md` (phases), `docs/PROGRESS.md`, `docs/OPEN_ITEMS.md`, `docs/BACKEND_GAPS.md`, `docs/adr/`.
 
 ## Working agreement
+
 - Plan each phase, then implement it completely (loading, empty, error, offline, validation, permission gating, a11y, tests). Stop at every CHECKPOINT for review.
 - No stubs, no TODOs in work marked done. Never skip or weaken a test to get green.
 - Local gate before every commit, reported with a short result summary: `typecheck`, `lint`, unit/component tests, production build, bundle-size check.
@@ -18,9 +20,11 @@ Production frontend (Next.js PWA) for a multi-tenant school management system us
 - Record decisions as short ADRs in `docs/adr/NNNN-title.md`.
 
 ## Stack (pin exact versions at F0 install; deviate only with an ADR)
+
 Next.js (App Router, latest stable) · React · TypeScript strict · Tailwind CSS + shadcn/ui (Radix) · TanStack Query (server state) · TanStack Table · React Hook Form + Zod · openapi-typescript + openapi-fetch (generated from `docs/openapi/v1.json`, drift-checked in CI) · Serwist (service worker) · Dexie (IndexedDB) · next-intl · date-fns + tz · Recharts (lazy-loaded only) · Vitest + Testing Library · MSW · Playwright + axe · Lighthouse CI.
 
 ## Architecture
+
 - **BFF only.** Browsers call `/api/bff/*` route handlers. Those forward to the .NET API. Client code never calls the API directly.
 - **Tokens** live in httpOnly, Secure, SameSite=Lax cookies. Client JS never reads them. Never store tokens or PII in localStorage, sessionStorage or IndexedDB.
 - **Refresh:** refresh before expiry and on 401. Serialize to one in-flight refresh per session. On 409 `auth.refresh_in_flight`, wait briefly and re-read the session. On a genuine auth failure, clear cookies and redirect to login with a same-origin return path (validated).
@@ -34,6 +38,7 @@ Next.js (App Router, latest stable) · React · TypeScript strict · Tailwind CS
 - **Authorization in UI:** navigation and actions come from effective permissions in `GET /me`. Never check role names.
 
 ## API conventions (see `docs/API_OVERVIEW.md`)
+
 - **Errors:** RFC 9457 ProblemDetails with a stable `code`. Map `code` to an i18n message, show field errors, and offer "copy error details" with the trace id.
 - **Idempotency-Key:** one UUID per user action, reused on every retry. Send it only on operations the contract marks as idempotent.
 - **Concurrency:** send `If-Match` with the `rowVersion` from the last read. On 409 `concurrency.conflict`, show a "changed by someone else" dialog with reload.
@@ -43,12 +48,14 @@ Next.js (App Router, latest stable) · React · TypeScript strict · Tailwind CS
 - **Downloads** (PDF, XLSX, CSV) are fetched on demand through the BFF. No PII in URLs.
 
 ## Security and privacy
+
 - No PII in URLs, logs, analytics or error messages. Never log tokens, OTPs, passwords, or full phone and email values.
 - Auth errors are uniform. Never reveal whether an account exists.
 - Shared phones: wipe every offline store and cache on logout and on session expiry. Warn before logout when unsynced changes exist.
 - Secrets come from env only. `.env.example` lists names, never values.
 
 ## UX and accessibility
+
 - Mobile-first, designed at 360px, then scaled up. Parents and teachers get bottom navigation on mobile. Staff get a collapsible sidebar and Cmd/Ctrl-K on desktop.
 - WCAG 2.2 AA. 44px touch targets. Visible focus. Labelled inputs. Errors and toasts are announced. Dialogs manage focus. Respect `prefers-reduced-motion`.
 - Status is shown as text and colour, never colour alone.
@@ -56,9 +63,11 @@ Next.js (App Router, latest stable) · React · TypeScript strict · Tailwind CS
 - Every screen has loading, empty, error and offline states.
 
 ## Performance budgets (enforced in CI)
+
 - Parent-portal routes: initial JS ≤ 170 KB gzipped.
 - Lighthouse mobile, throttled 4G, mid-range profile: performance ≥ 90, accessibility ≥ 95, PWA installable. LCP < 2.5s.
 - Lazy-load charts, PDF viewers and heavy editors. Use `next/image` for photos. Fail CI on a budget regression.
 
 ## Definition of done (per feature)
+
 Matches the API contract exactly · permission-gated · loading, empty, error and offline states · checked at 360px and desktop · keyboard and screen-reader accessible · strings in the catalog · tests added and green · budgets met · `docs/PROGRESS.md` and `docs/OPEN_ITEMS.md` updated.
