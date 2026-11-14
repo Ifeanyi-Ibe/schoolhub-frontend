@@ -25,6 +25,16 @@ beforeEach(() => {
 });
 
 describe("LoginForm", () => {
+  it("says so when the user was sent here after signing out or changing their password", () => {
+    renderWithProviders(<LoginForm next="/home" signedOut />);
+    expect(screen.getByRole("status")).toHaveTextContent("You have been signed out.");
+  });
+
+  it("shows no signed-out notice on a normal visit", () => {
+    renderWithProviders(<LoginForm next="/home" />);
+    expect(screen.queryByText("You have been signed out.")).toBeNull();
+  });
+
   it("shows the same message for an unknown account and a wrong password (no enumeration)", async () => {
     mocked.mockResolvedValue({
       ok: false,

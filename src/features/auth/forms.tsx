@@ -44,7 +44,8 @@ function loginMessageText(t: Translate, m: LoginMessage, seconds?: number | null
 
 // ---- Sign in with email or phone and password ----
 
-export function LoginForm({ next }: { next: string }) {
+/** `signedOut` is set when the user was sent here after signing out or changing their password. */
+export function LoginForm({ next, signedOut = false }: { next: string; signedOut?: boolean }) {
   const t = useTranslations("auth.login");
   const router = useRouter();
   const form = useForm<{ identifier: string; password: string }>({
@@ -80,6 +81,7 @@ export function LoginForm({ next }: { next: string }) {
       className="flex flex-col gap-4"
       aria-labelledby="login-title"
     >
+      {signedOut ? <Notice tone="info">{t("signedOut")}</Notice> : null}
       <Input
         label={t("identifier")}
         autoComplete="username"
