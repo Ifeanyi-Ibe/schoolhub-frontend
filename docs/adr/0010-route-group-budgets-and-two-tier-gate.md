@@ -23,3 +23,12 @@ CLAUDE.md sets one budget for parent-portal routes (170 KB gzipped). Staff and t
 - Any new route must be placed in a group in `scripts/budgets.json`. Routes not listed are not measured.
 - The `/login` margin to its cap is about 2 KB. Form or message changes there need a check with `npm run size`.
 - Source maps are emitted only with `BUNDLE_REPORT=1`, so normal builds publish none.
+
+## Addendum (2026-11-14): how bytes are counted, and what that changes
+
+- **Correction.** The F1 and F2 figures counted only the scripts in each page's HTML. Chunks the browser fetches after the document (the page's own chunk, the `(app)` layout, and the query client) were not counted. The budget check now loads each route in headless Chromium and counts every script the page fetches (`scripts/check-bundle-size.mjs`). Earlier figures for signed-in routes were too low by 10 to 25 KB.
+- **Measured with the corrected count:** `/login` 171,966 B (cap 174,080 B, met). `/home` 174,285 B, `/sessions` 175,729 B, `/profile` 189,288 B (cap 174,080 B, **not met**). Admin `/people` 187,850 B, `/roles` 186,530 B, `/roles/[id]` 187,022 B (cap 256,000 B, met).
+- **Ratchet.** `scripts/budgets.ratchet.json` holds the last accepted value per route. A route above its value fails, and `--update-ratchet` lowers values only. The file was re-baselined once, deliberately (`--reset-ratchet`), because the measurement changed. Build variation is a few hundred bytes, so the baseline is taken from a normal build.
+- **Route-specific JavaScript.** A group may set `maxRouteSpecificGzipBytes` against the assets every route in `shellRoutes` loads. Admin routes load 15 to 16 KB beyond the shell, against a proposed 40 KB limit, which is realistic.
+- **Shared staff chunk** (the assets every admin route loads): 185,332 B. Composition: Next runtime and React DOM about 78 KB, Next's App Router client about 41 KB, TanStack Query about 14 KB, the API client and its unwrapping about 8 KB, Next internals about 7 KB, next-intl and its ICU parser about 12 KB, the shell about 2 KB, UI components about 3 KB.
+- **Open decision.** The parent group is over its cap by 0.2 KB (`/home`), 1.6 KB (`/sessions`) and 15 KB (`/profile`). The caps are kept. Closing the gap needs one of: drop TanStack Query from the signed-in shell (about 14 KB), defer the profile forms until the user opens them (about 14 KB, a UX change), or cut the ICU message parser (about 12 KB, a catalogue change). Each needs an owner's decision; none is taken here.

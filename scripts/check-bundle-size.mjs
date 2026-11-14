@@ -7,14 +7,32 @@
 // which modules the first-load bytes come from. See scripts/bundle-analysis-lib.mjs.
 
 import { spawn } from "node:child_process";
+import { chromium } from "@playwright/test";
 import { request } from "node:http";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { attributeChunk } from "./bundle-analysis-lib.mjs";
-import { checkGroupBudgets, gzipBytes, initialScriptUrls, sumGzip } from "./bundle-size-lib.mjs";
+import {
+  checkGroupBudgets,
+  checkRatchet,
+  gzipBytes,
+  initialScriptUrls,
+  lowerRatchet,
+  routeSpecificBytes,
+  sharedAssets,
+  sumGzip,
+} from "./bundle-size-lib.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+
+// Per-route ceilings. They only go down: a route above its ceiling fails, and --update-ratchet lowers
+// a ceiling to the current measurement. Raising one is a deliberate edit to scripts/budgets.ratchet.json.
+const ratchetPath = resolve(root, "scripts/budgets.ratchet.json");
+let ratchetCeilings = existsSync(ratchetPath) ? JSON.parse(readFileSync(ratchetPath, "utf8")) : {};
+const updateRatchet = process.argv.includes("--update-ratchet");
+// A deliberate re-baseline (for example after a change in how bytes are measured). Not for normal use.
+const resetRatchet = process.argv.includes("--reset-ratchet");
 const config = JSON.parse(readFileSync(resolve(root, "scripts/budgets.json"), "utf8"));
 const groups = config.groups;
 const port = Number(process.env.SIZE_PORT ?? 3917);
@@ -50,11 +68,49 @@ async function waitForStack(child, timeoutMs = 180_000) {
   throw new Error(`stack did not become ready:\n${output}`);
 }
 
-async function measure(route, cookie) {
+/**
+ * The script URLs a route loads, as the browser loads them: the document's own scripts, plus the chunks
+ * the page fetches after it loads (the page's own chunk arrives through the RSC payload, not the HTML).
+ * Headless Chromium runs the page; a route that the browser cannot load fails the check.
+ */
+async function loadedScriptUrls(browser, route, cookie) {
+  const context = await browser.newContext();
+  try {
+    if (cookie) {
+      const pairs = cookie
+        .split(";")
+        .map((c) => c.trim().split("="))
+        .filter((p) => p.length >= 2);
+      await context.addCookies(
+        pairs.map(([name, ...rest]) => ({
+          name,
+          value: rest.join("="),
+          url: `http://${host}`,
+        })),
+      );
+    }
+    const page = await context.newPage();
+    await page.goto(`http://${host}${route}`, { waitUntil: "load" });
+    await page.waitForLoadState("networkidle");
+    const urls = await page.evaluate(() =>
+      performance
+        .getEntriesByType("resource")
+        .map((e) => e.name)
+        .filter((n) => /\/_next\/static\/.*\.js(\?|$)/.test(n)),
+    );
+    return [...new Set(urls.map((u) => new URL(u).pathname))];
+  } finally {
+    await context.close();
+  }
+}
+
+async function measure(browser, route, cookie) {
   const headers = cookie ? { cookie } : {};
+  const urls = new Set(await loadedScriptUrls(browser, route, cookie));
   const html = (await get(route, headers)).body.toString("utf8");
+  for (const url of initialScriptUrls(html)) urls.add(url);
   const assets = [];
-  for (const url of initialScriptUrls(html)) {
+  for (const url of urls) {
     const body = (await get(url, headers)).body;
     assets.push({ url, bytes: body.length, gzipBytes: gzipBytes(body) });
   }
@@ -93,14 +149,17 @@ async function main() {
       stdio: ["ignore", "pipe", "pipe"],
     },
   );
+  const browser = await chromium.launch();
   try {
     await waitForStack(child);
     const results = {};
+    const assetsByRoute = {};
     for (const [name, group] of Object.entries(groups)) {
       for (const [route, opts] of Object.entries(group.routes)) {
         const cookie = opts.cookie;
-        const m = await measure(route, cookie);
+        const m = await measure(browser, route, cookie);
         results[route] = m.total;
+        assetsByRoute[route] = m.assets;
         console.log(
           `${name}  ${route}  first-load JS: ${m.total} B gzipped (${m.assets.length} files)${cookie ? " [signed in]" : " [signed out]"}`,
         );
@@ -109,6 +168,54 @@ async function main() {
       }
     }
     const { failures, reports } = checkGroupBudgets(results, groups);
+
+    // Route-specific JavaScript: what a group's routes load beyond the shell they share.
+    for (const [name, group] of Object.entries(groups)) {
+      if (group.shellRoutes === undefined || group.maxRouteSpecificGzipBytes === undefined)
+        continue;
+      const shell = sharedAssets(group.shellRoutes.map((r) => assetsByRoute[r] ?? []));
+      for (const route of Object.keys(group.routes)) {
+        const specific = routeSpecificBytes(assetsByRoute[route] ?? [], shell);
+        console.log(
+          `${name}  ${route}  route-specific JS: ${specific} B gzipped (limit ${group.maxRouteSpecificGzipBytes} B; shell = assets of ${group.shellRoutes.join(", ")})`,
+        );
+        if (specific > group.maxRouteSpecificGzipBytes)
+          failures.push(
+            `${name}: ${route} route-specific JS ${specific} B exceeds ${group.maxRouteSpecificGzipBytes} B`,
+          );
+      }
+    }
+
+    // The shared staff chunk: the assets every route of the admin group loads, and what is in it.
+    const adminRoutes = Object.keys(groups.admin?.routes ?? {});
+    if (adminRoutes.length > 0) {
+      const shared = sharedAssets(adminRoutes.map((r) => assetsByRoute[r] ?? []));
+      console.log(
+        `\nShared staff chunk (every admin route loads it): ${sumGzip(shared)} B gzipped`,
+      );
+      if (report) printModuleReport("shared staff chunk", shared);
+    }
+
+    if (resetRatchet) {
+      writeFileSync(ratchetPath, JSON.stringify(results, null, 2) + "\n");
+      console.log(
+        "ratchet: re-baselined to the current measurements (scripts/budgets.ratchet.json)",
+      );
+      ratchetCeilings = results;
+    }
+    const ratchet = checkRatchet(results, ratchetCeilings);
+    failures.push(...ratchet.failures);
+    for (const r of ratchet.lowerable)
+      console.log(
+        `ratchet: ${r.route} can go from ${r.from} B to ${r.to} B (run with --update-ratchet)`,
+      );
+    if (updateRatchet) {
+      writeFileSync(
+        ratchetPath,
+        JSON.stringify(lowerRatchet(results, ratchetCeilings), null, 2) + "\n",
+      );
+      console.log("ratchet: ceilings lowered in scripts/budgets.ratchet.json");
+    }
     console.log("\nGroup budgets:");
     for (const r of reports) {
       if (r.worst === null) {
@@ -130,6 +237,7 @@ async function main() {
       console.log("All budgets met.");
     }
   } finally {
+    await browser.close();
     child.kill("SIGTERM");
   }
 }

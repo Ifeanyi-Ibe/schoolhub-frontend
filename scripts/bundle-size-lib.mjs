@@ -78,3 +78,64 @@ export function checkGroupBudgets(results, groups) {
   }
   return { failures, reports };
 }
+
+/**
+ * Ratchet: a route's first-load JS may only go down. `ceilings` holds the last accepted value per route.
+ * A route above its ceiling fails; a route below it is reported so the ceiling can be lowered; a route
+ * with no ceiling yet is reported, not failed. Ceilings are never raised by this check.
+ */
+export function checkRatchet(results, ceilings) {
+  const failures = [];
+  const lowerable = [];
+  for (const [route, measured] of Object.entries(results)) {
+    const ceiling = ceilings[route];
+    if (ceiling === undefined) continue;
+    if (measured > ceiling) {
+      failures.push(
+        `${route}: ${measured} B gzipped is above its ratchet ceiling ${ceiling} B (the ceiling only goes down)`,
+      );
+    } else if (measured < ceiling) {
+      lowerable.push({ route, from: ceiling, to: measured });
+    }
+  }
+  return { failures, lowerable };
+}
+
+/** The ceilings after a run: the lower of the old ceiling and the measurement; new routes take their measurement. */
+export function lowerRatchet(results, ceilings) {
+  const next = { ...ceilings };
+  for (const [route, measured] of Object.entries(results)) {
+    next[route] = next[route] === undefined ? measured : Math.min(next[route], measured);
+  }
+  return next;
+}
+
+/**
+ * JavaScript a route loads beyond the shell it shares with the signed-in pages: the gzipped bytes of
+ * its assets that the shell does not also load. Assets are compared by URL, without the query string.
+ */
+export function routeSpecificBytes(routeAssets, shellAssets) {
+  const bare = (url) => url.split("?")[0];
+  const shell = new Set(shellAssets.map((a) => bare(a.url)));
+  return routeAssets
+    .filter((a) => !shell.has(bare(a.url)))
+    .reduce((total, a) => total + a.gzipBytes, 0);
+}
+
+/** Composition of a set of assets by owning module, for the report. Needs module attribution per URL. */
+export function compositionOf(moduleBytesByAsset) {
+  const totals = new Map();
+  for (const modules of Object.values(moduleBytesByAsset))
+    for (const [owner, bytes] of Object.entries(modules))
+      totals.set(owner, (totals.get(owner) ?? 0) + bytes);
+  return [...totals.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+/** The assets present in every one of the given asset lists, compared without query strings. */
+export function sharedAssets(lists) {
+  if (lists.length === 0) return [];
+  const bare = (url) => url.split("?")[0];
+  const [first, ...rest] = lists;
+  const others = rest.map((list) => new Set(list.map((a) => bare(a.url))));
+  return first.filter((a) => others.every((set) => set.has(bare(a.url))));
+}

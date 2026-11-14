@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { checkGroupBudgets, gzipBytes, initialScriptUrls, sumGzip } from "./bundle-size-lib.mjs";
+import {
+  checkGroupBudgets,
+  checkRatchet,
+  gzipBytes,
+  initialScriptUrls,
+  lowerRatchet,
+  routeSpecificBytes,
+  sharedAssets,
+  sumGzip,
+} from "./bundle-size-lib.mjs";
 
 describe("initialScriptUrls", () => {
   it("collects same-origin script tags and script preloads, once each", () => {
@@ -72,5 +81,49 @@ describe("checkGroupBudgets", () => {
       worst: null,
       cap: 250,
     });
+  });
+});
+
+describe("ratchet", () => {
+  it("fails a route above its ceiling, and reports one below it without failing", () => {
+    const { failures, lowerable } = checkRatchet(
+      { "/a": 101, "/b": 90, "/c": 50 },
+      { "/a": 100, "/b": 100 },
+    );
+    expect(failures).toEqual([
+      expect.stringMatching(/\/a: 101 B gzipped is above its ratchet ceiling 100 B/),
+    ]);
+    expect(lowerable).toEqual([{ route: "/b", from: 100, to: 90 }]);
+  });
+
+  it("only lowers ceilings, and takes a measurement for a new route", () => {
+    expect(lowerRatchet({ "/a": 90, "/b": 120, "/c": 10 }, { "/a": 100, "/b": 100 })).toEqual({
+      "/a": 90,
+      "/b": 100,
+      "/c": 10,
+    });
+  });
+});
+
+describe("route-specific JavaScript", () => {
+  it("counts only the assets the shell does not load", () => {
+    const shell = [{ url: "/s/a.js", gzipBytes: 100 }];
+    const route = [
+      { url: "/s/a.js?v=1", gzipBytes: 100 },
+      { url: "/r/b.js", gzipBytes: 40 },
+      { url: "/r/c.js", gzipBytes: 5 },
+    ];
+    expect(routeSpecificBytes(route, shell)).toBe(45);
+  });
+});
+
+describe("shared assets", () => {
+  it("keeps the assets every list has, without query strings", () => {
+    const a = [
+      { url: "/x.js?v=1", gzipBytes: 1 },
+      { url: "/y.js", gzipBytes: 2 },
+    ];
+    const b = [{ url: "/x.js", gzipBytes: 1 }];
+    expect(sharedAssets([a, b]).map((x) => x.url)).toEqual(["/x.js?v=1"]);
   });
 });
