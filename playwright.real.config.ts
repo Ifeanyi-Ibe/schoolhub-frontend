@@ -1,16 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
+import { e2e } from "./e2e-real/support/env";
 
-// Journeys against the REAL SchoolHub backend (development seed, docs/DEV_SEED.md in the backend
-// repository). Requires the backend on http://localhost:5152 with the BFF key it was started with,
-// passed in REAL_BFF_KEY at run time. Never written to any file. Seeded accounts are only signed in
-// to; no test changes their passwords or lockout state.
-const key = process.env.REAL_BFF_KEY;
-if (!key) throw new Error("Set REAL_BFF_KEY to the BFF key the backend was started with.");
-const port = Number(process.env.REAL_PORT ?? 3300);
-const baseURL = `http://demo.localhost:${port}`;
+// Journeys against the REAL SchoolHub backend (development seed, docs/backend/DEV_SEED.md).
+// Credentials and hosts come from .env.e2e (git-ignored). The backend must be running with the BFF
+// key in .env.e2e. Seeded accounts are only signed in to; no test changes their passwords.
+const baseURL = `http://${e2e.schoolSlug}.localhost:${e2e.port}`;
 
 export default defineConfig({
   testDir: "e2e-real",
+  testMatch: /.*\.spec\.ts/,
   fullyParallel: false,
   workers: 1,
   retries: 0,
@@ -23,13 +21,13 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npm run start -- -p ${port}`,
-    url: `http://127.0.0.1:${port}/api/bff/health`,
+    command: `npm run start -- -p ${e2e.port}`,
+    url: `http://127.0.0.1:${e2e.port}/api/bff/health`,
     reuseExistingServer: false,
     timeout: 120_000,
     env: {
-      API_BASE_URL: "http://localhost:5152",
-      BFF_API_KEY: key,
+      API_BASE_URL: e2e.apiBaseUrl,
+      BFF_API_KEY: e2e.bffKey,
       APP_BASE_DOMAIN: "localhost",
       APP_ORIGIN: baseURL,
       REFRESH_GRACE_SECONDS: "10",

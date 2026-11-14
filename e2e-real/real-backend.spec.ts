@@ -1,71 +1,65 @@
-// Real-backend journeys. Accounts and data are the documented development seed (docs/DEV_SEED.md).
-import { expect, test } from "@playwright/test";
+// F1 journeys against the real backend (development seed). Data and accounts come from the seed
+// document through .env.e2e; nothing here depends on today's date.
+import { expect, test, type Page } from "@playwright/test";
+import { e2e } from "./support/env";
+import { latestOtpCode } from "./support/otp";
+import { platformLogin, platformVerify } from "./support/platform";
+import { freshTotp } from "./support/totp";
 
-const API = "http://localhost:5152";
-const PASSWORD = "Dev-Only-Passw0rd-2034";
-const PARENT_PHONE = "+2348011000001";
-
-// The backend allows 10 auth calls per minute per client address (RateLimits:AuthPerMinute), so the
-// journeys run one after another with a pause. Without it the later sign-ins are rate limited.
+// The backend allows 10 auth calls per minute per address and 3 OTP requests per phone every 10
+// minutes. Journeys run one at a time with a pause; no limit is worked around in the BFF.
 test.beforeEach(async () => {
   await new Promise((r) => setTimeout(r, 13_000));
 });
 
-async function signInAdmin(page: import("@playwright/test").Page) {
+async function signInAdmin(page: Page) {
   await page.goto("/login");
-  await page.getByLabel(/Email or phone/).fill("admin@demo.example.com");
-  await page.getByLabel(/^Password/).fill(PASSWORD);
+  await page.getByLabel(/Email or phone/).fill(e2e.adminIdentifier);
+  await page.getByLabel(/^Password/).fill(e2e.adminPassword);
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.waitForURL("**/home");
 }
 
-test("the school's own name comes from the real backend's public branding", async ({ page }) => {
+test("the school's name comes from the backend's public branding", async ({ page, request }) => {
+  const res = await request.get(
+    `${e2e.apiBaseUrl}/api/v1/public/tenants/${e2e.schoolSlug}/branding`,
+    {
+      headers: { "X-Bff-Key": e2e.bffKey, "X-Tenant": e2e.schoolSlug },
+    },
+  );
+  const name = ((await res.json()) as { name: string }).name;
   await page.goto("/login");
-  await expect(page.getByText("Demo Academy", { exact: true })).toBeVisible();
+  await expect(page.getByText(name, { exact: true })).toBeVisible();
 });
 
-test("a wrong password reads the same as the real backend's uniform error (UI)", async ({
-  page,
-}) => {
+test("a wrong password reads the same as the backend's uniform error", async ({ page }) => {
   await page.goto("/login");
-  await page.getByLabel(/Email or phone/).fill("admin@demo.example.com");
-  await page.getByLabel(/^Password/).fill("wrong-password-probe-0001");
+  await page.getByLabel(/Email or phone/).fill(e2e.adminIdentifier);
+  await page.getByLabel(/^Password/).fill(`${e2e.adminPassword}-wrong`);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.locator('p[role="alert"]')).toContainText("could not sign you in");
 });
 
-test("admin sign-in reaches home, and the signed-in shell loads the real account", async ({
+test("admin sign-in reaches home; the session cookies are httpOnly and invisible to page script", async ({
   page,
   context,
 }) => {
   await signInAdmin(page);
   await expect(page.getByRole("heading", { name: /Welcome,/ })).toBeVisible();
-  const cookies = await context.cookies();
-  const at = cookies.find((c) => c.name === "sh_at");
+  const at = (await context.cookies()).find((c) => c.name === "sh_at");
   expect(at?.httpOnly).toBe(true);
   expect(await page.evaluate(() => document.cookie)).not.toMatch(/sh_at|sh_rt/);
 });
 
-test("phone-code (OTP) sign-in for the seeded parent, reading the Development-only message", async ({
+test("phone-code sign-in for the seeded parent, reading the code from the Development messages endpoint", async ({
   page,
   request,
 }) => {
   await page.goto("/login/otp");
-  await page.getByLabel("Phone number").fill(PARENT_PHONE);
+  await page.getByLabel("Phone number").fill(e2e.parentPhone);
   await page.getByRole("button", { name: "Send code" }).click();
   await expect(page.getByLabel("6-digit code")).toBeVisible();
-  // Development only: the backend keeps the last message per recipient (docs/DEV_SEED.md).
-  const msg = await request.get(
-    `${API}/api/v1/dev/messages/latest?to=${encodeURIComponent(PARENT_PHONE)}`,
-    {
-      headers: { "X-Tenant": "demo" },
-    },
-  );
-  expect(msg.status()).toBe(200);
-  const body = String((await msg.json()).body ?? "");
-  const code = /Your code is (\d{6})/.exec(body)?.[1];
-  expect(code).toBeTruthy();
-  await page.getByLabel("6-digit code").fill(code!);
+  await page.getByLabel("6-digit code").fill(await latestOtpCode(request, e2e.parentPhone));
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/home$/);
 });
@@ -75,55 +69,51 @@ test("an unknown school is not found, and no session cookie is sent to it", asyn
   context,
 }) => {
   await signInAdmin(page);
-  await page.goto("http://nosuchschool.localhost:" + (process.env.REAL_PORT ?? 3300) + "/home");
+  const other = `http://nosuchschool.localhost:${e2e.port}`;
+  await page.goto(`${other}/home`);
   await expect(page).toHaveURL(/\/login/);
   await expect(page.getByRole("heading", { name: "School not found" })).toBeVisible();
-  expect(
-    (
-      await context.cookies("http://nosuchschool.localhost:" + (process.env.REAL_PORT ?? 3300))
-    ).some((c) => c.name.startsWith("sh_")),
-  ).toBe(false);
+  expect((await context.cookies(other)).some((c) => c.name.startsWith("sh_"))).toBe(false);
 });
 
-test("sign-out revokes the session on the server: the old refresh token is refused afterwards", async ({
-  page,
-  context,
-  request,
-}) => {
-  await signInAdmin(page);
-  const rt = (await context.cookies()).find((c) => c.name === "sh_rt")?.value;
-  expect(rt).toBeTruthy();
-  await page.getByRole("button", { name: "Sign out" }).click();
-  await expect(page).toHaveURL(/\/login/);
-  expect((await context.cookies()).some((c) => c.name.startsWith("sh_"))).toBe(false);
-  // The backend must refuse the refresh token that was in the cookie.
-  const res = await request.post(`${API}/api/v1/auth/refresh`, {
-    headers: {
-      "X-Bff-Key": process.env.REAL_BFF_KEY!,
-      "X-Tenant": "demo",
-      "Content-Type": "application/json",
-    },
-    data: { refreshToken: rt },
-    failOnStatusCode: false,
-  });
-  // Refused: anything but a fresh token. 429 means the backend's rate limit answered first.
-  expect(res.status()).not.toBe(200);
-});
-
-test("concurrent requests share a single refresh (in-process single flight)", async ({
+test("sign-out revokes the session on the server: the old refresh token is then refused", async ({
   page,
   context,
   request,
 }) => {
   await signInAdmin(page);
   const rt = (await context.cookies()).find((c) => c.name === "sh_rt")?.value ?? "";
-  // Access token expired, refresh token valid: the BFF must refresh once for two requests at once.
-  // Node's request client cannot resolve *.localhost, so it calls loopback with the school's Host.
-  const port = process.env.REAL_PORT ?? "3300";
-  const headers = { host: `demo.localhost:${port}`, cookie: `sh_at=stale-not-a-jwt; sh_rt=${rt}` };
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await expect(page).toHaveURL(/\/login/);
+  const res = await request.post(`${e2e.apiBaseUrl}/api/v1/auth/refresh`, {
+    headers: {
+      "X-Bff-Key": e2e.bffKey,
+      "X-Tenant": e2e.schoolSlug,
+      "Content-Type": "application/json",
+    },
+    data: { refreshToken: rt },
+    failOnStatusCode: false,
+  });
+  expect(res.status()).toBe(401);
+});
+
+test("concurrent requests share one refresh (in-process single flight)", async ({
+  page,
+  context,
+  request,
+}) => {
+  await signInAdmin(page);
+  const rt = (await context.cookies()).find((c) => c.name === "sh_rt")?.value ?? "";
+  const headers = {
+    host: `${e2e.schoolSlug}.localhost:${e2e.port}`,
+    cookie: `sh_at=stale-not-a-jwt; sh_rt=${rt}`,
+  };
   const [a, b] = await Promise.all([
-    request.get(`http://127.0.0.1:${port}/api/bff/api/v1/me`, { headers, failOnStatusCode: false }),
-    request.get(`http://127.0.0.1:${port}/api/bff/api/v1/me/tenant`, {
+    request.get(`http://127.0.0.1:${e2e.port}/api/bff/api/v1/me`, {
+      headers,
+      failOnStatusCode: false,
+    }),
+    request.get(`http://127.0.0.1:${e2e.port}/api/bff/api/v1/me/tenant`, {
       headers,
       failOnStatusCode: false,
     }),
@@ -132,8 +122,57 @@ test("concurrent requests share a single refresh (in-process single flight)", as
   expect(b.status()).toBe(200);
 });
 
-test("the sessions page lists the real device list", async ({ page }) => {
+test("the backend refuses a second concurrent refresh with the documented 409", async ({
+  request,
+}) => {
+  const h = {
+    "X-Bff-Key": e2e.bffKey,
+    "X-Tenant": e2e.schoolSlug,
+    "Content-Type": "application/json",
+  };
+  const login = await request.post(`${e2e.apiBaseUrl}/api/v1/auth/login`, {
+    headers: h,
+    data: { identifier: e2e.adminIdentifier, password: e2e.adminPassword },
+  });
+  const rt = ((await login.json()) as { refreshToken: string }).refreshToken;
+  const [a, b] = await Promise.all([
+    request.post(`${e2e.apiBaseUrl}/api/v1/auth/refresh`, {
+      headers: h,
+      data: { refreshToken: rt },
+      failOnStatusCode: false,
+    }),
+    request.post(`${e2e.apiBaseUrl}/api/v1/auth/refresh`, {
+      headers: h,
+      data: { refreshToken: rt },
+      failOnStatusCode: false,
+    }),
+  ]);
+  expect([a.status(), b.status()].sort()).toEqual([200, 409]);
+  const loser = a.status() === 409 ? a : b;
+  expect(loser.headers()["retry-after"]).toBe("1");
+  expect(((await loser.json()) as { code: string }).code).toBe("auth.refresh_in_flight");
+});
+
+test("the sessions page loads", async ({ page }) => {
   await signInAdmin(page);
   await page.goto("/sessions");
   await expect(page.getByRole("heading", { name: "Devices and sessions" })).toBeVisible();
+});
+
+test("platform developer: TOTP sign-in with a fresh code; the same code is then refused (replay)", async ({
+  request,
+}) => {
+  const secret = e2e.platformTotpSecret;
+  // First use: a fresh code for the current step.
+  const first = await platformLogin(request);
+  expect(first.status).toBe(200);
+  expect(first.body.mfaRequired).toBe(true);
+  const code = await freshTotp(secret);
+  const ok = await platformVerify(request, first.body.mfaToken!, code);
+  expect(ok.status, JSON.stringify(ok.body)).toBe(200);
+  expect(ok.body.accessToken).toBeTruthy();
+  // Replay: the same code, a new challenge. The backend must refuse it.
+  const second = await platformLogin(request);
+  const replay = await platformVerify(request, second.body.mfaToken!, code);
+  expect(replay.status).toBe(401);
 });

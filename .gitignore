@@ -34,3 +34,4 @@ npm-debug.log*
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+!.env.e2e.example
