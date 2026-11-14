@@ -192,11 +192,9 @@ test.describe.serial("a spare account this run invites", () => {
 });
 
 test.describe("the invitation email's link", () => {
-  // Known gap (docs/BACKEND_GAPS.md, B-18). The backend puts the token in the query string
-  // (`accept-invite?school=…&token=…`), and the page reads only the fragment, so the emailed link
-  // opens a page that cannot accept the invitation. This test records that current behaviour. When the
-  // gap is closed it fails, and then it must be changed to assert the working journey.
-  test("the link from the email does not yet open a page that can accept the invitation (B-18)", async ({
+  // B-18: the backend emits the token in the query string. The page accepts that form as an interim
+  // fallback, reads it, and removes it from the address bar at once (src/features/auth/one-time-token.ts).
+  test("the link from the email opens the accept page with its token, which is then removed from the address bar", async ({
     page,
     request,
   }) => {
@@ -206,12 +204,10 @@ test.describe("the invitation email's link", () => {
     const body = await latestMessage(request, email);
     const link = /https?:\/\/[^\s"<>]+accept-invite[^\s"<>]*/.exec(body)?.[0];
     if (!link) throw new Error("no invitation link in the latest message");
+    const token = new URL(link).searchParams.get("token") ?? "";
     // The host in the email is the production address; the same path and query are opened on this run's host.
     await page.goto(`${SCHOOL}/accept-invite${new URL(link).search}`);
-    const canAccept = await page
-      .getByRole("button", { name: "Accept and continue" })
-      .isVisible({ timeout: 5_000 })
-      .catch(() => false);
-    expect(canAccept, "the emailed link is expected not to work yet (B-18)").toBe(false);
+    await expect(page.getByRole("button", { name: "Accept and continue" })).toBeVisible();
+    expect(page.url()).not.toContain(token);
   });
 });

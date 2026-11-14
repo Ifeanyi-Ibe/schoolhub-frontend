@@ -42,7 +42,13 @@ export function proxy(request: NextRequest): NextResponse {
   response.headers.set("Content-Security-Policy", csp);
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-Frame-Options", "DENY");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  // The invitation and reset pages carry a one-time token in the address bar until they have read it.
+  // Nothing from that page may leak it in a Referer header.
+  const tokenPage = /^\/(accept-invite|reset-password)\/?$/.test(request.nextUrl.pathname);
+  response.headers.set(
+    "Referrer-Policy",
+    tokenPage ? "no-referrer" : "strict-origin-when-cross-origin",
+  );
   response.headers.set(
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=(), payment=(self)",

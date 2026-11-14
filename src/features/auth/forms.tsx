@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { extractOneTimeToken } from "./one-time-token";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
@@ -476,28 +477,27 @@ export function ForgotForm() {
   );
 }
 
-// ---- Reset and invitation: the one-time token lives in the URL fragment, which is never sent to the server ----
+// ---- Reset and invitation: the one-time token (B-18). Read once per page load, then removed from the address bar. ----
 
-// Read once per page load and cached, so removing the fragment below does not lose the token.
-let fragmentToken: string | undefined;
-function readFragmentToken(): string {
-  if (fragmentToken === undefined) {
-    const m = /(?:^#|&)token=([^&]+)/.exec(window.location.hash);
-    fragmentToken = m ? decodeURIComponent(m[1] ?? "") : "";
+let oneTime: string | undefined;
+/** Reads the token once, removes it from the address bar at once, and caches it for the page's life. */
+function readOneTimeToken(): string {
+  if (oneTime === undefined) {
+    const read = extractOneTimeToken(window.location.href);
+    oneTime = read.token;
+    if (read.cleanHref !== null) window.history.replaceState(null, "", read.cleanHref);
   }
-  return fragmentToken;
+  return oneTime;
+}
+/** Tests only: forgets the cached token so each test reads its own address. */
+export function forgetOneTimeTokenForTests(): void {
+  oneTime = undefined;
 }
 const noSubscribe = () => () => undefined;
 
-/** The one-time token from the URL fragment, or "" when absent. Null during server render. */
+/** The one-time token from the link, or "" when absent. Null during server render. */
 function useFragmentToken(): string | null {
-  const token = useSyncExternalStore(noSubscribe, readFragmentToken, () => null);
-  useEffect(() => {
-    // Remove the token from the address bar and history once it is read.
-    if (token && window.location.hash)
-      window.history.replaceState(null, "", window.location.pathname + window.location.search);
-  }, [token]);
-  return token;
+  return useSyncExternalStore(noSubscribe, readOneTimeToken, () => null);
 }
 
 function SecretForm<T extends FieldValues>({

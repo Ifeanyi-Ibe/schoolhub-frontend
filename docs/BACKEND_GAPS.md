@@ -152,11 +152,12 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 
 ### B-18 — Invitation and reset links carry the token in the query string
 
-- **Observed:** the Development message for an invitation reads `Set your password within 72 hours: https://app.schoolhub.example/accept-invite?school=demo&token=…`. The reset message carries its token in the same `token=` query form (the reset journey reads it from the message).
-- **Frontend rule:** the one-time token is read from the URL fragment, which the browser never sends to the server (F1 decision, `src/features/auth/forms.tsx`). A link with `?token=` opens the page with no token.
-- **Effect:** a user who clicks the emailed link cannot accept an invitation or reset a password. Tested against the real backend: the link's page shows no accept button.
-- **Design-around:** none without weakening the rule. Options: (a) the backend builds the link with the token in the fragment, `accept-invite?school=demo#token=…`; (b) the page accepts the query token once and moves it to the fragment, which exposes the token to any server or proxy log that records query strings. We recommend (a).
-- **Status:** Open, blocking the invitation and reset UX on real links. The real-backend test records the current behaviour and fails when the gap closes.
+- **Observed:** the Development message for an invitation reads `Set your password within 72 hours: https://app.schoolhub.example/accept-invite?school=demo&token=…`. The reset message uses the same `token=` query form.
+- **Frontend rule:** the one-time token is read from the URL fragment, which the browser never sends to the server. The page accepts the fragment as the preferred form.
+- **Interim (2026-11-14, tolerant):** the page also accepts the query form. It reads the token, removes it from the address bar at once (`history.replaceState`), and sends it only to the accept or reset call. The invitation and reset routes send `Referrer-Policy: no-referrer`. The query string of those routes is not logged by the app. The Next.js development server prints request paths, query strings included, in its own terminal output; production does not.
+- **Verification:** unit tests cover both forms, the stripping and the referrer header (`one-time-token.test.ts`, `reset-token.test.tsx`, `proxy-referrer.test.ts`). The real-backend journey opens the emailed link and checks the page accepts it (`e2e-real/admin-journeys.spec.ts`).
+- **Removal:** delete the query form (and the test that uses it) when the backend emits fragment links, for example `accept-invite#token=…`.
+- **Status:** Tolerant interim in place. Open until the backend emits fragment links.
 
 ### B-19 — Duplicate schema names: the spec shows the wrong shape for some operations
 
