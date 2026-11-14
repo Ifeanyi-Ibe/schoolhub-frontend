@@ -189,6 +189,14 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - Operations with `Idempotency-Key` do not match the spec's `[I]` list (B-06).
 - Only `localhost:5152` appears under `servers`. The production base URL is an env setting (OI-02).
 
+### B-20 — No immutable SchoolAdmin role; built-in roles accept writes
+
+- **Observed:** on a plan with custom roles (dev-all), `PUT /api/v1/roles/{id}/permissions` on the built-in Registrar role, sending its own permissions unchanged, answered 200 (real backend, roles-journeys.spec.ts).
+- **Contract:** no field marks a role as immutable, and the feature spec says system roles are "editable permissions only if plan allows custom roles; never deletable". The SchoolAdmin role is not described as immutable.
+- **Effect:** the screen cannot lock SchoolAdmin on a rule of its own, and a built-in role can be changed on the plan that allows custom roles. The UI must not branch on the role name (CLAUDE.md), so it cannot protect SchoolAdmin itself.
+- **Design-around:** none in the UI. The screen offers built-in roles as editable when the plan allows it.
+- **Status:** Open. Ask the backend for an `isImmutable` flag on `RoleView` (true for SchoolAdmin), and a refusal for writes to it.
+
 ### B-22 — Class level section is a free string in the contract, but an enum on the server
 
 - **Contract:** `LevelRequest.section` and `LevelView.section` are `{"type":"string"}`. The contract lists no allowed values.

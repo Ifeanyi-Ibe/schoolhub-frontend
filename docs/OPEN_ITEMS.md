@@ -186,3 +186,22 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 
 - The test double validates every request against the contract (ADR 0011). The staff journeys found one real defect in the dialog (its scroll lock was blocked by CSP, now fixed with the request's nonce) and two missing messages.
 - B-19: duplicate schema names. Recorded in BACKEND_GAPS.md.
+
+## Steering round (2026-11-14)
+
+### Decisions
+
+- Git identity on this repo: Ifeanyi Ibe <phenomenonif@gmail.com> (repo-local), applied to all 33 unpushed commits.
+- Parent-portal cap (174,080 B) is kept. Owner decision needed (see ADR 0010 addendum).
+- Class sections use the backend's five values until the contract documents them (B-22).
+
+### Open
+
+- **Budget cap, parent group:** `/home` 174,338 B, `/sessions` 175,782 B, `/profile` 189,341 B against 174,080 B. Options: drop TanStack Query from the signed-in shell, defer the profile forms, or cut the ICU parser. The full gate fails on this until one is chosen.
+- **LCP, `/people`:** 3,189 ms median (target 2.5 s); performance median 93 (met).
+- **Contract:** B-18 (interim accepted; query form to be removed), B-19 (sessions and rollover blocked), B-20 (no immutable SchoolAdmin), B-22 (section enum), B-03 (settings untyped), B-05 (no If-Match declared).
+- **F2 not built:** subjects and mappings, grading and bands, assessment and components, calendar and holidays. Each is typed; they need screens, tests and real-backend checks.
+- **Real backend, not verified:** the last-SchoolAdmin rule (the seed holds two admins); the suspended-school read-only state (no dedicated seeded school yet).
+- **WebKit (official image):** 25 of 26 critical journeys pass; one uncaught prefetch error on `/login/otp`.
+- **Firefox:** axe content-process crash after typing into the sign-in form (reproduced; reported to the engine as pending); offline journey skipped in Firefox (test-harness limitation, documented).
+- **Dev data:** test-created schools, levels, roles and accounts accumulate in the development database until it is recreated (the nightly job does this).
