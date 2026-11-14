@@ -1,0 +1,15 @@
+.next
+out
+coverage
+playwright-report
+test-results
+node_modules
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+package-lock.json
+src/lib/api/schema.d.ts
+src/lib/api/operations.generated.ts
+docs/openapi/v1.json
+docs/backend

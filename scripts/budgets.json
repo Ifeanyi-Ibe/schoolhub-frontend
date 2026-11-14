@@ -1,0 +1,6 @@
+{
+  "$comment": "Budgets from CLAUDE.md. Values are gzipped bytes of first-load JavaScript. Parent-portal routes are <= 170 KB; each parent route is added here when it exists. F0 measures the shell on '/' as the representative route.",
+  "firstLoadJsGzipBytes": {
+    "/": 174080
+  }
+}
