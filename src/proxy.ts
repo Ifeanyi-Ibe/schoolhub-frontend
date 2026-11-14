@@ -1,8 +1,9 @@
 // Request proxy (Next 16 name for middleware): per-request CSP nonce and security headers.
 //
 // The nonce is fresh for every page view, so pages must be dynamic (the root layout reads
-// headers()). Static files and the BFF are excluded from this matcher. The offline fallback is a
-// static file with no inline script, so it does not need a nonce.
+// headers()). Static files and the BFF are excluded from this matcher. The offline and unsupported-
+// browser pages are static files with inline styles and no script: a CSP nonce header would block
+// those styles, so they must stay outside the matcher (ADR 0005, ADR 0008).
 
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -56,7 +57,8 @@ export function proxy(request: NextRequest): NextResponse {
 export const config = {
   matcher: [
     {
-      source: "/((?!api|_next/static|_next/image|favicon.ico|sw.js|offline.html|icons/).*)",
+      source:
+        "/((?!api|_next/static|_next/image|favicon.ico|sw.js|offline.html|unsupported.html|browser-check.js|icons/).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },

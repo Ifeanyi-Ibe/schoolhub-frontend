@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCsp } from "./proxy";
+import { buildCsp, config } from "./proxy";
 
 describe("buildCsp", () => {
   const prod = buildCsp("abc123", false);
@@ -25,5 +25,22 @@ describe("buildCsp", () => {
   it("upgrades insecure requests in production only", () => {
     expect(prod).toContain("upgrade-insecure-requests");
     expect(buildCsp("n", true)).not.toContain("upgrade-insecure-requests");
+  });
+});
+
+describe("proxy matcher", () => {
+  // The matcher source is a path pattern that Next compiles; the negative lookahead is plain RegExp.
+  const matches = (path: string) => new RegExp(`^${config.matcher[0]!.source}$`).test(path);
+
+  it("leaves the static offline and unsupported-browser pages without a CSP nonce", () => {
+    expect(matches("/offline.html")).toBe(false);
+    expect(matches("/unsupported.html")).toBe(false);
+    expect(matches("/browser-check.js")).toBe(false);
+  });
+
+  it("applies the CSP to pages and not to the BFF or build assets", () => {
+    expect(matches("/login")).toBe(true);
+    expect(matches("/api/bff/health")).toBe(false);
+    expect(matches("/_next/static/chunks/x.js")).toBe(false);
   });
 });
