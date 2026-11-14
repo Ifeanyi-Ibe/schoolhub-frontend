@@ -158,7 +158,12 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Design-around:** none without weakening the rule. Options: (a) the backend builds the link with the token in the fragment, `accept-invite?school=demo#token=…`; (b) the page accepts the query token once and moves it to the fragment, which exposes the token to any server or proxy log that records query strings. We recommend (a).
 - **Status:** Open, blocking the invitation and reset UX on real links. The real-backend test records the current behaviour and fails when the gap closes.
 
-## Spec-to-contract naming differences (follow the contract)
+### B-19 — Duplicate schema names: the spec shows the wrong shape for some operations
+
+- **Observed:** the backend defines three view records with the same name in different modules: `SessionView` (identity device sessions, and academic sessions), `PaymentView`, and `InvoiceView`. The OpenAPI document keeps one schema per name, so `GET, POST /api/v1/sessions` and `PUT /api/v1/sessions/{id}` are documented with the device-session shape (`device`, `ipAddress`, `active`, `current`, `additionalProperties: false`). The backend's academic `SessionView` is `Id, Name, StartsOn, EndsOn, IsCurrent, IsArchived` (`src/SchoolHub.Modules.Academics/Features/Sessions/Sessions.cs`).
+- **Effect:** the generated client types an academic session as a device session. Any screen built on it would be wrong, so the academic sessions screens are blocked. The payment and invoice views (F6) are at risk for the same reason.
+- **Design-around:** none. The frontend does not hand-write the shape from the backend code (CLAUDE.md: types come from the generated client).
+- **Status:** Open, blocking academic sessions (F2) and the fees screens (F6). Ask the backend to give each record a unique schema name (for example `AcademicSessionView`) and to regenerate the document.
 
 | Spec name                                              | Contract                                               |
 | ------------------------------------------------------ | ------------------------------------------------------ |

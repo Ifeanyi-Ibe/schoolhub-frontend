@@ -96,3 +96,13 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 - Lighthouse, mobile throttled: sign-in performance 100, accessibility 100, best practices 100, SEO 100, LCP 766 ms. Signed-in shell performance 98, accessibility 100, best practices 100, SEO 100, LCP 1,855 ms (the school name is rendered on the server).
 - Real backend (development seed): see OPEN_ITEMS.md, "Verified end to end". Found and fixed two real bugs: the BFF's logout and refresh calls sent no JSON content type, so the API answered 415 and the session was not revoked. A regression test and a test double that enforces JSON now cover it.
 - Not verified end to end: see OPEN_ITEMS.md.
+
+## F1 fixes and F2 first slice (2026-11-14)
+
+- **Gate:** `npm run gate` passes (fast gate, API drift, audit, budgets, 88 Chromium e2e). `gate:fast` passes with 279 unit and component tests. Two tiers now (ADR 0010, CLAUDE.md).
+- **Budgets (per route group):** auth `/login` 171,815 B; parent `/home` 162,720 B, `/profile` 162,000 B, `/sessions` 164,167 B (cap 174,080 B each; target 153,600 B not met, see ADR 0010). Admin `/people` 199,241 B, `/roles` 202,096 B, `/roles/[id]` 174,662 B (cap 256,000 B). Teacher group reserved.
+- **Test double:** every `/api` request is validated against `docs/openapi/v1.json`; a mismatch fails the run (ADR 0011).
+- **Real backend:** 19 journeys pass (10 F1, 9 for the seed's gaps). See OPEN_ITEMS.md.
+- **Defects fixed:** unsupported-browser page under the CSP; the signed-out notice never shown; the dialog's scroll-lock style blocked by CSP.
+- **F2 first slice:** people (search, invite with idempotency) and roles (list, custom role creation, permission editor), gated by effective permissions. 8 browser journeys (desktop and 360px) and 12 unit tests pass.
+- **F2 blocked:** settings (B-03, untyped responses), academic sessions (B-19, wrong shape in the contract), and concurrency (B-05, no If-Match declared). Academics, rollover, calendar and grading remain to be built.
