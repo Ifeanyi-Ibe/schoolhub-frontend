@@ -198,6 +198,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/tenants/{slug}/branding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A school's public branding: name, logo, colours, motto and support contact
+         * @description Anonymous. Unknown and cancelled schools both answer 404 `tenancy.not_found`. Send `If-None-Match` with the last ETag to get a 304 while nothing has changed.
+         *
+         *     **Access:** anonymous.
+         */
+        get: operations["getPublicTenantsBySlugBranding"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/tenants/{slug}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A school's logo image, with no session
+         * @description Anonymous. Serves only the verified school-logo upload. The ETag is the file id, so the image is cached until the logo changes.
+         *
+         *     **Access:** anonymous.
+         */
+        get: operations["getPublicTenantsBySlugLogo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/billing/subscription": {
         parameters: {
             query?: never;
@@ -5985,13 +6029,34 @@ export interface components {
             subject: null | string;
             body: string;
         };
+        /** @description An RFC 9457 problem. `code` is the stable machine identifier (docs/ERROR_CODES.md); `traceId` is quoted to support. */
         ProblemDetails: {
-            type?: null | string;
-            title?: null | string;
-            /** Format: int32 */
-            status?: null | number | string;
-            detail?: null | string;
-            instance?: null | string;
+            /**
+             * Format: uri
+             * @description A URI that identifies the problem type.
+             */
+            type: string;
+            /** @description A short, human-readable summary of the problem type. */
+            title: string;
+            /**
+             * Format: int32
+             * @description The HTTP status code.
+             */
+            status: number;
+            /** @description A human-readable explanation specific to this occurrence. */
+            detail?: string;
+            /** @description The request path that produced the problem. */
+            instance?: string;
+            /** @description The stable machine code, for example `auth.invalid_credentials`. */
+            code: string;
+            /** @description The W3C trace id of the request. Quote it when contacting support. */
+            traceId: string;
+            /** @description Validation failures: each field name maps to its messages. Present only on `validation.failed`. */
+            errors?: {
+                [key: string]: string[];
+            };
+        } & {
+            [key: string]: unknown;
         };
         PromotionPreview: {
             rows: components["schemas"]["PromotionRow"][];
@@ -6214,6 +6279,16 @@ export interface components {
         };
         SchemeNameRequest: {
             name: string;
+        };
+        SchoolBrandingView: {
+            name: string;
+            logoUrl: null | string;
+            primaryColor: string;
+            secondaryColor: string;
+            motto: null | string;
+            supportEmail: null | string;
+            /** @description Phone number, stored and returned in E.164 (for example `+234…`). Local forms such as `080…` are accepted on input and normalised. */
+            supportPhone: null | string;
         };
         SchoolDaysView: {
             /** Format: uuid */
@@ -6625,6 +6700,7 @@ export interface components {
             status: string;
             pastDue: boolean;
             suspended: boolean;
+            branding: components["schemas"]["SchoolBrandingView"];
         };
         TenantUsage: {
             /** Format: int32 */
@@ -7227,10 +7303,7 @@ export interface operations {
     getSettingsSchoolProfile: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -7279,10 +7352,7 @@ export interface operations {
     putSettingsSchoolProfile: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -7371,10 +7441,7 @@ export interface operations {
     getSettingsBranding: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -7423,10 +7490,7 @@ export interface operations {
     putSettingsBranding: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -7515,10 +7579,7 @@ export interface operations {
     getSettingsPolicies: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -7567,10 +7628,7 @@ export interface operations {
     putSettingsPolicies: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -7659,10 +7717,7 @@ export interface operations {
     getMeTenant: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -7708,13 +7763,102 @@ export interface operations {
             };
         };
     };
+    getPublicTenantsBySlugBranding: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SchoolBrandingView"];
+                };
+            };
+            /** @description Not Modified */
+            304: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    getPublicTenantsBySlugLogo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Modified */
+            304: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     getBillingSubscription: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -7766,10 +7910,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -7821,8 +7962,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -7874,6 +8013,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -8012,10 +8153,7 @@ export interface operations {
     postAuthLogin: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -8079,9 +8217,11 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Too Many Requests */
+            /** @description Two different answers share this status. `rate_limit.exceeded`: too many sign-in attempts from this address. `auth.account_locked`: too many failures on this account or identifier, locked for the seconds in `Retry-After`. The answer is the same for an unknown identifier and a real one, so it does not say whether the account exists. */
             429: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -8153,10 +8293,7 @@ export interface operations {
     postAuthMfaVerify: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -8225,10 +8362,7 @@ export interface operations {
     postAuthMfaEnrollment: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -8299,10 +8433,7 @@ export interface operations {
     postAuthMfaEnrollmentConfirm: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -8566,10 +8697,7 @@ export interface operations {
     postMeMfaEnroll: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -8636,10 +8764,7 @@ export interface operations {
     postMeMfaConfirm: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -8719,10 +8844,7 @@ export interface operations {
     postMeMfaDisable: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -8802,10 +8924,7 @@ export interface operations {
     postAuthRefresh: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -8842,9 +8961,11 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Conflict */
+            /** @description `auth.refresh_in_flight`: this refresh token was rotated a moment ago by a request that is still in flight (for example a second tab, or a retry after a timeout), and its successor has not been used yet. Nothing is revoked and the session is not signed out. Wait `Retry-After` seconds (1), then read the session the winning request stored and retry with that newer refresh token. If the newer token is refused too, sign in again. The grace window is 10 seconds by default (`Auth:RefreshGraceSeconds`); after it, or once the successor has been used, the same request is a reuse, the session is revoked, and `auth.refresh_reuse_detected` is audited instead (ADR 0008). */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -8936,10 +9057,7 @@ export interface operations {
     postAuthLogout: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -8999,10 +9117,7 @@ export interface operations {
     postAuthLogoutAll: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9049,10 +9164,7 @@ export interface operations {
     getMe: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9101,10 +9213,7 @@ export interface operations {
     patchMe: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9175,10 +9284,7 @@ export interface operations {
     postMePassword: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9263,10 +9369,7 @@ export interface operations {
     postMeContactRequest: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9344,10 +9447,7 @@ export interface operations {
     postMeContactConfirm: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9430,8 +9530,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -9523,10 +9621,7 @@ export interface operations {
     postUsersByIdResendInvite: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -9604,10 +9699,7 @@ export interface operations {
     postAuthInvitesAccept: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9667,10 +9759,7 @@ export interface operations {
     postAuthPasswordForgot: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9728,10 +9817,7 @@ export interface operations {
     postAuthPasswordReset: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9791,10 +9877,7 @@ export interface operations {
     postAuthOtpRequest: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9852,10 +9935,7 @@ export interface operations {
     postAuthOtpVerify: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9924,10 +10004,7 @@ export interface operations {
     getMeSessions: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -9976,10 +10053,7 @@ export interface operations {
     deleteMeSessionsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -10046,10 +10120,7 @@ export interface operations {
     getRoles: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -10098,10 +10169,7 @@ export interface operations {
     postRoles: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -10190,10 +10258,7 @@ export interface operations {
     putRolesByIdPermissions: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -10293,10 +10358,7 @@ export interface operations {
     deleteRolesById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -10386,10 +10448,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -10438,10 +10497,7 @@ export interface operations {
     putUsersByIdRoles: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -10541,10 +10597,7 @@ export interface operations {
     postUsersByIdDisable: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -10622,10 +10675,7 @@ export interface operations {
     postUsersByIdEnable: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -10703,10 +10753,7 @@ export interface operations {
     postUsersByIdUnlock: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -10784,10 +10831,7 @@ export interface operations {
     postUsersByIdResetMfa: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -10865,10 +10909,7 @@ export interface operations {
     getPermissions: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -10917,10 +10958,7 @@ export interface operations {
     getSessions: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -10969,10 +11007,7 @@ export interface operations {
     postSessions: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -11061,10 +11096,7 @@ export interface operations {
     putSessionsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -11164,10 +11196,7 @@ export interface operations {
     postSessionsByIdArchive: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -11245,10 +11274,7 @@ export interface operations {
     getSessionsByIdTerms: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -11308,10 +11334,7 @@ export interface operations {
     postSessionsByIdTerms: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -11411,10 +11434,7 @@ export interface operations {
     putTermsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -11514,10 +11534,7 @@ export interface operations {
     postTermsByIdSetCurrent: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -11595,10 +11612,7 @@ export interface operations {
     getClassLevels: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -11647,10 +11661,7 @@ export interface operations {
     postClassLevels: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -11739,10 +11750,7 @@ export interface operations {
     putClassLevelsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -11842,10 +11850,7 @@ export interface operations {
     deleteClassLevelsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -11914,10 +11919,7 @@ export interface operations {
     getClassLevelsByIdArms: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -11977,10 +11979,7 @@ export interface operations {
     postClassLevelsByIdArms: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -12080,10 +12079,7 @@ export interface operations {
     putArmsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -12183,10 +12179,7 @@ export interface operations {
     deleteArmsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -12246,10 +12239,7 @@ export interface operations {
     getSubjects: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -12298,10 +12288,7 @@ export interface operations {
     postSubjects: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -12390,10 +12377,7 @@ export interface operations {
     putSubjectsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -12493,10 +12477,7 @@ export interface operations {
     deleteSubjectsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -12565,10 +12546,7 @@ export interface operations {
     getClassLevelsByIdSubjects: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -12628,10 +12606,7 @@ export interface operations {
     putClassLevelsByIdSubjects: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -12731,10 +12706,7 @@ export interface operations {
     getGradingSchemes: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -12783,10 +12755,7 @@ export interface operations {
     postGradingSchemes: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -12875,10 +12844,7 @@ export interface operations {
     putGradingSchemesByIdBands: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -12978,10 +12944,7 @@ export interface operations {
     postGradingSchemesByIdSetDefault: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -13050,10 +13013,7 @@ export interface operations {
     deleteGradingSchemesById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -13122,10 +13082,7 @@ export interface operations {
     getAssessmentSchemes: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -13174,10 +13131,7 @@ export interface operations {
     postAssessmentSchemes: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -13266,10 +13220,7 @@ export interface operations {
     putAssessmentSchemesByIdComponents: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -13369,10 +13320,7 @@ export interface operations {
     postAssessmentSchemesByIdSetDefault: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -13441,10 +13389,7 @@ export interface operations {
     getDomainTraits: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -13493,10 +13438,7 @@ export interface operations {
     postDomainTraits: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -13585,10 +13527,7 @@ export interface operations {
     putDomainTraitsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -13688,10 +13627,7 @@ export interface operations {
     deleteDomainTraitsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -13754,10 +13690,7 @@ export interface operations {
                 from?: string;
                 to?: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -13806,10 +13739,7 @@ export interface operations {
     postCalendarDays: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -13898,10 +13828,7 @@ export interface operations {
     deleteCalendarDaysById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -13968,10 +13895,7 @@ export interface operations {
     postCalendarImportHolidays: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -14060,10 +13984,7 @@ export interface operations {
     getTermsByIdSchoolDays: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -14126,8 +14047,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -14228,10 +14147,7 @@ export interface operations {
                 PageSize?: number | string;
                 Sort?: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -14294,8 +14210,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -14387,10 +14301,7 @@ export interface operations {
     getStudentsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -14450,10 +14361,7 @@ export interface operations {
     deleteStudentsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -14520,10 +14428,7 @@ export interface operations {
     patchStudentsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -14623,10 +14528,7 @@ export interface operations {
     postStudentsByIdGuardians: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -14726,10 +14628,7 @@ export interface operations {
     deleteStudentsByIdGuardiansByGuardianId: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
                 guardianId: string;
@@ -14806,10 +14705,7 @@ export interface operations {
     patchStudentsByIdGuardiansByGuardianId: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
                 guardianId: string;
@@ -14910,10 +14806,7 @@ export interface operations {
     getGuardiansById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -14973,10 +14866,7 @@ export interface operations {
     patchGuardiansById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -15076,10 +14966,7 @@ export interface operations {
     postGuardiansByIdPortalInvite: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -15157,10 +15044,7 @@ export interface operations {
     getMeWards: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -15209,10 +15093,7 @@ export interface operations {
     getMeWardsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -15272,10 +15153,7 @@ export interface operations {
     patchMeWardsByIdGuardian: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -15375,10 +15253,7 @@ export interface operations {
     postStudentsByIdTransferArm: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -15478,10 +15353,7 @@ export interface operations {
     postStudentsByIdWithdraw: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -15581,10 +15453,7 @@ export interface operations {
     postStudentsByIdGraduate: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -15684,10 +15553,7 @@ export interface operations {
     postStudentsByIdReinstate: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -15787,10 +15653,7 @@ export interface operations {
     getStudentsByIdNotes: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -15850,10 +15713,7 @@ export interface operations {
     postStudentsByIdNotes: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -15953,10 +15813,7 @@ export interface operations {
     getStudentsByIdDocuments: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -16016,10 +15873,7 @@ export interface operations {
     postStudentsByIdDocuments: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -16119,10 +15973,7 @@ export interface operations {
     deleteStudentsByIdDocumentsByDocumentId: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
                 documentId: string;
@@ -16190,10 +16041,7 @@ export interface operations {
     postPromotionsPreview: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -16294,8 +16142,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -16365,6 +16211,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -16396,10 +16244,7 @@ export interface operations {
     getStudentsImportTemplate: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -16446,10 +16291,7 @@ export interface operations {
     postStudentsImport: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -16547,10 +16389,7 @@ export interface operations {
     getStudentsImportById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -16614,10 +16453,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -16677,10 +16513,7 @@ export interface operations {
     getStudentsImportByIdErrorsCsv: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -16741,8 +16574,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path: {
                 id: string;
@@ -16814,6 +16645,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -16845,10 +16678,7 @@ export interface operations {
     postPublicBySlugAdmissions: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 slug: string;
             };
@@ -16923,10 +16753,7 @@ export interface operations {
             query?: {
                 status?: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -16975,10 +16802,7 @@ export interface operations {
     postAdmissionsByIdAccept: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -17078,10 +16902,7 @@ export interface operations {
     postAdmissionsByIdReject: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -17163,10 +16984,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -17224,10 +17042,7 @@ export interface operations {
     postStaff: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -17316,10 +17131,7 @@ export interface operations {
     getStaffById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -17379,10 +17191,7 @@ export interface operations {
     putStaffById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -17482,10 +17291,7 @@ export interface operations {
     deleteStaffById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -17554,10 +17360,7 @@ export interface operations {
             query: {
                 sessionId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -17619,10 +17422,7 @@ export interface operations {
             query: {
                 sessionId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -17724,10 +17524,7 @@ export interface operations {
             query: {
                 sessionId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -17789,10 +17586,7 @@ export interface operations {
             query?: {
                 sessionId?: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -17841,10 +17635,7 @@ export interface operations {
     getStaffByIdLeave: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -17904,10 +17695,7 @@ export interface operations {
     postStaffByIdLeave: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -18007,10 +17795,7 @@ export interface operations {
     postLeaveByIdApprove: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -18088,10 +17873,7 @@ export interface operations {
     postLeaveByIdReject: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -18169,10 +17951,7 @@ export interface operations {
     postStaffByIdDeactivate: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -18250,10 +18029,7 @@ export interface operations {
     postStaffByIdReactivate: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -18331,10 +18107,7 @@ export interface operations {
     postStaffByIdInviteUser: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -18437,10 +18210,7 @@ export interface operations {
                 date: string;
                 period?: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -18505,8 +18275,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path: {
                 id: string;
@@ -18612,10 +18380,7 @@ export interface operations {
             query?: {
                 period?: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
                 date: string;
@@ -18694,10 +18459,7 @@ export interface operations {
     postAttendanceClassArmsByIdByDateReopen: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
                 date: string;
@@ -18800,10 +18562,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -18866,10 +18625,7 @@ export interface operations {
                 date: string;
                 period?: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -18932,10 +18688,7 @@ export interface operations {
                 from: string;
                 to: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -19006,10 +18759,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -19071,10 +18821,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -19134,10 +18881,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -19201,10 +18945,7 @@ export interface operations {
                 classArmId: string;
                 subjectId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -19265,8 +19006,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -19336,6 +19075,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -19370,8 +19111,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path: {
                 id: string;
@@ -19443,6 +19182,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -19474,10 +19215,7 @@ export interface operations {
     postAssessmentScoreSheetsByIdSubmit: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -19555,10 +19293,7 @@ export interface operations {
     postAssessmentScoreSheetsByIdApprove: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -19636,10 +19371,7 @@ export interface operations {
     postAssessmentScoreSheetsByIdReopen: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -19739,10 +19471,7 @@ export interface operations {
     postAssessmentCompute: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -19840,10 +19569,7 @@ export interface operations {
     getAssessmentJobsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -19906,10 +19632,7 @@ export interface operations {
                 termId: string;
                 classArmId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -19961,10 +19684,7 @@ export interface operations {
                 termId: string;
                 classArmId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -20013,10 +19733,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -20078,10 +19795,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -20183,10 +19897,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -20286,10 +19997,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -20390,8 +20098,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -20452,6 +20158,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -20487,10 +20195,7 @@ export interface operations {
                 classArmId?: string;
                 studentId?: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -20539,10 +20244,7 @@ export interface operations {
     getReportCardsByIdDownload: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -20600,10 +20302,7 @@ export interface operations {
     postReportCardsPublish: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -20694,10 +20393,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -20757,10 +20453,7 @@ export interface operations {
     getMeReportCardsByIdDownload: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -20821,8 +20514,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -20892,6 +20583,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -20923,10 +20616,7 @@ export interface operations {
     postAssessmentAmendmentsByIdApprove: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -21004,10 +20694,7 @@ export interface operations {
     postAssessmentAmendmentsByIdReject: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -21109,10 +20796,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -21172,10 +20856,7 @@ export interface operations {
     getFeesItems: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -21224,10 +20905,7 @@ export interface operations {
     postFeesItems: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -21318,10 +20996,7 @@ export interface operations {
             query?: {
                 sessionId?: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -21370,10 +21045,7 @@ export interface operations {
     postFeesStructures: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -21471,10 +21143,7 @@ export interface operations {
     getFeesStructuresById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -21534,10 +21203,7 @@ export interface operations {
     putFeesStructuresByIdLines: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -21637,10 +21303,7 @@ export interface operations {
     postFeesStructuresByIdActivate: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -21709,10 +21372,7 @@ export interface operations {
     getFeesDiscounts: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -21761,10 +21421,7 @@ export interface operations {
     postFeesDiscounts: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -21856,8 +21513,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path: {
                 id: string;
@@ -21929,6 +21584,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -21960,10 +21617,7 @@ export interface operations {
     postStudentsByIdDiscountsByAssignmentIdApprove: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
                 assignmentId: string;
@@ -22045,8 +21699,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -22116,6 +21768,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -22153,10 +21807,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -22214,10 +21865,7 @@ export interface operations {
     getInvoicesById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -22277,10 +21925,7 @@ export interface operations {
     postInvoicesByIdVoid: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -22380,10 +22025,7 @@ export interface operations {
     postInvoicesByIdAdjustments: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -22486,10 +22128,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -22549,10 +22188,7 @@ export interface operations {
     getInvoicesByIdPdf: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -22613,8 +22249,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -22709,8 +22343,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -22771,6 +22403,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -22805,8 +22439,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -22876,6 +22508,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -22909,10 +22543,7 @@ export interface operations {
             query: {
                 reference: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -22975,10 +22606,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -23030,10 +22658,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -23082,10 +22707,7 @@ export interface operations {
     postPaymentsUnallocatedByIdAssign: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -23185,10 +22807,7 @@ export interface operations {
     getPaymentsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -23248,10 +22867,7 @@ export interface operations {
     getPaymentsByIdReceipt: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -23309,10 +22925,7 @@ export interface operations {
     postPaymentsByIdReverseRequest: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -23412,10 +23025,7 @@ export interface operations {
     postPaymentsByIdReverseApprove: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -23493,10 +23103,7 @@ export interface operations {
     getStudentsByIdLedger: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -23559,10 +23166,7 @@ export interface operations {
                 from: string;
                 to: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -23620,10 +23224,7 @@ export interface operations {
     getFeesReportsDebtors: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -23672,10 +23273,7 @@ export interface operations {
     getFeesReconciliation: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -23760,10 +23358,7 @@ export interface operations {
     getNotificationsTemplates: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -23812,10 +23407,7 @@ export interface operations {
     putNotificationsTemplatesByKey: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 key: string;
             };
@@ -23915,10 +23507,7 @@ export interface operations {
     deleteNotificationsTemplatesByKey: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 key: string;
             };
@@ -23987,10 +23576,7 @@ export interface operations {
     postNotificationsTemplatesByKeyPreview: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 key: string;
             };
@@ -24090,10 +23676,7 @@ export interface operations {
     getMeNotificationPreferences: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -24142,10 +23725,7 @@ export interface operations {
     putMeNotificationPreferences: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -24238,10 +23818,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -24293,8 +23870,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -24355,6 +23930,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -24386,10 +23963,7 @@ export interface operations {
     getAnnouncementsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -24449,10 +24023,7 @@ export interface operations {
     putAnnouncementsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -24552,10 +24123,7 @@ export interface operations {
     postAnnouncementsAudiencePreview: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -24647,8 +24215,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path: {
                 id: string;
@@ -24707,6 +24273,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -24738,10 +24306,7 @@ export interface operations {
     postAnnouncementsByIdCancel: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -24847,10 +24412,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -24910,10 +24472,7 @@ export interface operations {
             query?: {
                 days?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -24965,8 +24524,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path: {
                 id: string;
@@ -25025,6 +24582,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -25056,10 +24615,7 @@ export interface operations {
     getNotificationsSmsWallet: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -25173,6 +24729,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -25208,10 +24766,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -25260,10 +24815,7 @@ export interface operations {
     postMeNotificationsByIdRead: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -25332,10 +24884,7 @@ export interface operations {
     postMeNotificationsReadAll: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -25557,10 +25106,7 @@ export interface operations {
     postFilesPresignUpload: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -25649,10 +25195,7 @@ export interface operations {
     getFilesByIdContent: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -25719,10 +25262,7 @@ export interface operations {
     putFilesByIdContent: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -25807,10 +25347,7 @@ export interface operations {
     postFilesByIdComplete: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -25897,10 +25434,7 @@ export interface operations {
     getFilesByIdDownloadUrl: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -25969,10 +25503,7 @@ export interface operations {
     deleteFilesById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -26041,10 +25572,7 @@ export interface operations {
             query: {
                 termId: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -26104,10 +25632,7 @@ export interface operations {
                 From?: string;
                 To?: string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -26165,10 +25690,7 @@ export interface operations {
     getAuditLogsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -26228,10 +25750,7 @@ export interface operations {
     postAuditLogsExport: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -26320,10 +25839,7 @@ export interface operations {
     getAuditLogsExportsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -26383,10 +25899,7 @@ export interface operations {
     getAuditLogsExportsByIdDownload: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -26467,10 +25980,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -26519,10 +26029,7 @@ export interface operations {
     postComplianceConsents: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -26611,10 +26118,7 @@ export interface operations {
     postComplianceConsentsByIdWithdraw: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -26696,10 +26200,7 @@ export interface operations {
                 page?: number | string;
                 pageSize?: number | string;
             };
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -26751,8 +26252,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -26813,6 +26312,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -26844,10 +26345,7 @@ export interface operations {
     getComplianceDataRequestsById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -26907,10 +26405,7 @@ export interface operations {
     postComplianceDataRequestsByIdApprove: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -26988,10 +26483,7 @@ export interface operations {
     postComplianceDataRequestsByIdReject: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -27091,10 +26583,7 @@ export interface operations {
     getComplianceDataRequestsByIdExport: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -27155,8 +26644,6 @@ export interface operations {
             header: {
                 /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
                 "Idempotency-Key": string;
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
             };
             path?: never;
             cookie?: never;
@@ -27204,6 +26691,8 @@ export interface operations {
             /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -27235,10 +26724,7 @@ export interface operations {
     getComplianceTenantExportById: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };
@@ -27298,10 +26784,7 @@ export interface operations {
     getComplianceTenantExportByIdDownload: {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Development only: the school slug to act for when the request has no school host name (for example `http://localhost`). Ignored and not offered outside Development. */
-                "X-Tenant"?: string;
-            };
+            header?: never;
             path: {
                 id: string;
             };

@@ -1150,6 +1150,28 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "extensions": {}
   },
   {
+    "id": "GET /api/v1/public/tenants/{slug}/branding",
+    "method": "GET",
+    "path": "/api/v1/public/tenants/{slug}/branding",
+    "tag": "Public",
+    "idempotent": false,
+    "ifMatch": false,
+    "access": "anonymous",
+    "permissions": [],
+    "extensions": {}
+  },
+  {
+    "id": "GET /api/v1/public/tenants/{slug}/logo",
+    "method": "GET",
+    "path": "/api/v1/public/tenants/{slug}/logo",
+    "tag": "Public",
+    "idempotent": false,
+    "ifMatch": false,
+    "access": "anonymous",
+    "permissions": [],
+    "extensions": {}
+  },
+  {
     "id": "GET /api/v1/report-cards",
     "method": "GET",
     "path": "/api/v1/report-cards",
