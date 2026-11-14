@@ -7,7 +7,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 
-export function buildCsp(nonce: string, isDev: boolean): string {
+export function buildCsp(nonce: string, isDev: boolean, secure = !isDev): string {
   return [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
@@ -22,14 +22,16 @@ export function buildCsp(nonce: string, isDev: boolean): string {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    ...(isDev ? [] : ["upgrade-insecure-requests"]),
+    // Only where the page itself is https. On plain http (a local run, or an http test server) the directive
+    // would upgrade every subresource to https and break the page.
+    ...(secure ? ["upgrade-insecure-requests"] : []),
   ].join("; ");
 }
 
 export function proxy(request: NextRequest): NextResponse {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const isDev = process.env.NODE_ENV === "development";
-  const csp = buildCsp(nonce, isDev);
+  const csp = buildCsp(nonce, isDev, request.nextUrl.protocol === "https:");
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);

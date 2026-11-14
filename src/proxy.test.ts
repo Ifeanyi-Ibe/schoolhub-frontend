@@ -22,9 +22,9 @@ describe("buildCsp", () => {
     expect(prod).not.toContain("unsafe-eval");
   });
 
-  it("upgrades insecure requests in production only", () => {
-    expect(prod).toContain("upgrade-insecure-requests");
-    expect(buildCsp("n", true)).not.toContain("upgrade-insecure-requests");
+  it("upgrades insecure requests only where the page is https", () => {
+    expect(buildCsp("n", false, true)).toContain("upgrade-insecure-requests");
+    expect(buildCsp("n", false, false)).not.toContain("upgrade-insecure-requests");
   });
 });
 
