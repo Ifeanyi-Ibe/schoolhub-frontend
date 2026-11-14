@@ -150,6 +150,14 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Design-around:** treat any 2xx response without a visible report card as "not available yet". Show the withheld message only after the code is documented.
 - **Status:** Blocking for the withheld-results UX (F7). Ask for the response shape.
 
+### B-18 — Invitation and reset links carry the token in the query string
+
+- **Observed:** the Development message for an invitation reads `Set your password within 72 hours: https://app.schoolhub.example/accept-invite?school=demo&token=…`. The reset message carries its token in the same `token=` query form (the reset journey reads it from the message).
+- **Frontend rule:** the one-time token is read from the URL fragment, which the browser never sends to the server (F1 decision, `src/features/auth/forms.tsx`). A link with `?token=` opens the page with no token.
+- **Effect:** a user who clicks the emailed link cannot accept an invitation or reset a password. Tested against the real backend: the link's page shows no accept button.
+- **Design-around:** none without weakening the rule. Options: (a) the backend builds the link with the token in the fragment, `accept-invite?school=demo#token=…`; (b) the page accepts the query token once and moves it to the fragment, which exposes the token to any server or proxy log that records query strings. We recommend (a).
+- **Status:** Open, blocking the invitation and reset UX on real links. The real-backend test records the current behaviour and fails when the gap closes.
+
 ## Spec-to-contract naming differences (follow the contract)
 
 | Spec name                                              | Contract                                               |
