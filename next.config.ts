@@ -7,8 +7,8 @@ const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
-  // Source maps are not published to the public site.
-  productionBrowserSourceMaps: false,
+  // Source maps are off by default. BUNDLE_REPORT=1 turns them on for the bundle analysis.
+  productionBrowserSourceMaps: process.env.BUNDLE_REPORT === "1",
 };
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkBudgets, gzipBytes, initialScriptUrls, sumGzip } from "./bundle-size-lib.mjs";
+import { checkGroupBudgets, gzipBytes, initialScriptUrls, sumGzip } from "./bundle-size-lib.mjs";
 
 describe("initialScriptUrls", () => {
   it("collects same-origin script tags and script preloads, once each", () => {
@@ -35,13 +35,42 @@ describe("gzipBytes and sums", () => {
   });
 });
 
-describe("checkBudgets", () => {
-  it("passes when every measured route is within budget", () => {
-    expect(checkBudgets({ "/": 100 }, { "/": 170 })).toEqual([]);
+describe("checkGroupBudgets", () => {
+  const groups = {
+    auth: { budgetGzipBytes: 170, targetGzipBytes: 150, routes: { "/login": {} } },
+    parent: { budgetGzipBytes: 170, routes: { "/home": {}, "/profile": {} } },
+    admin: { budgetGzipBytes: 250, routes: {} },
+  };
+
+  it("passes when every route in every group is within the cap", () => {
+    const { failures, reports } = checkGroupBudgets(
+      { "/login": 160, "/home": 100, "/profile": 120 },
+      groups,
+    );
+    expect(failures).toEqual([]);
+    expect(reports.find((r) => r.group === "parent")?.worst).toEqual({
+      route: "/profile",
+      bytes: 120,
+    });
   });
 
-  it("fails over-budget routes and routes that were not measured", () => {
-    expect(checkBudgets({ "/": 200 }, { "/": 170 })[0]).toMatch(/exceeds budget/);
-    expect(checkBudgets({}, { "/parent": 170 })[0]).toMatch(/no measurement/);
+  it("fails a route over its group cap, and a route with no measurement", () => {
+    const over = checkGroupBudgets({ "/login": 171, "/home": 100, "/profile": 100 }, groups);
+    expect(over.failures[0]).toMatch(/auth: \/login 171 B gzipped exceeds the group cap 170 B/);
+    const missing = checkGroupBudgets({ "/login": 100, "/home": 100 }, groups);
+    expect(missing.failures[0]).toMatch(/parent: \/profile has no measurement/);
+  });
+
+  it("reports groups with no routes yet without failing them", () => {
+    const { failures, reports } = checkGroupBudgets(
+      { "/login": 1, "/home": 1, "/profile": 1 },
+      groups,
+    );
+    expect(failures).toEqual([]);
+    expect(reports.find((r) => r.group === "admin")).toMatchObject({
+      routes: [],
+      worst: null,
+      cap: 250,
+    });
   });
 });

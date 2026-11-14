@@ -34,16 +34,47 @@ export function sumGzip(assets) {
   return assets.reduce((total, a) => total + a.gzipBytes, 0);
 }
 
-/** Compare measured sizes with budgets. Returns one failure string per route over budget. */
-export function checkBudgets(results, budgets) {
+/**
+ * Checks per-route-group budgets. A group passes when every route in it is measured and within the
+ * hard cap. Returns { failures, reports }: failures are strings for CI; reports describe each group's
+ * worst route against its target (when set) and cap.
+ */
+export function checkGroupBudgets(results, groups) {
   const failures = [];
-  for (const [route, limit] of Object.entries(budgets)) {
-    const measured = results[route];
-    if (measured === undefined) {
-      failures.push(`${route}: no measurement (route missing from results)`);
-    } else if (measured > limit) {
-      failures.push(`${route}: ${measured} B gzipped exceeds budget ${limit} B`);
+  const reports = [];
+  for (const [name, group] of Object.entries(groups)) {
+    const routes = Object.keys(group.routes);
+    if (routes.length === 0) {
+      reports.push({
+        group: name,
+        routes: [],
+        worst: null,
+        cap: group.budgetGzipBytes,
+        target: group.targetGzipBytes ?? null,
+      });
+      continue;
     }
+    let worst = { route: null, bytes: -1 };
+    for (const route of routes) {
+      const measured = results[route];
+      if (measured === undefined) {
+        failures.push(`${name}: ${route} has no measurement`);
+        continue;
+      }
+      if (measured > group.budgetGzipBytes) {
+        failures.push(
+          `${name}: ${route} ${measured} B gzipped exceeds the group cap ${group.budgetGzipBytes} B`,
+        );
+      }
+      if (measured > worst.bytes) worst = { route, bytes: measured };
+    }
+    reports.push({
+      group: name,
+      routes,
+      worst,
+      cap: group.budgetGzipBytes,
+      target: group.targetGzipBytes ?? null,
+    });
   }
-  return failures;
+  return { failures, reports };
 }

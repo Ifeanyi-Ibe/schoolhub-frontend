@@ -1,13 +1,35 @@
 {
-  "$comment": "Budgets from CLAUDE.md. Values are gzipped bytes of first-load JavaScript, measured on the production build with the labelled test double. Parent-portal routes are <= 170 KB (174080 bytes). Signed-in routes carry a session cookie; the cookie value is a test token (test double), not a credential.",
-  "firstLoadJsGzipBytes": {
-    "/login": 174080,
-    "/home": 174080
-  },
-  "routes": {
-    "/login": {},
-    "/home": {
-      "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJvayIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:ok:1"
+  "$comment": "Per-route-group budgets (CLAUDE.md performance budgets). Values are gzipped bytes of first-load JavaScript, measured on the production build with the labelled test double. A group's budget applies to every route in it. 'targetGzipBytes' (where set) is the goal and only reported; 'budgetGzipBytes' is the hard cap and fails CI. Signed-in routes carry a session cookie; the cookie value is a test token (test double), not a credential. Groups with no routes yet reserve their budget for the features that will add them.",
+  "groups": {
+    "auth": {
+      "targetGzipBytes": 153600,
+      "budgetGzipBytes": 174080,
+      "routes": {
+        "/login": {}
+      }
+    },
+    "parent": {
+      "targetGzipBytes": 153600,
+      "budgetGzipBytes": 174080,
+      "routes": {
+        "/home": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJvayIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:ok:1"
+        },
+        "/profile": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJvayIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:ok:1"
+        },
+        "/sessions": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJvayIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:ok:1"
+        }
+      }
+    },
+    "teacher": {
+      "budgetGzipBytes": 204800,
+      "routes": {}
+    },
+    "admin": {
+      "budgetGzipBytes": 256000,
+      "routes": {}
     }
   }
 }
