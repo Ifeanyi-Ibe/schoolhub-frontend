@@ -51,6 +51,11 @@ export function createApiClient(
       });
       const timeout = AbortSignal.timeout(call.timeoutMs);
       const signal = call.signal ? AbortSignal.any([call.signal, timeout]) : timeout;
+      // A string body is JSON that the BFF serialised. The browser's request may carry no content
+      // type (a GET that refreshes the session, for example), and the API answers 415 without one.
+      if (typeof call.body === "string" && !headers.has("content-type")) {
+        headers.set("content-type", "application/json");
+      }
       const init: RequestInit & { duplex?: "half" } = {
         method: call.method,
         headers,

@@ -1,12 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
+import { TEST_BFF_KEY, FAKE_API_PORT, TENANT } from "./e2e/fake-api";
 
+// e2e runs ONLY against the production build (npm run build runs first in the gate). The
+// upstream is the labelled test double in e2e/fake-api.ts, never the real backend.
 const port = Number(process.env.E2E_PORT ?? 3000);
-const baseURL = `http://localhost:${port}`;
-
-// The styleguide is non-production only (404 in production), so its axe checks run against
-// `next dev`. The offline page is checked against the production build in the Lighthouse job.
-// The BFF integration tests run against a fake upstream API (e2e/fake-api.ts), started in global setup.
-const FAKE_API = "http://127.0.0.1:5999";
+// A real school host: {slug}.localhost resolves to loopback in Chromium, and the tenant comes from it.
+const baseURL = `http://${TENANT}.localhost:${port}`;
 
 export default defineConfig({
   testDir: "e2e",
@@ -20,27 +19,24 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [
-    {
-      name: "mobile-360",
-      use: { ...devices["Pixel 5"], viewport: { width: 360, height: 780 } },
-    },
+    { name: "mobile-360", use: { ...devices["Pixel 5"], viewport: { width: 360, height: 780 } } },
     {
       name: "desktop",
       use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } },
     },
   ],
   webServer: {
-    command: `npm run dev -- --port ${port}`,
-    url: baseURL,
-    // Always start our own server: a reused one could have other API settings.
+    command: `npm run start -- -p ${port}`,
+    url: `http://127.0.0.1:${port}/api/bff/health`,
     reuseExistingServer: false,
     env: {
-      API_BASE_URL: FAKE_API,
-      BFF_API_KEY: "e2e-bff-key-0000000001",
+      API_BASE_URL: `http://127.0.0.1:${FAKE_API_PORT}`,
+      BFF_API_KEY: TEST_BFF_KEY,
       APP_BASE_DOMAIN: "localhost",
       APP_ORIGIN: baseURL,
-      DEV_TENANT_SLUG: "greenfield",
+      DEV_TENANT_SLUG: TENANT,
       DOWNLOAD_ALLOWED_HOSTS: "127.0.0.1",
+      REFRESH_GRACE_SECONDS: "10",
     },
     timeout: 120_000,
   },

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en-NG">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Your browser is too old for SchoolHub. Update it to continue."
+    />
+    <title>Please update your browser · SchoolHub</title>
+    <link rel="icon" href="/icons/icon-192.png" type="image/png" />
+    <!-- Static page: no script. Shown when the browser lacks features SchoolHub needs (ADR 0008). -->
+    <style>
+      :root {
+        color-scheme: light dark;
+        --background: #f6f7f9;
+        --foreground: #111827;
+        --muted-foreground: #4b5563;
+        --brand: #0f5c4d;
+        --on-brand: #ffffff;
+        --ring: #1d4ed8;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: #0b1220;
+          --foreground: #e5e7eb;
+          --muted-foreground: #aab4c3;
+          --brand: #2dd4bf;
+          --on-brand: #042f2e;
+          --ring: #60a5fa;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        background: var(--background);
+        color: var(--foreground);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        max-width: 36rem;
+        margin: 0 auto;
+        padding: 3rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin: 0;
+      }
+      p,
+      li {
+        margin: 0;
+        color: var(--muted-foreground);
+        line-height: 1.6;
+      }
+      ul {
+        margin: 0;
+        padding-left: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      a {
+        color: var(--foreground);
+        font-weight: 600;
+      }
+      .note {
+        border-left: 4px solid var(--brand);
+        padding-left: 0.75rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Please update your browser</h1>
+      <p>
+        SchoolHub needs a recent browser to keep your information safe and the pages working
+        properly. Your browser is a little out of date.
+      </p>
+      <p>To continue, update to one of these, then open this page again:</p>
+      <ul>
+        <li>Google Chrome or Microsoft Edge, version 111 or newer</li>
+        <li>Mozilla Firefox, version 111 or newer</li>
+        <li>Safari on iPhone or Mac, version 16.4 or newer</li>
+      </ul>
+      <p class="note">
+        Updating is free. On Android, update Chrome from the Play Store. On iPhone, update iOS in
+        Settings, then General, then Software Update.
+      </p>
+      <p>Nothing has been lost. Your school's details and your account are unchanged.</p>
+    </main>
+  </body>
+</html>

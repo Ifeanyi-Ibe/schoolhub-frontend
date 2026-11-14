@@ -33,6 +33,8 @@ export function proxy(request: NextRequest): NextResponse {
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
+  // Path and query for the sign-in return path (validated by src/server/return-path.ts).
+  requestHeaders.set("x-pathname", request.nextUrl.pathname + request.nextUrl.search);
   requestHeaders.set("Content-Security-Policy", csp);
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });

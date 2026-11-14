@@ -2,11 +2,15 @@
 // inbound X-Forwarded-*, X-Tenant, Cookie and Authorization never reach the API unless we add
 // them ourselves.
 
-/** Request headers the browser may send that we forward to the API. */
+/**
+ * Request headers the browser may send that we forward to the API.
+ * Content-Length is deliberately NOT forwarded: a body may be re-serialised by the BFF (auth
+ * routes add fields), and a stale length makes the upstream read the wrong number of bytes and
+ * stall. fetch computes the length itself.
+ */
 const FORWARDED_REQUEST_HEADERS = [
   "accept",
   "content-type",
-  "content-length",
   "if-match",
   "if-none-match",
   "idempotency-key",

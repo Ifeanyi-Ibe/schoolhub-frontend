@@ -1,15 +1,15 @@
-import { AlertTriangle, CheckCircle2, CircleDashed, Info, XCircle } from "lucide-react";
+import { AlertIcon, CheckCircleIcon, InfoIcon, XCircleIcon, DashedCircleIcon } from "./icons";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export type StatusTone = "success" | "warning" | "danger" | "info" | "neutral";
 
-const TONES: Record<StatusTone, { surface: string; icon: typeof Info }> = {
-  success: { surface: "bg-success-surface text-success-foreground", icon: CheckCircle2 },
-  warning: { surface: "bg-warning-surface text-warning-foreground", icon: AlertTriangle },
-  danger: { surface: "bg-danger-surface text-danger-foreground", icon: XCircle },
-  info: { surface: "bg-info-surface text-info-foreground", icon: Info },
-  neutral: { surface: "bg-neutral-surface text-neutral-foreground", icon: CircleDashed },
+const TONES: Record<StatusTone, { surface: string; icon: typeof InfoIcon }> = {
+  success: { surface: "bg-success-surface text-success-foreground", icon: CheckCircleIcon },
+  warning: { surface: "bg-warning-surface text-warning-foreground", icon: AlertIcon },
+  danger: { surface: "bg-danger-surface text-danger-foreground", icon: XCircleIcon },
+  info: { surface: "bg-info-surface text-info-foreground", icon: InfoIcon },
+  neutral: { surface: "bg-neutral-surface text-neutral-foreground", icon: DashedCircleIcon },
 };
 
 export interface StatusBadgeProps {

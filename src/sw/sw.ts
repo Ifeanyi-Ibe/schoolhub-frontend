@@ -30,6 +30,12 @@ const serwist = new Serwist({
   navigationPreload: true,
   runtimeCaching: [
     {
+      // Pages are never cached (they can show a signed-in user's data on a shared phone). A failed
+      // navigation falls through to the offline page below.
+      matcher: ({ request }) => request.mode === "navigate",
+      handler: new NetworkOnly(),
+    },
+    {
       // Never cache the BFF or the API: their responses can carry PII.
       matcher: ({ url }) => url.pathname.startsWith("/api/"),
       handler: new NetworkOnly(),

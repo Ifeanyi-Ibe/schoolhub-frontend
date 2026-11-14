@@ -23,6 +23,7 @@ function depsWith(api: ReturnType<typeof fakeApi>, overrides: Partial<BffDeps> =
       DEV_TENANT_SLUG: undefined,
       NODE_ENV: "production",
       DOWNLOAD_ALLOWED_HOSTS: ["files.schoolhub.example"],
+      REFRESH_GRACE_SECONDS: 10,
     },
     api,
     fetchExternal: vi.fn(
@@ -107,7 +108,7 @@ describe("handleProxy: forwarding", () => {
   it("sends the access token from the cookie, never the refresh token", async () => {
     const api = fakeApi(() => json(200, {}));
     await handleProxy(
-      request("/api/bff/api/v1/me", { cookie: `sh_at=${fresh}; sh_rt=refresh-1` }),
+      request("/api/bff/api/v1/me", { cookie: `__Host-sh_at=${fresh}; __Host-sh_rt=refresh-1` }),
       ["api", "v1", "me"],
       depsWith(api),
     );
@@ -127,7 +128,9 @@ describe("handleProxy: session refresh", () => {
       call.path === "api/v1/auth/refresh" ? json(200, rotated) : json(200, { me: 1 }),
     );
     const res = await handleProxy(
-      request("/api/bff/api/v1/me", { cookie: `sh_at=${nearExpiry}; sh_rt=refresh-1` }),
+      request("/api/bff/api/v1/me", {
+        cookie: `__Host-sh_at=${nearExpiry}; __Host-sh_rt=refresh-1`,
+      }),
       ["api", "v1", "me"],
       depsWith(api),
     );
@@ -135,9 +138,11 @@ describe("handleProxy: session refresh", () => {
     expect(api.calls[1]?.accessToken).toBe(rotated.accessToken);
     const cookies = res.headers.getSetCookie();
     expect(
-      cookies.some((c) => c.startsWith(`sh_at=${rotated.accessToken}`) && c.includes("Secure")),
+      cookies.some(
+        (c) => c.startsWith(`__Host-sh_at=${rotated.accessToken}`) && c.includes("Secure"),
+      ),
     ).toBe(true);
-    expect(cookies.some((c) => c.startsWith("sh_rt=refresh-2"))).toBe(true);
+    expect(cookies.some((c) => c.startsWith("__Host-sh_rt=refresh-2"))).toBe(true);
   });
 
   it("on 401, refreshes once, retries the call, and returns the retried response", async () => {
@@ -153,7 +158,7 @@ describe("handleProxy: session refresh", () => {
       return meCalls === 1 ? json(401, { code: "auth.token_invalid" }) : json(200, { me: 2 });
     });
     const res = await handleProxy(
-      request("/api/bff/api/v1/me", { cookie: `sh_at=${fresh}; sh_rt=refresh-1` }),
+      request("/api/bff/api/v1/me", { cookie: `__Host-sh_at=${fresh}; __Host-sh_rt=refresh-1` }),
       ["api", "v1", "me"],
       depsWith(api),
     );
@@ -169,7 +174,7 @@ describe("handleProxy: session refresh", () => {
         : json(401, { code: "auth.token_invalid" }),
     );
     const res = await handleProxy(
-      request("/api/bff/api/v1/me", { cookie: `sh_at=${fresh}; sh_rt=dead` }),
+      request("/api/bff/api/v1/me", { cookie: `__Host-sh_at=${fresh}; __Host-sh_rt=dead` }),
       ["api", "v1", "me"],
       depsWith(api),
     );
@@ -178,7 +183,7 @@ describe("handleProxy: session refresh", () => {
     expect(api.calls.filter((c) => c.path === "api/v1/me")).toHaveLength(1);
     const cookies = res.headers.getSetCookie();
     expect(cookies.every((c) => c.includes("Max-Age=0"))).toBe(true);
-    expect(cookies).toHaveLength(2);
+    expect(cookies).toHaveLength(4);
   });
 
   it("answers 503 (keeping the cookies) when the session cannot be refreshed right now", async () => {
@@ -186,7 +191,9 @@ describe("handleProxy: session refresh", () => {
       call.path === "api/v1/auth/refresh" ? json(503, {}) : json(200, {}),
     );
     const res = await handleProxy(
-      request("/api/bff/api/v1/me", { cookie: `sh_at=${nearExpiry}; sh_rt=refresh-1` }),
+      request("/api/bff/api/v1/me", {
+        cookie: `__Host-sh_at=${nearExpiry}; __Host-sh_rt=refresh-1`,
+      }),
       ["api", "v1", "me"],
       depsWith(api),
     );

@@ -16,8 +16,16 @@ import { z } from "zod";
 import type { ApiClient } from "./api-client";
 import type { SessionTokens } from "./session";
 
-/** Cached results expire inside the backend's 10 s grace window (Auth:RefreshGraceSeconds). */
-export const RESULT_TTL_MS = 8_000;
+/** A cached result must expire this long before the backend's grace window does. */
+const GRACE_SAFETY_MARGIN_MS = 2_000;
+
+/**
+ * How long a settled refresh result may be reused, derived from the backend's refresh grace
+ * window (Auth:RefreshGraceSeconds, documented default 10 s). Never less than one second.
+ */
+export function resultTtlMsForGrace(graceSeconds: number): number {
+  return Math.max(1_000, graceSeconds * 1_000 - GRACE_SAFETY_MARGIN_MS);
+}
 export const MAX_IN_FLIGHT_RETRIES = 3;
 /** How many times we follow a newer refresh token within one call. */
 const MAX_NEWER_TOKEN_HOPS = 2;
@@ -30,6 +38,8 @@ export type RefreshOutcome =
 
 export interface RefreshContext {
   api: ApiClient;
+  /** Reuse window for settled results, from resultTtlMsForGrace(). */
+  resultTtlMs: number;
   tenantSlug: string | null;
   clientIp: string | null;
   inbound: Headers;
@@ -86,7 +96,7 @@ export function refreshSession(
   const existing = inflight.get(key);
   if (
     existing &&
-    (existing.settled.at === null || ctx.now() - existing.settled.at < RESULT_TTL_MS)
+    (existing.settled.at === null || ctx.now() - existing.settled.at < ctx.resultTtlMs)
   ) {
     return existing.promise;
   }

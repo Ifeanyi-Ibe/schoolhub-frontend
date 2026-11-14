@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { headers } from "next/headers";
+import { ALL_CLIENT_NAMESPACES, pickNamespaces } from "@/i18n/client-namespaces";
+import Script from "next/script";
 import type { ReactNode } from "react";
 import { Providers } from "@/components/providers";
 import { OnlineIndicator } from "@/components/ui/offline-status";
@@ -28,13 +30,17 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   // Reading request headers makes this layout dynamic, which the CSP nonce from src/proxy.ts needs.
-  await headers();
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const locale = await getLocale();
-  const messages = await getMessages();
+  // Only the namespaces that client components read are sent to the browser (the full catalogue is
+  // used on the server). Keeps the first load within budget.
+  const messages = pickNamespaces(await getMessages(), ALL_CLIENT_NAMESPACES);
 
   return (
     <html lang={locale} className={`${inter.variable} ${plusJakarta.variable}`}>
       <body className="min-h-dvh antialiased">
+        {/* Feature detection before the app loads (ADR 0008). Carries the request nonce. */}
+        <Script src="/browser-check.js" strategy="beforeInteractive" nonce={nonce} />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>
             <OnlineIndicator />

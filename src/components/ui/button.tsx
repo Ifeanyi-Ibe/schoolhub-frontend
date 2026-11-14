@@ -1,5 +1,5 @@
+import { SpinnerIcon } from "./icons";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Loader2 } from "lucide-react";
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
@@ -59,7 +59,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     >
       {loading ? (
         <>
-          <Loader2 className="size-4 motion-safe:animate-spin" aria-hidden="true" />
+          <SpinnerIcon className="size-4 motion-safe:animate-spin" aria-hidden="true" />
           <span>{loadingLabel}</span>
         </>
       ) : (

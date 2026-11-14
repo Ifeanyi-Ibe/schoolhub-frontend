@@ -1,10 +1,9 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 
 // The update banner is a separate chunk, loaded only when an update is actually waiting.
-const UpdatePrompt = dynamic(() => import("./update-prompt"), { ssr: false });
+const UpdatePrompt = lazy(() => import("./update-prompt"));
 
 /**
  * Registers the service worker in production and offers an in-app update prompt when a new
@@ -50,15 +49,17 @@ export function ServiceWorkerRegistrar() {
 
   if (!waiting) return null;
   return (
-    <UpdatePrompt
-      onAccept={() => {
-        navigator.serviceWorker.addEventListener(
-          "controllerchange",
-          () => window.location.reload(),
-          { once: true },
-        );
-        waiting.postMessage({ type: "SKIP_WAITING" });
-      }}
-    />
+    <Suspense fallback={null}>
+      <UpdatePrompt
+        onAccept={() => {
+          navigator.serviceWorker.addEventListener(
+            "controllerchange",
+            () => window.location.reload(),
+            { once: true },
+          );
+          waiting.postMessage({ type: "SKIP_WAITING" });
+        }}
+      />
+    </Suspense>
   );
 }

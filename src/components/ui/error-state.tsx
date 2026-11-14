@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle } from "lucide-react";
+import { AlertIcon } from "./icons";
 import { useTranslations } from "next-intl";
 import { problemDetailsForCopy, type ApiProblem } from "@/lib/api/problem";
 import { Button } from "./button";
@@ -37,7 +37,7 @@ export function ErrorState({ title, description, problem, onRetry }: ErrorStateP
       className="flex flex-col gap-3 rounded-card border border-danger/40 bg-danger-surface p-4 text-danger-foreground"
     >
       <div className="flex items-start gap-2">
-        <AlertTriangle className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+        <AlertIcon className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
         <div className="flex flex-col gap-1">
           <p className="font-semibold">{title}</p>
           {description ? <p className="text-sm">{description}</p> : null}

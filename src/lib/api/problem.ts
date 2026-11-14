@@ -1,10 +1,8 @@
 // The single tolerant parser for API error bodies (RFC 9457 ProblemDetails).
 //
-// The contract's ProblemDetails schema omits `code`, `traceId` and `errors` (BACKEND_GAPS B-04).
-// Those fields are optional here, and anything missing or malformed falls back to safe defaults,
-// so the UI never crashes on an unexpected body.
-
-import { z } from "zod";
+// Written without a schema library on purpose: this module is in the browser bundle, and the budget
+// for the first load is tight. Every field is optional. Anything missing or malformed falls back
+// to a safe default, so the UI never crashes on an unexpected body.
 
 export interface ApiProblem {
   status: number;
@@ -19,17 +17,6 @@ export interface ApiProblem {
   errors: Record<string, string[]> | null;
 }
 
-const lenient = z.object({
-  type: z.string().nullish(),
-  title: z.string().nullish(),
-  status: z.union([z.number(), z.string()]).nullish(),
-  detail: z.string().nullish(),
-  instance: z.string().nullish(),
-  code: z.string().nullish(),
-  traceId: z.string().nullish(),
-  errors: z.record(z.string(), z.union([z.array(z.string()), z.string()])).nullish(),
-});
-
 const GENERIC_TITLE: Record<number, string> = {
   400: "Please check the highlighted fields.",
   401: "Your session has ended. Please sign in again.",
@@ -41,28 +28,36 @@ const GENERIC_TITLE: Record<number, string> = {
   429: "Too many requests. Please wait a moment.",
 };
 
-/** Parse an error response. `status` comes from the HTTP response; the body may add detail. */
+function text(v: unknown): string | null {
+  return typeof v === "string" && v.length > 0 ? v : null;
+}
+
+function fieldErrors(v: unknown): Record<string, string[]> | null {
+  if (typeof v !== "object" || v === null || Array.isArray(v)) return null;
+  const out: Record<string, string[]> = {};
+  for (const [field, messages] of Object.entries(v)) {
+    if (typeof messages === "string") out[field] = [messages];
+    else if (Array.isArray(messages))
+      out[field] = messages.filter((m): m is string => typeof m === "string");
+  }
+  return Object.keys(out).length > 0 ? out : null;
+}
+
+/** Parse an error response. `status` is the HTTP status; the body may add detail but never changes it. */
 export function parseApiProblem(status: number, body: unknown): ApiProblem {
-  const parsed = lenient.safeParse(body);
-  const b = parsed.success ? parsed.data : undefined;
-  const bodyStatus = b?.status === undefined || b?.status === null ? NaN : Number(b.status);
-  const errors = b?.errors
-    ? Object.fromEntries(
-        Object.entries(b.errors).map(([field, messages]) => [
-          field,
-          Array.isArray(messages) ? messages : [messages],
-        ]),
-      )
-    : null;
+  const b =
+    typeof body === "object" && body !== null && !Array.isArray(body)
+      ? (body as Record<string, unknown>)
+      : {};
   return {
-    status: Number.isFinite(bodyStatus) ? bodyStatus : status,
-    type: b?.type ?? null,
-    title: b?.title ?? GENERIC_TITLE[status] ?? "Something went wrong.",
-    detail: b?.detail ?? null,
-    instance: b?.instance ?? null,
-    code: b?.code ?? null,
-    traceId: b?.traceId ?? null,
-    errors,
+    status,
+    type: text(b.type),
+    title: text(b.title) ?? GENERIC_TITLE[status] ?? "Something went wrong.",
+    detail: text(b.detail),
+    instance: text(b.instance),
+    code: text(b.code),
+    traceId: text(b.traceId),
+    errors: fieldErrors(b.errors),
   };
 }
 

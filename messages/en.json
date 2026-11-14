@@ -70,5 +70,172 @@
     "dialogTitle": "Confirm this action?",
     "dialogBody": "This example dialog shows focus management and the destructive pattern.",
     "toast": "Show toast"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "identifier": "Email or phone",
+      "password": "Password",
+      "submit": "Sign in",
+      "forgot": "Forgot your password?",
+      "otpLink": "Sign in with a code sent to your phone",
+      "requiredIdentifier": "Enter your email or phone",
+      "requiredPassword": "Enter your password",
+      "invalid": "We could not sign you in with those details. Check them and try again.",
+      "notFound": "We could not find this school's address. Check the web address you opened.",
+      "unavailable": "We cannot reach the school system right now. Please try again shortly.",
+      "billing": "This school's account is suspended, so you can view information but not make changes. Ask your school administrator.",
+      "rate": "Too many attempts. You can try again in {seconds} seconds.",
+      "rateDone": "You can try again now.",
+      "generic": "Something went wrong. Please try again.",
+      "signedOut": "You have been signed out."
+    },
+    "mfa": {
+      "title": "Enter your sign-in code",
+      "body": "Open your authenticator app and enter the 6-digit code. You can also use a recovery code.",
+      "code": "Code",
+      "submit": "Continue",
+      "invalid": "That code did not work. Try again.",
+      "expired": "Your sign-in step has expired. Please sign in again.",
+      "back": "Back to sign in"
+    },
+    "enroll": {
+      "title": "Set up two-step sign-in",
+      "body": "Your school requires an extra security step. Add this account to an authenticator app, then enter the code the app shows.",
+      "secret": "Setup key",
+      "openApp": "Open in an authenticator app",
+      "code": "Code from the app",
+      "submit": "Finish set up",
+      "recoveryTitle": "Save your recovery codes",
+      "recoveryBody": "Each code works once if you lose your phone. They are shown only now.",
+      "continue": "Continue to SchoolHub",
+      "expired": "Your set-up step has expired. Please sign in again.",
+      "invalid": "That code did not work. Try again."
+    },
+    "otp": {
+      "title": "Sign in with a phone code",
+      "phone": "Phone number",
+      "sendCode": "Send code",
+      "code": "6-digit code",
+      "verify": "Sign in",
+      "sent": "If an account uses this number, we have sent a code. It expires in 5 minutes.",
+      "resend": "Send a new code",
+      "invalidPhone": "Enter a valid phone number",
+      "invalidCode": "That code did not work. Try again.",
+      "back": "Back to sign in"
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "body": "Enter your email or phone. If an account exists, we will send instructions.",
+      "identifier": "Email or phone",
+      "submit": "Send instructions",
+      "sent": "If an account exists for that, instructions are on their way.",
+      "back": "Back to sign in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "password": "New password",
+      "hint": "At least 10 characters",
+      "submit": "Save new password",
+      "done": "Your password has been changed. Sign in with it.",
+      "missingToken": "This link is incomplete. Request a new one.",
+      "invalid": "This link has expired or was already used. Request a new one.",
+      "tooShort": "Use at least 10 characters"
+    },
+    "invite": {
+      "title": "Accept your invitation",
+      "body": "Choose a password to finish setting up your account.",
+      "password": "Password",
+      "submit": "Accept and continue",
+      "done": "Your account is ready. Sign in to continue.",
+      "missingToken": "This invitation link is incomplete. Ask your school for a new one.",
+      "invalid": "This invitation has expired or was already used. Ask your school for a new one."
+    },
+    "schoolMissing": {
+      "title": "School not found",
+      "body": "This web address does not belong to a school on SchoolHub. Check the address, or ask your school for its link."
+    }
+  },
+  "shell": {
+    "menu": "Main navigation",
+    "signOut": "Sign out",
+    "signedInAs": "Signed in as {name}",
+    "nav": {
+      "home": "Home",
+      "profile": "Profile",
+      "sessions": "Devices and sessions"
+    },
+    "billingTitle": "Read-only: this school's account is suspended",
+    "billingBody": "You can view information, but changes are turned off. Ask your school administrator to restore the account.",
+    "pastDueTitle": "Payment is overdue",
+    "pastDueBody": "Full access continues for now. Ask your school administrator about the balance.",
+    "sessionEnded": "Your session has ended. Please sign in again.",
+    "loading": "Loading your account…",
+    "loadFailed": "We could not load your account. Please try again."
+  },
+  "home": {
+    "welcome": "Welcome, {name}",
+    "roles": "Your roles",
+    "noRoles": "No roles have been assigned to you yet.",
+    "school": "School account",
+    "status": {
+      "active": "Active",
+      "trial": "Trial",
+      "pastDue": "Overdue",
+      "suspended": "Suspended",
+      "cancelled": "Cancelled"
+    },
+    "title": "Home"
+  },
+  "profile": {
+    "title": "Your profile",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "notSet": "Not set",
+    "twoStep": "Two-step sign-in",
+    "on": "On",
+    "off": "Off",
+    "contactTitle": "Verify contact details",
+    "channel": "Contact type",
+    "channelEmail": "Email",
+    "channelPhone": "Phone",
+    "value": "Email address or phone number",
+    "sendCode": "Send code",
+    "code": "Code",
+    "confirm": "Confirm",
+    "contactSent": "We have sent a code.",
+    "contactDone": "Your contact details are verified.",
+    "changeTitle": "Change password",
+    "current": "Current password",
+    "next": "New password",
+    "change": "Change password",
+    "changedSignedOut": "Your password has been changed. For your security, you have been signed out everywhere. Sign in with the new password.",
+    "valueRequired": "Enter an email address or phone number",
+    "currentRequired": "Enter your current password",
+    "newTooShort": "Use at least 10 characters",
+    "newSame": "Choose a password different from the current one",
+    "contactFailed": "We could not complete that. Check the details and try again.",
+    "passwordFailed": "Your password could not be changed. Check your current password and try again.",
+    "checkFields": "Check the highlighted fields."
+  },
+  "sessions": {
+    "title": "Devices and sessions",
+    "current": "This device",
+    "active": "Active",
+    "inactive": "Signed out",
+    "device": "Device",
+    "unknownDevice": "Unknown device",
+    "lastUsed": "Last used {when}",
+    "revoke": "Sign out this device",
+    "revoked": "That device has been signed out.",
+    "empty": "There are no other devices signed in.",
+    "signOutEverywhere": "Sign out everywhere"
+  },
+  "retry": {
+    "seconds": "Try again in {seconds} s"
+  },
+  "fields": {
+    "required": "This field is required"
   }
 }

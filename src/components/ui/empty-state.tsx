@@ -1,5 +1,4 @@
-import type { LucideIcon } from "lucide-react";
-import { Inbox } from "lucide-react";
+import { type IconComponent, InboxIcon } from "./icons";
 import type { ReactNode } from "react";
 
 export interface EmptyStateProps {
@@ -7,10 +6,15 @@ export interface EmptyStateProps {
   description?: string;
   /** The next action, for example a button that starts the first record. */
   action?: ReactNode;
-  icon?: LucideIcon;
+  icon?: IconComponent;
 }
 
-export function EmptyState({ title, description, action, icon: Icon = Inbox }: EmptyStateProps) {
+export function EmptyState({
+  title,
+  description,
+  action,
+  icon: Icon = InboxIcon,
+}: EmptyStateProps) {
   return (
     <section className="flex flex-col items-center gap-3 rounded-card border border-dashed border-border bg-surface px-6 py-10 text-center">
       <Icon className="size-10 text-muted-foreground" aria-hidden="true" />

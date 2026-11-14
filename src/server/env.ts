@@ -22,7 +22,13 @@ const envSchema = z.object({
     }),
   APP_ORIGIN: z.url().default("http://localhost:3000"),
   API_BASE_URL: z.url(),
-  BFF_API_KEY: z.string().min(16, "BFF_API_KEY must be set (at least 16 characters)"),
+  BFF_API_KEY: z
+    .string()
+    .min(32, "BFF_API_KEY must be set (at least 32 characters; backend ADR 0026)")
+    .refine((v) => !/\s/.test(v), { message: "BFF_API_KEY must not contain whitespace" }),
+  // Must match the backend's Auth:RefreshGraceSeconds (documented default 10). The BFF's cached
+  // refresh result expires safely inside that window (see resultTtlMsForGrace in refresh.ts).
+  REFRESH_GRACE_SECONDS: z.coerce.number().int().min(3).max(60).default(10),
   TRUSTED_PROXY_COUNT: z.coerce.number().int().min(0).max(5).default(0),
   DEV_TENANT_SLUG: z
     .string()

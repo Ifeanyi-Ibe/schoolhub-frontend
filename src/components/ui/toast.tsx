@@ -1,7 +1,15 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  lazy,
+  Suspense,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import type { ToastInput, ToastItemView } from "./toast-types";
 
 export type { ToastInput } from "./toast-types";
@@ -11,7 +19,7 @@ type ToastFn = (input: ToastInput) => void;
 const ToastContext = createContext<ToastFn | null>(null);
 
 // The Radix toast region is loaded only while a toast is showing (keeps the first load small).
-const ToastRegion = dynamic(() => import("./toast-region"), { ssr: false });
+const ToastRegion = lazy(() => import("./toast-region"));
 
 let toastSeq = 0;
 
@@ -37,7 +45,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      {items.length > 0 ? <ToastRegion items={items} onDismiss={dismiss} /> : null}
+      {items.length > 0 ? (
+        <Suspense fallback={null}>
+          <ToastRegion items={items} onDismiss={dismiss} />
+        </Suspense>
+      ) : null}
     </ToastContext.Provider>
   );
 }

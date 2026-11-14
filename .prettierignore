@@ -13,3 +13,5 @@ src/lib/api/schema.d.ts
 src/lib/api/operations.generated.ts
 docs/openapi/v1.json
 docs/backend
+public/browser-check.js
+public/unsupported.html

@@ -3,6 +3,9 @@
 import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { SCHOOL } from "./api-host";
+
+test.use(SCHOOL);
 
 test.describe("PWA installability", () => {
   test("manifest declares name, standalone display, scope, and 192 and 512 icons", async ({

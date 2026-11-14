@@ -1,7 +1,7 @@
 "use client";
 
+import { XIcon } from "./icons";
 import * as RadixToast from "@radix-ui/react-toast";
-import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { StatusTone } from "./status-badge";
@@ -53,7 +53,7 @@ export default function ToastRegion({
             aria-label={t("close")}
             className="-m-2 inline-flex size-11 items-center justify-center rounded-control hover:bg-muted/60"
           >
-            <X className="size-4" aria-hidden="true" />
+            <XIcon className="size-4" aria-hidden="true" />
           </RadixToast.Close>
         </RadixToast.Root>
       ))}

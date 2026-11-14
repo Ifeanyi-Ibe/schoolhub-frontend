@@ -1,10 +1,9 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useSyncExternalStore } from "react";
+import { lazy, Suspense, useSyncExternalStore } from "react";
 
 // The banner is loaded only while offline.
-const OfflineBanner = dynamic(() => import("./offline-banner"), { ssr: false });
+const OfflineBanner = lazy(() => import("./offline-banner"));
 
 function subscribe(onChange: () => void): () => void {
   window.addEventListener("online", onChange);
@@ -27,5 +26,9 @@ export function useOnline(): boolean {
 /** Persistent offline notice. Writes that need the network say so where they are made. */
 export function OnlineIndicator() {
   const online = useOnline();
-  return online ? null : <OfflineBanner />;
+  return online ? null : (
+    <Suspense fallback={null}>
+      <OfflineBanner />
+    </Suspense>
+  );
 }

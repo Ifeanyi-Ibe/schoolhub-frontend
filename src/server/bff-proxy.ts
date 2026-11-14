@@ -7,19 +7,23 @@
 //   3. tenant from the Host header; client IP from our own proxy's X-Forwarded-For
 //   4. session: refresh the access token when it is near expiry (single-flight per session)
 //   5. call the API through the single API client; on 401 refresh once and retry (replayable bodies)
-//   6. relay the response as a stream with allowlisted headers and Cache-Control: no-store
+//   6. relay the response as a stream with allow-listed headers and Cache-Control: no-store
 
 import type { ApiClient } from "./api-client";
 import { buildDownstreamHeaders } from "./headers";
 import { clientIpFromForwardedFor } from "./client-ip";
 import { log, routeTemplate } from "./log";
 import { problemResponse } from "./problem";
-import { refreshSession, type RefreshContext, type RefreshOutcome } from "./refresh";
 import {
-  ACCESS_COOKIE,
-  REFRESH_COOKIE,
+  refreshSession,
+  resultTtlMsForGrace,
+  type RefreshContext,
+  type RefreshOutcome,
+} from "./refresh";
+import {
   accessTokenNeedsRefresh,
   clearSessionCookieHeaders,
+  cookieNames,
   parseCookieHeader,
   sessionCookieHeaders,
   type SessionTokens,
@@ -33,6 +37,8 @@ export const REPLAYABLE_BODY_LIMIT = 1024 * 1024;
 const API_TIMEOUT_MS = 20_000;
 const DOWNLOAD_TIMEOUT_MS = 30_000;
 
+export const UNAVAILABLE_SESSION = "unavailable" as const;
+
 export interface BffDeps {
   env: Pick<
     AppEnv,
@@ -42,6 +48,7 @@ export interface BffDeps {
     | "DEV_TENANT_SLUG"
     | "NODE_ENV"
     | "DOWNLOAD_ALLOWED_HOSTS"
+    | "REFRESH_GRACE_SECONDS"
   >;
   api: ApiClient;
   /** Fetch used for absolute download URLs (never sent the BFF key or a token). */
@@ -52,7 +59,7 @@ export interface BffDeps {
   logger?: typeof log;
 }
 
-interface SessionState {
+export interface SessionState {
   accessToken: string | undefined;
   refreshToken: string | undefined;
   /** New tokens obtained during this request; their cookies must be set on the response. */
@@ -61,11 +68,11 @@ interface SessionState {
   invalid: boolean;
 }
 
-function isSecureOrigin(appOrigin: string): boolean {
+export function isSecureOrigin(appOrigin: string): boolean {
   return new URL(appOrigin).protocol === "https:";
 }
 
-function tenantFor(deps: BffDeps, request: Request): string | null {
+export function tenantFor(deps: Pick<BffDeps, "env">, request: Request): string | null {
   return (
     resolveTenant({
       hostHeader: request.headers.get("host"),
@@ -76,6 +83,12 @@ function tenantFor(deps: BffDeps, request: Request): string | null {
   );
 }
 
+/** The request's cookies, under the names this deployment uses. */
+export function sessionFromCookies(deps: Pick<BffDeps, "env">, cookies: Record<string, string>) {
+  const names = cookieNames(isSecureOrigin(deps.env.APP_ORIGIN));
+  return { accessToken: cookies[names.access], refreshToken: cookies[names.refresh] };
+}
+
 function refreshContext(
   deps: BffDeps,
   request: Request,
@@ -83,8 +96,10 @@ function refreshContext(
   clientIp: string | null,
   cookies: Record<string, string>,
 ): RefreshContext {
+  const current = sessionFromCookies(deps, cookies);
   return {
     api: deps.api,
+    resultTtlMs: resultTtlMsForGrace(deps.env.REFRESH_GRACE_SECONDS),
     tenantSlug,
     clientIp,
     inbound: request.headers,
@@ -94,10 +109,7 @@ function refreshContext(
     // A request holds a snapshot of its cookies, so within this request this returns the same
     // values. A concurrent request in another instance writes new cookies to the browser, and
     // they are visible to the next request. See ADR 0003.
-    readCurrentSession: () => ({
-      accessToken: cookies[ACCESS_COOKIE],
-      refreshToken: cookies[REFRESH_COOKIE],
-    }),
+    readCurrentSession: () => current,
   };
 }
 
@@ -107,27 +119,23 @@ async function ensureFreshSession(
   tenantSlug: string | null,
   clientIp: string | null,
   cookies: Record<string, string>,
-): Promise<SessionState | "unavailable"> {
-  const state: SessionState = {
-    accessToken: cookies[ACCESS_COOKIE],
-    refreshToken: cookies[REFRESH_COOKIE],
-    rotated: null,
-    invalid: false,
-  };
-  if (!state.refreshToken) return state; // anonymous call (login, OTP request, public pages)
+): Promise<SessionState | typeof UNAVAILABLE_SESSION> {
+  const { accessToken, refreshToken } = sessionFromCookies(deps, cookies);
+  const state: SessionState = { accessToken, refreshToken, rotated: null, invalid: false };
+  if (!refreshToken) return state; // anonymous call (login, OTP request, public pages)
   if (!accessTokenNeedsRefresh(state.accessToken, deps.now())) return state;
 
   const outcome = await refreshSession(
-    state.refreshToken,
+    refreshToken,
     refreshContext(deps, request, tenantSlug, clientIp, cookies),
   );
   return applyRefreshOutcome(state, outcome);
 }
 
-function applyRefreshOutcome(
+export function applyRefreshOutcome(
   state: SessionState,
   outcome: RefreshOutcome,
-): SessionState | "unavailable" {
+): SessionState | typeof UNAVAILABLE_SESSION {
   if (outcome.ok) {
     state.accessToken = outcome.tokens.accessToken;
     state.refreshToken = outcome.tokens.refreshToken;
@@ -140,7 +148,7 @@ function applyRefreshOutcome(
     state.invalid = true;
     return state;
   }
-  return "unavailable";
+  return UNAVAILABLE_SESSION;
 }
 
 function withSessionCookies(response: Response, state: SessionState, secure: boolean): Response {
@@ -151,6 +159,16 @@ function withSessionCookies(response: Response, state: SessionState, secure: boo
     for (const c of clearSessionCookieHeaders({ secure })) response.headers.append("Set-Cookie", c);
   }
   return response;
+}
+
+export function sessionUnavailable(): Response {
+  return problemResponse(
+    503,
+    "bff.session_unavailable",
+    "Session temporarily unavailable",
+    "Please try again in a moment.",
+    { "Retry-After": "1" },
+  );
 }
 
 /** Proxy any /api/bff/api/v1/... call. */
@@ -199,18 +217,7 @@ export async function handleProxy(
   const cookies = parseCookieHeader(request.headers.get("cookie"));
 
   const session = await ensureFreshSession(deps, request, tenantSlug, clientIp, cookies);
-  if (session === "unavailable") {
-    return finish(
-      problemResponse(
-        503,
-        "bff.session_unavailable",
-        "Session temporarily unavailable",
-        "Please try again in a moment.",
-        { "Retry-After": "1" },
-      ),
-      { tenant: tenantSlug },
-    );
-  }
+  if (session === UNAVAILABLE_SESSION) return finish(sessionUnavailable(), { tenant: tenantSlug });
 
   // Bodies up to the limit are buffered so a 401 can be retried. Larger bodies are streamed once.
   const hasBody = method !== "GET" && method !== "HEAD";
@@ -268,18 +275,7 @@ export async function handleProxy(
       refreshContext(deps, request, tenantSlug, clientIp, cookies),
     );
     const next = applyRefreshOutcome(session, outcome);
-    if (next === "unavailable") {
-      return finish(
-        problemResponse(
-          503,
-          "bff.session_unavailable",
-          "Session temporarily unavailable",
-          "Please try again in a moment.",
-          { "Retry-After": "1" },
-        ),
-        { tenant: tenantSlug },
-      );
-    }
+    if (next === UNAVAILABLE_SESSION) return finish(sessionUnavailable(), { tenant: tenantSlug });
     if (next.invalid) {
       return finish(
         withSessionCookies(
@@ -303,7 +299,7 @@ export async function handleProxy(
 }
 
 /** Stream the upstream body straight through with allowlisted headers. Nothing is buffered. */
-function relay(upstream: Response): Response {
+export function relay(upstream: Response): Response {
   return new Response(upstream.body, {
     status: upstream.status,
     headers: buildDownstreamHeaders(upstream.headers),
@@ -362,15 +358,7 @@ export async function handleDownload(
       return problemResponse(400, "bff.download_invalid", "Invalid download", "Path is not valid.");
     const cookies = parseCookieHeader(request.headers.get("cookie"));
     const session = await ensureFreshSession(deps, request, tenantSlug, clientIp, cookies);
-    if (session === "unavailable") {
-      return problemResponse(
-        503,
-        "bff.session_unavailable",
-        "Session temporarily unavailable",
-        "Please try again in a moment.",
-        { "Retry-After": "1" },
-      );
-    }
+    if (session === UNAVAILABLE_SESSION) return sessionUnavailable();
     let upstream = await apiGet(deps, path, session.accessToken, request, tenantSlug, clientIp);
     if (upstream === null)
       return problemResponse(
@@ -388,14 +376,7 @@ export async function handleDownload(
           refreshContext(deps, request, tenantSlug, clientIp, cookies),
         ),
       );
-      if (next === "unavailable")
-        return problemResponse(
-          503,
-          "bff.session_unavailable",
-          "Session temporarily unavailable",
-          "Please try again in a moment.",
-          { "Retry-After": "1" },
-        );
+      if (next === UNAVAILABLE_SESSION) return sessionUnavailable();
       upstream =
         (await apiGet(deps, path, next.accessToken, request, tenantSlug, clientIp)) ?? upstream;
       return withSessionCookies(streamFile(upstream), next, secure);

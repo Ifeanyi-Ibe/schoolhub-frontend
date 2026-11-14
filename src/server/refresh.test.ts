@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   MAX_IN_FLIGHT_RETRIES,
-  RESULT_TTL_MS,
   refreshSession,
+  resultTtlMsForGrace,
   resetRefreshStateForTests,
   retryAfterSeconds,
   type RefreshContext,
@@ -20,6 +20,7 @@ function ctx(overrides: Partial<RefreshContext> & { api: RefreshContext["api"] }
   const clock = { t: NOW };
   const sleeps: number[] = [];
   const base: RefreshContext = {
+    resultTtlMs: resultTtlMsForGrace(10),
     tenantSlug: "greenfield",
     clientIp: "203.0.113.9",
     inbound: new Headers({ "user-agent": "test" }),
@@ -67,15 +68,20 @@ describe("refreshSession", () => {
     expect(api.calls).toHaveLength(1);
   });
 
-  it("keeps the cached result well inside the backend's 10 second grace window", () => {
-    expect(RESULT_TTL_MS).toBeLessThan(10_000);
+  it("keeps the cached result inside the configured grace window, minus a safety margin", () => {
+    for (const grace of [3, 5, 10, 30]) {
+      expect(resultTtlMsForGrace(grace)).toBeLessThan(grace * 1000);
+    }
+    expect(resultTtlMsForGrace(10)).toBe(8000);
+    expect(resultTtlMsForGrace(5)).toBe(3000);
+    expect(resultTtlMsForGrace(3)).toBe(1000);
   });
 
   it("reuses a settled result within the TTL, then refreshes again after it", async () => {
     const api = fakeApi(() => json(200, okBody));
     const { context, clock } = ctx({ api });
     await refreshSession("tok", context);
-    clock.t += RESULT_TTL_MS - 1;
+    clock.t += resultTtlMsForGrace(10) - 1;
     await refreshSession("tok", context);
     expect(api.calls).toHaveLength(1);
     clock.t += 2;

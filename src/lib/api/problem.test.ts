@@ -50,8 +50,8 @@ describe("parseApiProblem", () => {
     expect(p.errors).toEqual({ phone: ["Enter a valid number"] });
   });
 
-  it("uses the body status when it is numeric text", () => {
-    expect(parseApiProblem(400, { status: "422" }).status).toBe(422);
+  it("keeps the transport status even when the body repeats a different one", () => {
+    expect(parseApiProblem(401, { status: "422" }).status).toBe(401);
   });
 });
 

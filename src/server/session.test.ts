@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  ACCESS_COOKIE,
-  REFRESH_COOKIE,
+  cookieNames,
   accessTokenNeedsRefresh,
   clearSessionCookieHeaders,
   jwtExpiryMs,
@@ -30,9 +29,9 @@ describe("session cookies", () => {
       expect(c).not.toMatch(/Domain=/i);
     }
     expect(access).toBe(
-      `${ACCESS_COOKIE}=a.b.c; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=900`,
+      `${cookieNames(true).access}=a.b.c; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=900`,
     );
-    expect(refresh).toMatch(new RegExp(`^${REFRESH_COOKIE}=r1; .*Max-Age=2592000$`));
+    expect(refresh).toMatch(new RegExp(`^${cookieNames(true).refresh}=r1; .*Max-Age=2592000$`));
   });
 
   it("omits Secure on plain http (local development)", () => {
@@ -41,7 +40,7 @@ describe("session cookies", () => {
 
   it("clears both cookies with Max-Age=0", () => {
     const cleared = clearSessionCookieHeaders({ secure: true });
-    expect(cleared).toHaveLength(2);
+    expect(cleared).toHaveLength(4);
     for (const c of cleared) {
       expect(c).toMatch(/=; Path=\/;/);
       expect(c).toContain("Max-Age=0");

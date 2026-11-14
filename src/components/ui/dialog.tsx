@@ -1,7 +1,7 @@
 "use client";
 
+import { XIcon } from "./icons";
 import * as RadixDialog from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 
@@ -58,7 +58,7 @@ export function Dialog({ open, onOpenChange, title, description, children, foote
               aria-label={t("close")}
               className="inline-flex size-11 shrink-0 items-center justify-center rounded-control hover:bg-muted"
             >
-              <X className="size-5" aria-hidden="true" />
+              <XIcon className="size-5" aria-hidden="true" />
             </RadixDialog.Close>
           </div>
           {children}

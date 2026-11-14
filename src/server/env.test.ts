@@ -3,7 +3,7 @@ import { parseEnv } from "./env";
 
 const valid = {
   API_BASE_URL: "http://localhost:5152",
-  BFF_API_KEY: "0123456789abcdef",
+  BFF_API_KEY: "0123456789abcdef0123456789abcdef",
 };
 
 describe("parseEnv", () => {

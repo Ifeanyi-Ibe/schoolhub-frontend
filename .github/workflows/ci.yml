@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   quality:
-    name: typecheck, lint, format, API drift, unit tests
+    name: typecheck, lint, format, API drift, audit, unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,17 +28,14 @@ jobs:
       - run: npm run format:check
       - name: API client drift (contract, generated types, operation manifest)
         run: npm run api:check
+      - name: Production dependency advisories
+        run: npm run audit:prod
       - run: npm run test
 
   build:
     name: production build and bundle budgets
     needs: quality
     runs-on: ubuntu-latest
-    env:
-      API_BASE_URL: ${{ vars.API_BASE_URL || 'http://localhost:5152' }}
-      BFF_API_KEY: ${{ secrets.BFF_API_KEY_CI || 'ci-only-placeholder-key-0001' }}
-      APP_BASE_DOMAIN: localhost
-      APP_ORIGIN: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -47,7 +44,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npm run size
+      - name: First-load JavaScript budgets (signed-out and signed-in routes)
+        run: npm run size
       - uses: actions/upload-artifact@v4
         with:
           name: standalone
@@ -55,14 +53,9 @@ jobs:
           retention-days: 3
 
   e2e:
-    name: axe checks (Playwright)
+    name: end-to-end journeys and accessibility (production build)
     needs: quality
     runs-on: ubuntu-latest
-    env:
-      API_BASE_URL: http://localhost:5152
-      BFF_API_KEY: ci-only-placeholder-key-0001
-      APP_BASE_DOMAIN: localhost
-      APP_ORIGIN: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -71,6 +64,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - run: npm run build
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4
         if: failure()
@@ -80,14 +74,9 @@ jobs:
           retention-days: 7
 
   lighthouse:
-    name: Lighthouse (mobile, throttled 4G)
+    name: Lighthouse (sign-in and signed-in shell, mobile, throttled)
     needs: build
     runs-on: ubuntu-latest
-    env:
-      API_BASE_URL: http://localhost:5152
-      BFF_API_KEY: ci-only-placeholder-key-0001
-      APP_BASE_DOMAIN: localhost
-      APP_ORIGIN: http://localhost:3100
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

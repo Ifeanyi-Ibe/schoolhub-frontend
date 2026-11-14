@@ -1,9 +1,12 @@
 // BFF integration: the real route handlers, running in `next dev`, against the fake API.
 import { expect, test } from "@playwright/test";
-import { FAKE_API_URL, fakeJwt } from "./fake-api";
+import { FAKE_API_URL, TEST_BFF_KEY, fakeJwt } from "./fake-api";
+import { SCHOOL } from "./api-host";
+
+test.use(SCHOOL);
 
 const CSRF = { "X-SchoolHub-Request": "1" };
-const ORIGIN = { Origin: "http://localhost:3000" };
+const ORIGIN = { Origin: "http://greenfield.localhost:3000" };
 
 test.describe("BFF", () => {
   test("health is public and reveals nothing", async ({ request }) => {
@@ -29,7 +32,7 @@ test.describe("BFF", () => {
     expect(res.status()).toBe(401); // anonymous, so the fake API refuses
     const key = encodeURIComponent(`/api/v1/me?probe=${probe}`);
     const seen = await (await request.get(`${FAKE_API_URL}/__received?path=${key}`)).json();
-    expect(seen["x-bff-key"]).toBe("e2e-bff-key-0000000001");
+    expect(seen["x-bff-key"]).toBe(TEST_BFF_KEY);
     expect(seen["x-tenant"]).toBe("greenfield");
     expect(seen["x-forwarded-for"]).toBeUndefined(); // no trusted proxy in this test setup
     expect(seen["x-client-user-agent"]).toBe("Mozilla/5.0 test");
@@ -49,7 +52,7 @@ test.describe("BFF", () => {
     request,
   }) => {
     const res = await request.get("/api/bff/api/v1/me", {
-      headers: { Cookie: "sh_at=stale-not-a-jwt; sh_rt=rt-1" },
+      headers: { Cookie: "sh_at=stale-not-a-jwt; sh_rt=rt:ok:1" },
     });
     expect(res.status()).toBe(200);
     const cookies = res
@@ -61,7 +64,7 @@ test.describe("BFF", () => {
         (c) => c.startsWith("sh_at=") && c.includes("HttpOnly") && c.includes("SameSite=Lax"),
       ),
     ).toBe(true);
-    expect(cookies.some((c) => c.startsWith("sh_rt=rotated-rt-1"))).toBe(true);
+    expect(cookies.some((c) => c.startsWith("sh_rt=rt:ok:2"))).toBe(true);
   });
 
   test("survives the backend's 409 auth.refresh_in_flight by waiting and retrying", async ({
@@ -110,20 +113,33 @@ test.describe("BFF", () => {
   test("passes a same-origin mutation through with its body and Idempotency-Key", async ({
     request,
   }) => {
-    const res = await request.post("/api/bff/api/v1/students", {
+    // A unique probe per run: other tests post to the same path.
+    const probe = `probe-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const res = await request.post(`/api/bff/api/v1/students?probe=${probe}`, {
       data: { firstName: "Ada" },
-      headers: { ...CSRF, ...ORIGIN, "Idempotency-Key": "0190a6c2-7d4e-7000-8000-123456789abc" },
+      headers: {
+        ...CSRF,
+        ...ORIGIN,
+        Cookie: `sh_at=${fakeJwt("ok")}`,
+        "Idempotency-Key": "0190a6c2-7d4e-7000-8000-123456789abc",
+      },
     });
     expect(res.status()).toBe(201);
     expect(await res.json()).toMatchObject({ created: true, echo: { firstName: "Ada" } });
     const seen = await (
-      await request.get(`${FAKE_API_URL}/__received?path=/api/v1/students`)
+      await request.get(
+        `${FAKE_API_URL}/__received?path=${encodeURIComponent(`/api/v1/students?probe=${probe}`)}`,
+      )
     ).json();
     expect(seen["idempotency-key"]).toBe("0190a6c2-7d4e-7000-8000-123456789abc");
   });
 
   test("relays a 402 billing.suspended problem unchanged", async ({ request }) => {
-    const res = await request.get("/api/bff/api/v1/billing/suspended", { failOnStatusCode: false });
+    const res = await request.post("/api/bff/api/v1/students", {
+      data: { firstName: "Ada" },
+      headers: { ...CSRF, ...ORIGIN, Cookie: `sh_at=${fakeJwt("suspended")}` },
+      failOnStatusCode: false,
+    });
     expect(res.status()).toBe(402);
     expect(await res.json()).toMatchObject({ code: "billing.suspended" });
   });
@@ -138,7 +154,7 @@ test.describe("BFF", () => {
   }) => {
     const res = await request.post("/api/bff/download", {
       data: { path: "api/v1/payments/9/receipt" },
-      headers: { ...CSRF, ...ORIGIN },
+      headers: { ...CSRF, ...ORIGIN, Cookie: `sh_at=${fakeJwt("ok")}` },
     });
     expect(res.status()).toBe(200);
     expect(res.headers()["content-type"]).toBe("application/pdf");
@@ -148,18 +164,15 @@ test.describe("BFF", () => {
     expect(await res.text()).toBe("%PDF-1.7 fake");
   });
 
-  test("fetches an allow-listed absolute URL without credentials, and refuses other hosts", async ({
+  test("refuses plain http and unlisted hosts for absolute downloads in production", async ({
     request,
   }) => {
-    const ok = await request.post("/api/bff/download", {
+    const plainHttp = await request.post("/api/bff/download", {
       data: { url: `${FAKE_API_URL}/export.csv` },
       headers: { ...CSRF, ...ORIGIN },
+      failOnStatusCode: false,
     });
-    expect(ok.status()).toBe(200);
-    expect(ok.headers()["content-type"]).toBe("text/csv");
-    const seen = await (await request.get(`${FAKE_API_URL}/__received?path=/export.csv`)).json();
-    expect(seen["x-bff-key"]).toBeUndefined();
-    expect(seen.authorization).toBeUndefined();
+    expect(plainHttp.status()).toBe(400);
 
     const refused = await request.post("/api/bff/download", {
       data: { url: "http://169.254.169.254/latest/meta-data" },

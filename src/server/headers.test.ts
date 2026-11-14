@@ -45,6 +45,19 @@ describe("buildUpstreamHeaders", () => {
   });
 });
 
+describe("content-length", () => {
+  it("is never forwarded, because a re-serialised body changes length", () => {
+    const out = buildUpstreamHeaders({
+      inbound: new Headers({ "content-type": "application/json", "content-length": "16" }),
+      bffKey: "bff-key-value-1234567890abcdef",
+      tenantSlug: null,
+      clientIp: null,
+    });
+    expect(out.get("content-length")).toBeNull();
+    expect(out.get("content-type")).toBe("application/json");
+  });
+});
+
 describe("buildDownstreamHeaders", () => {
   it("relays only allowlisted response headers and forces no-store", () => {
     const upstream = new Headers({

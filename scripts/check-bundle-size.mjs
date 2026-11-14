@@ -1,45 +1,57 @@
 #!/usr/bin/env node
-// Bundle-size gate (CLAUDE.md performance budgets). Starts the production server, reads the
-// JavaScript each budgeted page loads on first paint, gzips it, and fails when a page is over
-// budget. Run after `npm run build`. Needs .env.local (or the environment) for the server.
+// Bundle-size gate (CLAUDE.md performance budgets). Starts the performance stack (production server
+// plus the labelled test double), reads the JavaScript each budgeted page loads on first paint,
+// gzips it, and fails when a page is over budget. Run after `npm run build`.
 
 import { spawn } from "node:child_process";
+import { request } from "node:http";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { checkBudgets, gzipBytes, initialScriptUrls, sumGzip } from "./bundle-size-lib.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const budgets = JSON.parse(
-  readFileSync(resolve(root, "scripts/budgets.json"), "utf8"),
-).firstLoadJsGzipBytes;
+const config = JSON.parse(readFileSync(resolve(root, "scripts/budgets.json"), "utf8"));
+const budgets = config.firstLoadJsGzipBytes;
+const routes = config.routes;
 const port = Number(process.env.SIZE_PORT ?? 3917);
-const base = `http://localhost:${port}`;
+const host = `greenfield.localhost:${port}`;
 
-async function waitForServer(child, timeoutMs = 60_000) {
-  const started = Date.now();
+// GET through node:http so the school Host header can be set (fetch does not allow it).
+function get(path, headers = {}) {
+  return new Promise((resolveP, reject) => {
+    const req = request(
+      { host: "127.0.0.1", port, path, method: "GET", headers: { host, ...headers } },
+      (res) => {
+        const chunks = [];
+        res.on("data", (c) => chunks.push(c));
+        res.on("end", () => resolveP({ status: res.statusCode ?? 0, body: Buffer.concat(chunks) }));
+      },
+    );
+    req.on("error", reject);
+    req.end();
+  });
+}
+
+async function waitForStack(child, timeoutMs = 180_000) {
   let output = "";
   child.stdout.on("data", (d) => (output += d));
   child.stderr.on("data", (d) => (output += d));
+  const started = Date.now();
   while (Date.now() - started < timeoutMs) {
-    try {
-      const res = await fetch(`${base}/api/bff/health`);
-      if (res.ok) return;
-    } catch {
-      // not up yet
-    }
-    if (child.exitCode !== null) throw new Error(`next start exited early:\n${output}`);
-    await new Promise((r) => setTimeout(r, 500));
+    if (output.includes("STACK_READY")) return;
+    if (child.exitCode !== null) throw new Error(`stack exited early:\n${output}`);
+    await new Promise((r) => setTimeout(r, 300));
   }
-  throw new Error(`next start did not become ready:\n${output}`);
+  throw new Error(`stack did not become ready:\n${output}`);
 }
 
-async function measureRoute(route) {
-  const html = await (await fetch(`${base}${route}`, { headers: { Accept: "text/html" } })).text();
-  const urls = initialScriptUrls(html);
+async function measure(route, cookie) {
+  const headers = cookie ? { cookie } : {};
+  const html = (await get(route, headers)).body.toString("utf8");
   const assets = [];
-  for (const url of urls) {
-    const body = Buffer.from(await (await fetch(`${base}${url}`)).arrayBuffer());
+  for (const url of initialScriptUrls(html)) {
+    const body = (await get(url, headers)).body;
     assets.push({ url, bytes: body.length, gzipBytes: gzipBytes(body) });
   }
   return { route, assets, total: sumGzip(assets) };
@@ -48,20 +60,23 @@ async function measureRoute(route) {
 async function main() {
   const child = spawn(
     process.execPath,
-    [resolve(root, "node_modules/next/dist/bin/next"), "start", "-p", String(port)],
+    ["--experimental-strip-types", resolve(root, "scripts/stack.mts")],
     {
       cwd: root,
-      env: { ...process.env, NODE_ENV: "production" },
+      env: { ...process.env, STACK_PORT: String(port) },
       stdio: ["ignore", "pipe", "pipe"],
     },
   );
   try {
-    await waitForServer(child);
+    await waitForStack(child);
     const results = {};
     for (const route of Object.keys(budgets)) {
-      const m = await measureRoute(route);
+      const cookie = routes[route]?.cookie;
+      const m = await measure(route, cookie);
       results[route] = m.total;
-      console.log(`${route}  first-load JS: ${m.total} B gzipped (${m.assets.length} files)`);
+      console.log(
+        `${route}  first-load JS: ${m.total} B gzipped (${m.assets.length} files)${cookie ? " [signed in]" : " [signed out]"}`,
+      );
       for (const a of m.assets) console.log(`    ${a.gzipBytes} B  ${a.url}`);
     }
     const failures = checkBudgets(results, budgets);
