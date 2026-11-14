@@ -1,28 +1,27 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { lazy, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dialog } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
-import { Input } from "@/components/ui/input";
 import { ResponsiveTable, type Column } from "@/components/ui/responsive-table";
 import { SkeletonList } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { useToast } from "@/components/ui/toast";
 import { meQuery, tenantQuery } from "@/features/shell/api";
 import { useReadOnly } from "@/features/shell/read-only";
 import type { components } from "@/lib/api/schema";
 import { ApiError } from "@/lib/api/unwrap";
-import { createRole, permissionCatalogQuery, rolesQuery } from "./api";
-import { PermissionChecklist } from "./PermissionChecklist";
+import { rolesQuery } from "./api";
 import { PERMISSION, holdsAny, hasCustomRoles } from "./rules";
+
+// The create form loads when it is opened (see CreateRoleDialog.tsx).
+const CreateRoleDialog = lazy(() =>
+  import("./CreateRoleDialog").then((m) => ({ default: m.CreateRoleDialog })),
+);
 
 type Role = components["schemas"]["RoleView"];
 
@@ -149,7 +148,9 @@ export function RolesView() {
       )}
 
       {creating ? (
-        <CreateRoleDialog open onOpenChange={setCreating} mine={me.data.permissions} />
+        <Suspense fallback={null}>
+          <CreateRoleDialog open onOpenChange={setCreating} mine={me.data.permissions} />
+        </Suspense>
       ) : null}
     </div>
   );
@@ -157,105 +158,4 @@ export function RolesView() {
 
 function canSee(permissions: readonly string[]): boolean {
   return holdsAny(permissions, [PERMISSION.assignRoles, PERMISSION.manageRoles]);
-}
-
-function CreateRoleDialog({
-  open,
-  onOpenChange,
-  mine,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  mine: readonly string[];
-}) {
-  const t = useTranslations("staff.createRole");
-  const toast = useToast();
-  const qc = useQueryClient();
-  const router = useRouter();
-  const catalogue = useQuery(permissionCatalogQuery);
-  const form = useForm<{ name: string; description: string }>({
-    defaultValues: { name: "", description: "" },
-  });
-  const [selected, setSelected] = useState<string[]>([]);
-  const [message, setMessage] = useState<string | null>(null);
-
-  async function onSubmit(v: { name: string; description: string }) {
-    setMessage(null);
-    try {
-      const role = await createRole({
-        name: v.name.trim(),
-        description: v.description.trim(),
-        permissions: selected,
-      });
-      toast({ tone: "success", title: t("created") });
-      await qc.invalidateQueries({ queryKey: ["roles"] });
-      onOpenChange(false);
-      router.push(`/roles/${role.id}`);
-    } catch (err) {
-      const status = err instanceof ApiError ? err.problem.status : 0;
-      setMessage(status === 403 ? t("forbidden") : t("failed"));
-    }
-  }
-
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-      title={t("title")}
-      description={t("description")}
-      footer={
-        <>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            {t("cancel")}
-          </Button>
-          <Button
-            type="submit"
-            form="create-role-form"
-            loading={form.formState.isSubmitting}
-            loadingLabel={t("submit")}
-          >
-            {t("submit")}
-          </Button>
-        </>
-      }
-    >
-      <form
-        id="create-role-form"
-        noValidate
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
-      >
-        <Input
-          label={t("name")}
-          required
-          error={form.formState.errors.name?.message}
-          {...form.register("name", {
-            validate: (value) => value.trim() !== "" || t("nameRequired"),
-          })}
-        />
-        <Input label={t("descriptionLabel")} {...form.register("description")} />
-        {catalogue.data !== undefined ? (
-          <PermissionChecklist
-            areas={catalogue.data}
-            selected={selected}
-            mine={mine}
-            disabled={false}
-            legend={t("title")}
-            onToggle={(permission, checked) =>
-              setSelected((prev) =>
-                checked
-                  ? [...prev.filter((p) => p !== permission), permission]
-                  : prev.filter((p) => p !== permission),
-              )
-            }
-          />
-        ) : null}
-        {message ? (
-          <p role="alert" className="text-sm text-danger-foreground">
-            {message}
-          </p>
-        ) : null}
-      </form>
-    </Dialog>
-  );
 }

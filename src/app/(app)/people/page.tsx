@@ -1,6 +1,35 @@
+// Staff accounts. The first HTML already holds the signed-in user, the school, and the first page of
+// the list (no client waterfall). Visibility and actions are still decided on the client, from the
+// effective permissions in GET /me (UX only; the API decides).
+import { HydrationBoundary } from "@tanstack/react-query";
 import { PeopleView } from "@/features/staff/PeopleView";
+import { peopleQuery } from "@/features/staff/api";
+import { parsePeopleQuery } from "@/features/staff/rules";
+import { meQuery, tenantQuery } from "@/features/shell/api";
+import { prefetchSignedIn } from "@/server/prefetch";
 
-// Staff accounts. Visibility and actions are decided on the client from effective permissions.
-export default function PeoplePage() {
-  return <PeopleView />;
+export default async function PeoplePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const raw = await searchParams;
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(raw)) if (typeof v === "string") params.set(k, v);
+  const state = parsePeopleQuery(params);
+  const list = peopleQuery(state);
+  const dehydrated = await prefetchSignedIn([
+    { key: meQuery.queryKey, path: "api/v1/me" },
+    { key: tenantQuery.queryKey, path: "api/v1/me/tenant" },
+    {
+      key: list.queryKey,
+      path: "api/v1/users",
+      query: { ...(state.q !== "" ? { q: state.q } : {}), page: state.page, pageSize: 20 },
+    },
+  ]);
+  return (
+    <HydrationBoundary state={dehydrated}>
+      <PeopleView />
+    </HydrationBoundary>
+  );
 }

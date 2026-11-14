@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -17,7 +17,11 @@ import { useReadOnly } from "@/features/shell/read-only";
 import type { components } from "@/lib/api/schema";
 import { ApiError } from "@/lib/api/unwrap";
 import { peopleQuery } from "./api";
-import { InviteDialog } from "./InviteDialog";
+// The invitation form (react-hook-form) loads when the dialog opens, not with the list. It is not needed
+// for the first paint, and on a mid-range phone its script time delays that paint.
+const InviteDialog = lazy(() =>
+  import("./InviteDialog").then((m) => ({ default: m.InviteDialog })),
+);
 import { PERMISSION, holdsAny, parsePeopleQuery, peopleQueryParams } from "./rules";
 
 type Person = components["schemas"]["UserView"];
@@ -187,7 +191,11 @@ export function PeopleView() {
         </Card>
       ) : null}
 
-      {inviting ? <InviteDialog open onOpenChange={(open) => setInviting(open)} /> : null}
+      {inviting ? (
+        <Suspense fallback={null}>
+          <InviteDialog open onOpenChange={(open) => setInviting(open)} />
+        </Suspense>
+      ) : null}
     </div>
   );
 }

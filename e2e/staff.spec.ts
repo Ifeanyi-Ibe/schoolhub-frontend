@@ -7,6 +7,9 @@ import { FAKE_API_URL, fakeJwt } from "./fake-api";
 import { test, expect } from "./fixtures";
 import { COOKIE, SCHOOL_ORIGIN } from "./origin";
 
+const PORT = 3000;
+const LOOPBACK = "http://127.0.0.1:3000";
+
 const WCAG = ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"];
 
 async function signInAs(context: BrowserContext, label: string) {
@@ -38,6 +41,20 @@ test.describe("people and roles for an administrator", () => {
     await expect(page.getByRole("cell", { name: "Ada Okafor" })).toBeVisible();
     await expect(page.getByRole("cell", { name: "Tunde Bello" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Invite a person" })).toBeEnabled();
+  });
+
+  test("the first HTML already holds the signed-in list, read on the server (no client waterfall)", async ({
+    request,
+  }) => {
+    const res = await request.get(`${LOOPBACK}/people`, {
+      headers: {
+        host: `greenfield.localhost:${PORT}`,
+        cookie: `${COOKIE.at}=${fakeJwt("admin")}; ${COOKIE.rt}=rt:admin:1`,
+      },
+    });
+    const html = await res.text();
+    expect(html).toContain("Ada Okafor");
+    expect(html).toContain("Tunde Bello");
   });
 
   test("the search is in the URL, so the filtered list can be shared and the empty state is clear", async ({

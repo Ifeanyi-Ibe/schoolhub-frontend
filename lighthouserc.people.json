@@ -5,7 +5,7 @@
       "startServerReadyPattern": "STACK_READY",
       "startServerReadyTimeout": 180000,
       "url": ["http://greenfield.localhost:3100/people"],
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": {
         "formFactor": "mobile",
         "screenEmulation": {

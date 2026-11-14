@@ -35,6 +35,8 @@ Next.js (App Router, latest stable) · React · TypeScript strict · Tailwind CS
 - **Tenancy:** the tenant comes from the request host `{slug}.<base domain>`. Local dev supports `{slug}.localhost` and an `X-Tenant` env fallback. Public branding is fetched server-side. Tenant colours are applied as CSS variables, after a WCAG AA contrast check.
 - **Folders:** route groups `(auth)`, `(staff)`, `(parent)`, `(platform)`. Feature code in `src/features/<module>/{api,components,schemas,tests}`. Shared UI in `src/components/ui`. Server code in `src/server`. Page files hold no business logic.
 - **Server Components by default.** Add `"use client"` only where interactivity needs it.
+- **Signed-in data (default for staff screens).** A page reads its primary data on the server, in parallel, with `prefetchSignedIn` (`src/server/prefetch.ts`): the signed-in user (`GET /me`), the school (`GET /me/tenant`) and the screen's first list or record. The result is dehydrated and hydrated into the client cache with `HydrationBoundary`, so there is no client waterfall. The server never refreshes a session; with no usable token, the client loads as before. The query keys are the client's keys. Client permission checks remain UX only; the API decides.
+- **Heavy forms load on demand.** A dialog or form that uses react-hook-form loads with `lazy` when it opens, not with the screen.
 - **Environment-driven:** base domain, tenant host scheme and API URL come from env (`APP_BASE_DOMAIN`, `API_BASE_URL`, `BFF_API_KEY`). Never hardcode them. See `.env.example`.
 - **Runtime:** Node, not edge. `output: 'standalone'`. Single instance initially (ADR 0003).
 - **Typefaces:** Inter (body, UI, numerals) and Plus Jakarta Sans (headings), via `next/font` (ADR 0002).
