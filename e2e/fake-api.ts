@@ -4,6 +4,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { contractProblems, violations } from "./contract";
 
 export const FAKE_API_PORT = Number(process.env.FAKE_API_PORT ?? 5999);
 export const FAKE_API_URL = `http://127.0.0.1:${FAKE_API_PORT}`;
@@ -98,6 +99,7 @@ export function startFakeApi(): Promise<Server> {
     if (path === "/__received") {
       return send(res, 200, received.get(url.searchParams.get("path") ?? "") ?? {});
     }
+    if (path === "/__contract") return send(res, 200, violations);
 
     // Keyed by path and query, so parallel tests can each read their own request.
     received.set(path + url.search, headerSnapshot(req));
@@ -105,6 +107,23 @@ export function startFakeApi(): Promise<Server> {
     // Like the real API: a body without a JSON content type is refused (415). Keeps the BFF honest.
     if (bodyText && !String(req.headers["content-type"] ?? "").includes("json")) {
       return send(res, 415, problem("request.unsupported_media_type", "Unsupported media type"));
+    }
+    // Every API request must match the contract. A mismatch is recorded and fails the run (global
+    // teardown), so a test cannot pass against a request the real API would refuse.
+    if (path.startsWith("/api/")) {
+      const problems = contractProblems(
+        req.method ?? "GET",
+        path,
+        url.searchParams,
+        req.headers,
+        bodyText,
+      );
+      if (problems.length > 0) {
+        for (const problem of problems)
+          violations.push({ method: req.method ?? "GET", path, problem });
+        console.error(`CONTRACT VIOLATION ${req.method} ${path}: ${problems.join("; ")}`);
+        return send(res, 500, problem("contract.violation", problems.join("; ")));
+      }
     }
     const body = (bodyText ? JSON.parse(bodyText) : {}) as Record<string, string | undefined>;
     const label = labelOf(req.headers.authorization);

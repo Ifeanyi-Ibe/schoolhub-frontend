@@ -1,6 +1,7 @@
 // F1 journeys against the real backend (development seed). Data and accounts come from the seed
 // document through .env.e2e; nothing here depends on today's date.
-import { expect, test, type Page } from "@playwright/test";
+import { test, expect } from "../e2e/fixtures";
+import { type Page } from "@playwright/test";
 import { e2e } from "./support/env";
 import { latestOtpCode } from "./support/otp";
 import { platformLogin, platformVerify } from "./support/platform";

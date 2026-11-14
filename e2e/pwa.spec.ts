@@ -1,6 +1,6 @@
 // Installability and offline-readiness checks. Lighthouse 13 no longer audits installability, so
 // these assert the requirements directly: manifest, icons, and the service worker's precache.
-import { expect, test } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { SCHOOL } from "./api-host";

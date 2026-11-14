@@ -1,12 +1,33 @@
 // BFF integration: the real route handlers, running in `next dev`, against the fake API.
-import { expect, test } from "@playwright/test";
+import { test, expect } from "./fixtures";
+import { COOKIE, SCHOOL_ORIGIN } from "./origin";
 import { FAKE_API_URL, TEST_BFF_KEY, fakeJwt } from "./fake-api";
 import { SCHOOL } from "./api-host";
 
 test.use(SCHOOL);
 
 const CSRF = { "X-SchoolHub-Request": "1" };
-const ORIGIN = { Origin: "http://greenfield.localhost:3000" };
+const IDEMPOTENCY_KEY = "0190a6c2-7d4e-7000-8000-123456789abc";
+
+// A body the contract accepts for POST /api/v1/students (RegisterStudentRequest, docs/openapi/v1.json).
+// The test double rejects any request that does not match, so tests send only valid bodies.
+const validStudent = (overrides: Record<string, unknown> = {}) => ({
+  admissionNo: null,
+  firstName: "Ada",
+  middleName: null,
+  lastName: "Okafor",
+  gender: "Female",
+  dateOfBirth: "2015-03-09",
+  address: null,
+  admittedOn: "2026-09-07",
+  sessionId: "0190a6c2-0000-7000-8000-000000000001",
+  classArmId: "0190a6c2-0000-7000-8000-000000000002",
+  medicalNotes: null,
+  specialNeedsNotes: null,
+  guardians: [],
+  ...overrides,
+});
+const ORIGIN = { Origin: SCHOOL_ORIGIN };
 
 test.describe("BFF", () => {
   test("health is public and reveals nothing", async ({ request }) => {
@@ -41,7 +62,9 @@ test.describe("BFF", () => {
 
   test("uses the access token from the cookie and never echoes it back", async ({ request }) => {
     const token = fakeJwt("fresh", 900);
-    const res = await request.get("/api/bff/api/v1/me", { headers: { Cookie: `sh_at=${token}` } });
+    const res = await request.get("/api/bff/api/v1/me", {
+      headers: { Cookie: `${COOKIE.at}=${token}` },
+    });
     expect(res.status()).toBe(200);
     const body = await res.text();
     expect(body).not.toContain(token);
@@ -52,7 +75,7 @@ test.describe("BFF", () => {
     request,
   }) => {
     const res = await request.get("/api/bff/api/v1/me", {
-      headers: { Cookie: "sh_at=stale-not-a-jwt; sh_rt=rt:ok:1" },
+      headers: { Cookie: `${COOKIE.at}=stale-not-a-jwt; ${COOKIE.rt}=rt:ok:1` },
     });
     expect(res.status()).toBe(200);
     const cookies = res
@@ -61,24 +84,25 @@ test.describe("BFF", () => {
       .map((h) => h.value);
     expect(
       cookies.some(
-        (c) => c.startsWith("sh_at=") && c.includes("HttpOnly") && c.includes("SameSite=Lax"),
+        (c) =>
+          c.startsWith(`${COOKIE.at}=`) && c.includes("HttpOnly") && c.includes("SameSite=Lax"),
       ),
     ).toBe(true);
-    expect(cookies.some((c) => c.startsWith("sh_rt=rt:ok:2"))).toBe(true);
+    expect(cookies.some((c) => c.startsWith(`${COOKIE.rt}=rt:ok:2`))).toBe(true);
   });
 
   test("survives the backend's 409 auth.refresh_in_flight by waiting and retrying", async ({
     request,
   }) => {
     const res = await request.get("/api/bff/api/v1/me", {
-      headers: { Cookie: "sh_at=stale; sh_rt=race" },
+      headers: { Cookie: `${COOKIE.at}=stale; ${COOKIE.rt}=race` },
     });
     expect(res.status()).toBe(200);
   });
 
   test("clears the session when the refresh token is dead", async ({ request }) => {
     const res = await request.get("/api/bff/api/v1/me", {
-      headers: { Cookie: "sh_at=stale; sh_rt=dead" },
+      headers: { Cookie: `${COOKIE.at}=stale; ${COOKIE.rt}=dead` },
       failOnStatusCode: false,
     });
     expect(res.status()).toBe(401);
@@ -116,12 +140,12 @@ test.describe("BFF", () => {
     // A unique probe per run: other tests post to the same path.
     const probe = `probe-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const res = await request.post(`/api/bff/api/v1/students?probe=${probe}`, {
-      data: { firstName: "Ada" },
+      data: validStudent(),
       headers: {
         ...CSRF,
         ...ORIGIN,
-        Cookie: `sh_at=${fakeJwt("ok")}`,
-        "Idempotency-Key": "0190a6c2-7d4e-7000-8000-123456789abc",
+        Cookie: `${COOKIE.at}=${fakeJwt("ok")}`,
+        "Idempotency-Key": IDEMPOTENCY_KEY,
       },
     });
     expect(res.status()).toBe(201);
@@ -131,13 +155,18 @@ test.describe("BFF", () => {
         `${FAKE_API_URL}/__received?path=${encodeURIComponent(`/api/v1/students?probe=${probe}`)}`,
       )
     ).json();
-    expect(seen["idempotency-key"]).toBe("0190a6c2-7d4e-7000-8000-123456789abc");
+    expect(seen["idempotency-key"]).toBe(IDEMPOTENCY_KEY);
   });
 
   test("relays a 402 billing.suspended problem unchanged", async ({ request }) => {
     const res = await request.post("/api/bff/api/v1/students", {
-      data: { firstName: "Ada" },
-      headers: { ...CSRF, ...ORIGIN, Cookie: `sh_at=${fakeJwt("suspended")}` },
+      data: validStudent(),
+      headers: {
+        ...CSRF,
+        ...ORIGIN,
+        Cookie: `${COOKIE.at}=${fakeJwt("suspended")}`,
+        "Idempotency-Key": IDEMPOTENCY_KEY,
+      },
       failOnStatusCode: false,
     });
     expect(res.status()).toBe(402);
@@ -154,7 +183,7 @@ test.describe("BFF", () => {
   }) => {
     const res = await request.post("/api/bff/download", {
       data: { path: "api/v1/payments/9/receipt" },
-      headers: { ...CSRF, ...ORIGIN, Cookie: `sh_at=${fakeJwt("ok")}` },
+      headers: { ...CSRF, ...ORIGIN, Cookie: `${COOKIE.at}=${fakeJwt("ok")}` },
     });
     expect(res.status()).toBe(200);
     expect(res.headers()["content-type"]).toBe("application/pdf");

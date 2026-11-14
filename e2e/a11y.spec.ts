@@ -1,6 +1,7 @@
 // Accessibility (WCAG 2.2 AA) with axe on the production screens, at 360px and desktop.
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { test, expect } from "./fixtures";
+import { type Page } from "@playwright/test";
 import { TEST_PASSWORD } from "./fake-api";
 
 const WCAG = ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"];

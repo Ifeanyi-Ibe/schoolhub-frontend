@@ -1,5 +1,7 @@
 // F1 journeys against the production build. Upstream = labelled test double (e2e/fake-api.ts).
-import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { test, expect } from "./fixtures";
+import { COOKIE, OTHER_ORIGIN, SCHOOL_ORIGIN } from "./origin";
+import { type BrowserContext, type Page } from "@playwright/test";
 import { TEST_PASSWORD } from "./fake-api";
 import { LOOPBACK, SCHOOL_HOST } from "./api-host";
 
@@ -50,10 +52,10 @@ test.describe("sign-in page", () => {
     expect(page.url()).not.toContain(TEST_PASSWORD);
     const visible = await page.evaluate(() => document.cookie);
     expect(visible).not.toMatch(/sh_at|sh_rt/);
-    const at = await cookieNamed(context, "sh_at");
+    const at = await cookieNamed(context, COOKIE.at);
     expect(at?.httpOnly).toBe(true);
     expect(at?.sameSite).toBe("Lax");
-    expect((await cookieNamed(context, "sh_rt"))?.httpOnly).toBe(true);
+    expect((await cookieNamed(context, COOKIE.rt))?.httpOnly).toBe(true);
   });
 });
 
@@ -149,8 +151,8 @@ test.describe("routing and return paths", () => {
     context,
   }) => {
     await context.addCookies([
-      { name: "sh_at", value: "stale-not-a-jwt", url: "http://greenfield.localhost:3000" },
-      { name: "sh_rt", value: "dead", url: "http://greenfield.localhost:3000" },
+      { name: COOKIE.at, value: "stale-not-a-jwt", url: SCHOOL_ORIGIN },
+      { name: COOKIE.rt, value: "dead", url: SCHOOL_ORIGIN },
     ]);
     await page.goto("/home");
     await expect(page).toHaveURL(/\/login/);
@@ -161,8 +163,8 @@ test.describe("routing and return paths", () => {
     context,
   }) => {
     await context.addCookies([
-      { name: "sh_at", value: "stale-not-a-jwt", url: "http://greenfield.localhost:3000" },
-      { name: "sh_rt", value: "rt:race:1", url: "http://greenfield.localhost:3000" },
+      { name: COOKIE.at, value: "stale-not-a-jwt", url: SCHOOL_ORIGIN },
+      { name: COOKIE.rt, value: "rt:race:1", url: SCHOOL_ORIGIN },
     ]);
     await page.goto("/home");
     await expect(page.getByRole("heading", { name: /Welcome/ })).toBeVisible({ timeout: 10_000 });
@@ -174,12 +176,10 @@ test.describe("tenant isolation and read-only state", () => {
     await signIn(page, "ok@test.invalid");
     await page.waitForURL("**/home");
     // A different school on the same base domain: no session cookie is sent there.
-    await page.goto("http://other.localhost:3000/home");
+    await page.goto(`${OTHER_ORIGIN}/home`);
     await expect(page).toHaveURL(/\/login/);
     await expect(page.getByRole("heading", { name: "School not found" })).toBeVisible();
-    expect(
-      (await context.cookies("http://other.localhost:3000")).some((c) => c.name.startsWith("sh_")),
-    ).toBe(false);
+    expect((await context.cookies(OTHER_ORIGIN)).some((c) => c.name.includes("sh_"))).toBe(false);
   });
 
   test("a suspended school is read-only: a banner, and writes are disabled", async ({ page }) => {
@@ -198,8 +198,8 @@ test.describe("tenant isolation and read-only state", () => {
     await page.waitForURL("**/home");
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/login/);
-    expect(await cookieNamed(context, "sh_at")).toBeUndefined();
-    expect(await cookieNamed(context, "sh_rt")).toBeUndefined();
+    expect(await cookieNamed(context, COOKIE.at)).toBeUndefined();
+    expect(await cookieNamed(context, COOKIE.rt)).toBeUndefined();
     await page.goto("/home");
     await expect(page).toHaveURL(/\/login/);
   });
@@ -212,7 +212,7 @@ test.describe("tenant isolation and read-only state", () => {
     await page.getByLabel("New password").fill("a-brand-new-password");
     await page.getByRole("button", { name: "Change password" }).click();
     await expect(page).toHaveURL(/\/login\?signedOut=1/);
-    expect(await cookieNamed(context, "sh_at")).toBeUndefined();
+    expect(await cookieNamed(context, COOKIE.at)).toBeUndefined();
   });
 
   test("sessions: revoke another device", async ({ page }) => {
@@ -257,19 +257,22 @@ test.describe("headers, browser support and offline", () => {
     await expect(page.getByRole("heading", { name: "Please update your browser" })).toBeVisible();
   });
 
-  test("offline: the shell says so, and a reload shows the offline page", async ({
-    page,
-    context,
-  }) => {
-    await signIn(page, "ok@test.invalid");
-    await page.waitForURL("**/home");
-    await page.evaluate(async () => {
-      await navigator.serviceWorker.ready;
+  test.describe("offline", () => {
+    test.use({ allowOfflineNetwork: true });
+    test("offline: the shell says so, and a reload shows the offline page", async ({
+      page,
+      context,
+    }) => {
+      await signIn(page, "ok@test.invalid");
+      await page.waitForURL("**/home");
+      await page.evaluate(async () => {
+        await navigator.serviceWorker.ready;
+      });
+      await context.setOffline(true);
+      await expect(page.getByText("You are offline")).toBeVisible();
+      await page.goto("/profile").catch(() => undefined);
+      await expect(page.getByRole("heading", { name: "You are offline" })).toBeVisible();
+      await context.setOffline(false);
     });
-    await context.setOffline(true);
-    await expect(page.getByText("You are offline")).toBeVisible();
-    await page.goto("/profile").catch(() => undefined);
-    await expect(page.getByRole("heading", { name: "You are offline" })).toBeVisible();
-    await context.setOffline(false);
   });
 });

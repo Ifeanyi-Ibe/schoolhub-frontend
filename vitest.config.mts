@@ -11,8 +11,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["src/test/setup.ts"],
-    include: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs"],
-    exclude: ["e2e/**", "node_modules/**", ".next/**"],
+    include: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs", "e2e/**/*.test.ts"],
+    exclude: ["e2e/**/*.spec.ts", "node_modules/**", ".next/**"],
     restoreMocks: true,
     coverage: {
       provider: "v8",
