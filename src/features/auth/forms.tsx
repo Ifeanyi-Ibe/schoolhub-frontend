@@ -115,12 +115,14 @@ export function LoginForm({ next, signedOut = false }: { next: string; signedOut
       </Button>
       <div className="flex flex-col items-center gap-2 text-sm">
         <Link
+          prefetch={false}
           href="/forgot-password"
           className="font-semibold text-foreground underline underline-offset-4"
         >
           {t("forgot")}
         </Link>
         <Link
+          prefetch={false}
           href={`/login/otp?next=${encodeURIComponent(afterSignIn(next))}`}
           className="text-foreground underline underline-offset-4"
         >
@@ -204,6 +206,7 @@ export function OtpForm({ next }: { next: string }) {
           {t("sendCode")}
         </Button>
         <Link
+          prefetch={false}
           href={`/login?next=${encodeURIComponent(afterSignIn(next))}`}
           className="text-center text-sm underline underline-offset-4"
         >
@@ -298,7 +301,11 @@ export function MfaForm({ next }: { next: string }) {
       >
         {t("submit")}
       </Button>
-      <Link href="/login" className="text-center text-sm underline underline-offset-4">
+      <Link
+        prefetch={false}
+        href="/login"
+        className="text-center text-sm underline underline-offset-4"
+      >
         {t("back")}
       </Link>
     </form>
@@ -470,7 +477,11 @@ export function ForgotForm() {
       >
         {t("submit")}
       </Button>
-      <Link href="/login" className="text-center text-sm underline underline-offset-4">
+      <Link
+        prefetch={false}
+        href="/login"
+        className="text-center text-sm underline underline-offset-4"
+      >
         {t("back")}
       </Link>
     </form>
