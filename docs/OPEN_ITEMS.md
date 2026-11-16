@@ -220,3 +220,14 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Import chain of the formatter (about 12 KB):** `src/app/layout.tsx` renders `NextIntlClientProvider` around every route with the shared messages. That pulls `use-intl` (2,187 B), `intl-messageformat` (1,696 B), `@formatjs/icu-messageformat-parser` (6,064 B) and `@formatjs/icu-skeleton-parser` (2,037 B) into every first load, including `/login`. Parent route components also call `useTranslations` in client components (shell, home, profile, sessions).
 - **Next step (not started):** server-format parent route strings and ship no provider to parent routes (steering item 2b to 2e). Blocked on the decision about a client helper for dynamic strings.
 - **Contract spec (item 5):** `docs/openapi/v1.json` was rewritten at 09:09 today by the running backend (it regenerates the spec in Development). The rewrite adds `/api/v1/dev/messages/latest` and changes formatting; settings responses are still `type: object` (B-03), and `SessionView` is still shared by sessions, rollover and `me/sessions` (B-19). The condition for building settings and sessions is not met, so nothing was built. The reviewed committed spec was restored; the backend will overwrite it again on each Development start, so the generated copy should be kept out of this repo.
+
+## Open after the round of 2026-11-16 (later)
+
+- **Real backend, blocked:** port 5152 is held by another backend process (pid 73319, started 10:42 from the `School-Management` working copy, its key does not match `.env.e2e`). Stop it or restart it through `scripts/dev-backend.sh`, then re-run `npm run test:real` (the preflight shows the state). Last green: 25 passed, 3 skipped.
+- **TOTP:** `mfa.code_invalid` on the platform sign-in in later runs; the persisted-step fix is committed but not yet verified. The platform account may be locked for 15 minutes after repeated failed codes (5 failures).
+- **B-24:** `GET /api/v1/users?q=` answers 500 on the real backend. The people search is broken there.
+- **Staff ratchet:** `/people`, `/roles`, `/academics/levels` are over their ceilings by about 2.8 KB (see the PROGRESS entry). Decision needed.
+- **Parent target:** `/home`, `/profile`, `/sessions` 4.4 to 5.8 KB over the 160,000 B target. Cap holds.
+- **Spec swap:** the backend HEAD export is ready (B-19 renames, typed settings). Swap with `npm run api:sync -- --write` once you approve; then settings and sessions can be built.
+- **Not started:** Part 3 (`/people` LCP) and Part 4 (F2 subjects, grading, assessment, calendar; settings and sessions wait for the swap).
+- **Design:** sign-in, home, and the list screens are not restyled yet.
