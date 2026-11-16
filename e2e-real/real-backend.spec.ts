@@ -7,11 +7,8 @@ import { latestOtpCode } from "./support/otp";
 import { platformLogin, platformVerify } from "./support/platform";
 import { freshTotp } from "./support/totp";
 
-// The backend allows 10 auth calls per minute per address and 3 OTP requests per phone every 10
-// minutes. Journeys run one at a time with a pause; no limit is worked around in the BFF.
-test.beforeEach(async () => {
-  await new Promise((r) => setTimeout(r, 13_000));
-});
+// The suite runs with the backend's rate limits lifted for local runs (E2E__RelaxLimits, Development;
+// scripts/dev-backend.sh). The one journey that needs the real limits is zz-rate-limit.spec.ts.
 
 async function signInAdmin(page: Page) {
   await page.goto("/login");

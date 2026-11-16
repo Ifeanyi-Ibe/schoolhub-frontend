@@ -84,7 +84,8 @@ export async function platformAccessToken(request: APIRequestContext): Promise<s
     throw new Error(`platform sign-in answered ${first.status} without a challenge`);
   const code = await freshTotp(e2e.platformTotpSecret);
   const second = await platformVerify(request, first.body.mfaToken, code);
-  if (!second.body.accessToken) throw new Error(`platform TOTP answered ${second.status}`);
+  if (!second.body.accessToken)
+    throw new Error(`platform TOTP answered ${second.status} ${second.body.code ?? "no code"}`);
   return second.body.accessToken;
 }
 

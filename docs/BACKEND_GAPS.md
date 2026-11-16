@@ -211,3 +211,10 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Effect:** generated types can say a value is present when it is not. A `null` reaching a string-only code path can break rendering or validation.
 - **Design-around:** no field is assumed non-null because the generated type says so. Optional display values are rendered with a fallback, and optional dates and emails are checked before use.
 - **Status:** Open. Ask the backend to audit nullable properties against the server models and declare them `nullable` in the contract.
+
+### B-24 — User search (`GET /api/v1/users?q=`) answers 500 on the real backend
+
+- **Observed:** on backend HEAD 729b182 with the development seed, every request with a `q` value answered `500 internal.error` (3 of 3 with `q=E2E`, and with `q=E2E Actor`). The same request without `q` answers 200. The backend log shows `The reader is closed` and an index-out-of-range error while iterating the query results (EF Core).
+- **Effect:** the people screen's search box fails on the real backend. The fake API used by the browser tests answers search, so the defect is only visible in the real-backend suite. The suite pages through the list instead of searching.
+- **Design-around:** the real-backend journey pages through the list ("Next page") to find its account. No journey searches.
+- **Status:** Open. Ask the backend to fix the query (a likely concurrent use of one database context for the results and the count).

@@ -11,10 +11,6 @@ import { test, expect } from "../e2e/fixtures";
 import { e2e } from "./support/env";
 import { adminAccessToken, inviteUser, latestMessage, runAddress } from "./support/admin";
 
-test.beforeEach(async () => {
-  await new Promise((r) => setTimeout(r, 13_000));
-});
-
 const url = (p: string) => `${e2e.apiBaseUrl}${p}`;
 const apiHeaders = (token: string) => ({
   "X-Bff-Key": e2e.bffKey,
@@ -28,14 +24,14 @@ async function rolesOf(request: APIRequestContext, token: string) {
     headers: apiHeaders(token),
     failOnStatusCode: false,
   });
+  const body: unknown = await res.json().catch(() => null);
+  if (res.status() !== 200 || !Array.isArray(body)) {
+    const code = (body as { code?: string } | null)?.code ?? "no code";
+    throw new Error(`GET /roles answered ${res.status()} ${code}`);
+  }
   return {
     status: res.status(),
-    roles: (await res.json()) as Array<{
-      id: string;
-      name: string;
-      permissions: string[];
-      isSystem: boolean;
-    }>,
+    roles: body as Array<{ id: string; name: string; permissions: string[]; isSystem: boolean }>,
   };
 }
 
@@ -198,8 +194,18 @@ test.describe.serial("roles and escalation", () => {
     await page.getByLabel(/^Password/).fill(e2e.adminPassword);
     await page.getByRole("button", { name: "Sign in" }).click();
     await page.waitForURL("**/home");
+    // The people search fails on the real backend (B-24: users?q= answers 500), so the list is paged
+    // instead until this run's account is on screen. Earlier runs leave accounts behind, so this can take
+    // several pages.
     await page.goto("/people");
-    await page.getByRole("button", { name: `Roles: ${actorName}` }).click();
+    const rolesButton = page.getByRole("button", { name: `Roles: ${actorName}` });
+    const next = page.getByRole("button", { name: "Next page" });
+    for (let i = 0; i < 30 && !(await rolesButton.isVisible()); i++) {
+      if (await next.isDisabled()) break;
+      await next.click();
+      await page.waitForLoadState("networkidle");
+    }
+    await rolesButton.click();
     const dialog = page.getByRole("dialog", { name: `Roles for ${actorName}` });
     await dialog.getByRole("checkbox", { name: inviteOnlyRoleName }).click();
     await dialog.getByRole("button", { name: "Save roles" }).click();

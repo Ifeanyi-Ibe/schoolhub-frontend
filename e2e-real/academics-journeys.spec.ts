@@ -3,10 +3,6 @@
 import { test, expect } from "../e2e/fixtures";
 import { e2e } from "./support/env";
 
-test.beforeEach(async () => {
-  await new Promise((r) => setTimeout(r, 13_000));
-});
-
 test.describe.serial("class levels", () => {
   const code = `E2E-${Date.now().toString(36)}`;
   const name = `E2E level ${code}`;

@@ -3,6 +3,7 @@
 #
 #   scripts/dev-backend.sh            run the API in the foreground
 #   scripts/dev-backend.sh --seed     apply migrations and the idempotent demo seed first
+#   scripts/dev-backend.sh --real-limits   keep the backend's rate limits (for the rate-limit journey)
 #
 # The backend directory is SCHOOLHUB_BACKEND_DIR (default ../School-Management). Its .env supplies the
 # database connection. The BFF key is read from this repo's .env.e2e (E2E_BFF_KEY) and is never printed.
@@ -28,8 +29,12 @@ set -a
 [ -f .env ] && . ./.env
 set +a
 export Bff__Keys__0="$bff_key"
-export E2E__RelaxLimits=true
 export ASPNETCORE_ENVIRONMENT=Development
+if [ "${2:-}" = "--real-limits" ] || [ "${1:-}" = "--real-limits" ]; then
+  echo "Rate limits are ON (real limits). Run the suite with E2E_REAL_LIMITS=1 for the rate-limit journey."
+else
+  export E2E__RelaxLimits=true
+fi
 
 if [ "${1:-}" = "--seed" ]; then
   dotnet tool restore >/dev/null

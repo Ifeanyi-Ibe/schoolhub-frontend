@@ -21,9 +21,6 @@ import {
 import { freshTotp } from "./support/totp";
 
 // Sign-in is rate limited per address, so journeys run one at a time with a pause (see real-backend.spec.ts).
-test.beforeEach(async () => {
-  await new Promise((r) => setTimeout(r, 13_000));
-});
 
 const SCHOOL = `http://${e2e.schoolSlug}.localhost:${e2e.port}`;
 const LOOPBACK = `http://127.0.0.1:${e2e.port}`;
