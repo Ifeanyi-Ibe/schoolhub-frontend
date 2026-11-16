@@ -213,3 +213,10 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Firefox axe crash:** still open. Measured: 5 of 5 crashes with label locators, 2 of 5 with name locators. Skip stays. Engine report pending.
 - **Backend seed:** `seed-demo` fails at `MarkRegisterCommand` (`validation.failed`) on 2026-11-16 after other steps run. The existing data was used. Owner: backend.
 - **Parent cap, LCP, F2 subjects/grading/assessment/calendar, settings and sessions:** unchanged; see the steering round.
+
+## Round 2026-11-16: parent shell size and the contract check
+
+- **Parent first-load JS (BUNDLE_REPORT=1 build, gzipped, measured 2026-11-16):** `/home` 174,862 B, `/profile` 175,558 B, `/sessions` 176,305 B; cap 174,080 B. All three are over, and the gate fails. Not loosened.
+- **Import chain of the formatter (about 12 KB):** `src/app/layout.tsx` renders `NextIntlClientProvider` around every route with the shared messages. That pulls `use-intl` (2,187 B), `intl-messageformat` (1,696 B), `@formatjs/icu-messageformat-parser` (6,064 B) and `@formatjs/icu-skeleton-parser` (2,037 B) into every first load, including `/login`. Parent route components also call `useTranslations` in client components (shell, home, profile, sessions).
+- **Next step (not started):** server-format parent route strings and ship no provider to parent routes (steering item 2b to 2e). Blocked on the decision about a client helper for dynamic strings.
+- **Contract spec (item 5):** `docs/openapi/v1.json` was rewritten at 09:09 today by the running backend (it regenerates the spec in Development). The rewrite adds `/api/v1/dev/messages/latest` and changes formatting; settings responses are still `type: object` (B-03), and `SessionView` is still shared by sessions, rollover and `me/sessions` (B-19). The condition for building settings and sessions is not met, so nothing was built. The reviewed committed spec was restored; the backend will overwrite it again on each Development start, so the generated copy should be kept out of this repo.
