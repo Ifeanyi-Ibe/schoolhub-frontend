@@ -34,6 +34,11 @@ const TEXT_PAIRS: [string, string][] = [
   ["danger-foreground", "danger-surface"],
   ["info-foreground", "info-surface"],
   ["neutral-foreground", "neutral-surface"],
+  ["foreground", "surface-sunken"],
+  ["sidebar-foreground", "sidebar"],
+  ["sidebar-muted", "sidebar"],
+  ["sidebar-foreground", "sidebar-active"],
+  ["brand-soft-foreground", "brand-soft"],
 ];
 
 const NON_TEXT_PAIRS: [string, string][] = [

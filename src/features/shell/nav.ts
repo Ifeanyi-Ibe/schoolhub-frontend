@@ -1,3 +1,13 @@
+import type { IconComponent } from "@/components/ui/icons";
+import {
+  AcademicIcon,
+  DevicesIcon,
+  HomeIcon,
+  PeopleIcon,
+  ShieldIcon,
+  UserIcon,
+} from "@/components/ui/icons";
+
 // Navigation registry. Each item names the permission it needs (or, with anyOf, any one of them); an
 // item with neither is for every signed-in user. Items appear only for features that exist (no dead
 // links). Visibility comes from effective permissions in GET /me, never from role names.
@@ -6,28 +16,32 @@ export interface NavItem {
   id: string;
   href: string;
   labelKey: string;
+  icon: IconComponent;
   permission?: string;
   anyOf?: readonly string[];
 }
 
 export const NAV_ITEMS: readonly NavItem[] = [
-  { id: "home", href: "/home", labelKey: "shell.nav.home" },
-  { id: "profile", href: "/profile", labelKey: "shell.nav.profile" },
-  { id: "sessions", href: "/sessions", labelKey: "shell.nav.sessions" },
+  { id: "home", icon: HomeIcon, href: "/home", labelKey: "shell.nav.home" },
+  { id: "profile", icon: UserIcon, href: "/profile", labelKey: "shell.nav.profile" },
+  { id: "sessions", icon: DevicesIcon, href: "/sessions", labelKey: "shell.nav.sessions" },
   {
     id: "people",
+    icon: PeopleIcon,
     href: "/people",
     labelKey: "shell.nav.people",
     anyOf: ["users.invite", "users.manage"],
   },
   {
     id: "roles",
+    icon: ShieldIcon,
     href: "/roles",
     labelKey: "shell.nav.roles",
     anyOf: ["roles.assign", "roles.manage"],
   },
   {
     id: "academics",
+    icon: AcademicIcon,
     href: "/academics/levels",
     labelKey: "shell.nav.academics",
     anyOf: ["academics.read", "academics.manage"],

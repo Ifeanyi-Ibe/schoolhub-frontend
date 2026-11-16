@@ -5,18 +5,21 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useSyncExternalStore, type ReactNode } from "react";
+import { Avatar } from "@/components/ui/avatar";
 import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
+import { LogOutIcon } from "@/components/ui/icons";
 import { ApiError } from "@/lib/api/unwrap";
 import { isBillingSuspended, subscribeBillingSuspended } from "@/lib/api/billing-events";
 import { meQuery, tenantQuery } from "./api";
-import { NAV_ITEMS, visibleNav } from "./nav";
+import { NAV_ITEMS, visibleNav, type NavItem } from "./nav";
 import { ReadOnlyProvider } from "./read-only";
 import { signOut } from "./sign-out";
 
 /**
- * The signed-in frame: navigation filtered by permission, the school's name, banners for
- * read-only and overdue accounts, and sign-out. Writes are disabled while read-only.
+ * The signed-in frame. Desktop: a sidebar with navigation, the school and the account. Mobile: a top
+ * bar and a bottom bar of icons (44px targets). Navigation is filtered by effective permissions from
+ * GET /me; writes are disabled while the school is read-only.
  */
 export function AppShell({
   children,
@@ -46,6 +49,7 @@ export function AppShell({
 
   const readOnly = billingSuspended || Boolean(tenant.data?.suspended);
   const nav = visibleNav(NAV_ITEMS, me.data?.permissions ?? []);
+  const school = schoolName ?? tenant.data?.branding?.name ?? "SchoolHub";
 
   async function onSignOut() {
     await signOut({ queryClient }).catch(() => undefined);
@@ -54,71 +58,154 @@ export function AppShell({
 
   return (
     <ReadOnlyProvider readOnly={readOnly}>
-      <div className="flex min-h-dvh flex-col bg-background">
-        <header className="sticky top-0 z-20 border-b border-border bg-surface">
-          <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
-            <p className="font-display text-base font-semibold text-foreground">
-              {schoolName ?? tenant.data?.branding?.name ?? "SchoolHub"}
-            </p>
-            <div className="flex items-center gap-2">
-              {me.data ? (
-                <span className="hidden text-sm text-muted-foreground sm:inline">
-                  {t("signedInAs", { name: me.data.displayName })}
-                </span>
-              ) : null}
-              <Button variant="ghost" onClick={onSignOut}>
-                {t("signOut")}
-              </Button>
+      <div className="flex min-h-dvh bg-background">
+        <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground md:flex">
+          <div className="flex items-center gap-3 px-5 pb-6 pt-6">
+            <BrandMark name={school} />
+            <div className="min-w-0">
+              <p className="truncate font-display text-sm font-semibold">{school}</p>
+              <p className="text-xs text-sidebar-muted">SchoolHub</p>
             </div>
           </div>
-        </header>
-        <nav
-          aria-label={t("menu")}
-          className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:static md:border-0 md:bg-transparent"
-        >
-          <ul className="mx-auto flex max-w-5xl justify-around gap-1 px-2 md:justify-start md:px-4">
-            {nav.map((item) => {
-              const current = pathname === item.href;
-              return (
+          <nav aria-label={t("menu")} className="flex-1 overflow-y-auto px-3">
+            <ul className="flex flex-col gap-1">
+              {nav.map((item) => (
                 <li key={item.id}>
-                  <Link
-                    href={item.href}
-                    aria-current={current ? "page" : undefined}
-                    className={`inline-flex min-h-11 items-center px-3 text-sm font-semibold ${current ? "text-brand underline underline-offset-8" : "text-foreground"}`}
-                  >
-                    {t(`nav.${item.id}`)}
-                  </Link>
+                  <NavLink item={item} current={pathname === item.href} variant="sidebar" t={t} />
                 </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        {readOnly ? (
-          <Banner tone="danger" assertive title={t("billingTitle")}>
-            {t("billingBody")}
-          </Banner>
-        ) : tenant.data?.pastDue ? (
-          <Banner tone="warning" title={t("pastDueTitle")}>
-            {t("pastDueBody")}
-          </Banner>
-        ) : null}
-
-        <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 pb-24 pt-6 md:pb-10">
-          {me.isPending ? (
-            <p role="status" className="text-sm text-muted-foreground">
-              {t("loading")}
-            </p>
+              ))}
+            </ul>
+          </nav>
+          {me.data ? (
+            <div className="m-3 flex items-center gap-3 rounded-card bg-sidebar-active p-3">
+              <Avatar name={me.data.displayName} size="sm" />
+              <p className="min-w-0 flex-1 truncate text-sm font-semibold">{me.data.displayName}</p>
+              <button
+                type="button"
+                onClick={onSignOut}
+                className="inline-flex size-11 items-center justify-center rounded-control text-sidebar-muted transition-colors hover:bg-sidebar hover:text-sidebar-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                aria-label={t("signOut")}
+              >
+                <LogOutIcon className="size-5" />
+              </button>
+            </div>
           ) : null}
-          {me.isError && !sessionEnded ? (
-            <p role="alert" className="text-sm text-danger-foreground">
-              {t("loadFailed")}
-            </p>
+        </aside>
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-surface/95 px-4 py-3 backdrop-blur md:hidden">
+            <div className="flex min-w-0 items-center gap-3">
+              <BrandMark name={school} small />
+              <p className="truncate font-display text-base font-semibold text-foreground">
+                {school}
+              </p>
+            </div>
+            {me.data ? (
+              <div className="flex shrink-0 items-center gap-1">
+                <Avatar name={me.data.displayName} size="sm" />
+                <Button variant="ghost" size="icon" onClick={onSignOut} aria-label={t("signOut")}>
+                  <LogOutIcon className="size-5" />
+                </Button>
+              </div>
+            ) : null}
+          </header>
+
+          <nav
+            aria-label={t("menu")}
+            className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden"
+          >
+            <ul className="mx-auto flex max-w-xl justify-around gap-1 px-2">
+              {nav.map((item) => (
+                <li key={item.id} className="min-w-0 flex-1">
+                  <NavLink item={item} current={pathname === item.href} variant="bottom" t={t} />
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {readOnly ? (
+            <Banner tone="danger" assertive title={t("billingTitle")}>
+              {t("billingBody")}
+            </Banner>
+          ) : tenant.data?.pastDue ? (
+            <Banner tone="warning" title={t("pastDueTitle")}>
+              {t("pastDueBody")}
+            </Banner>
           ) : null}
-          {/* Pages render their own heading and skeleton while the account loads (the BFF gates data). */}
-          {children}
-        </main>
+
+          <main
+            id="main"
+            className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 md:px-10 md:pb-12 md:pt-10"
+          >
+            {me.isPending ? (
+              <p role="status" className="text-sm text-muted-foreground">
+                {t("loading")}
+              </p>
+            ) : null}
+            {me.isError && !sessionEnded ? (
+              <p role="alert" className="text-sm text-danger-foreground">
+                {t("loadFailed")}
+              </p>
+            ) : null}
+            {/* Pages render their own heading and skeleton while the account loads (the BFF gates data). */}
+            {children}
+          </main>
+        </div>
       </div>
     </ReadOnlyProvider>
+  );
+}
+
+function BrandMark({ name, small = false }: { name: string; small?: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`inline-flex shrink-0 items-center justify-center rounded-control bg-brand font-display font-bold text-on-brand ${small ? "size-8 text-sm" : "size-10 text-base"}`}
+    >
+      {name.trim().charAt(0).toUpperCase() || "S"}
+    </span>
+  );
+}
+
+function NavLink({
+  item,
+  current,
+  variant,
+  t,
+}: {
+  item: NavItem;
+  current: boolean;
+  variant: "sidebar" | "bottom";
+  t: (key: string) => string;
+}) {
+  const Icon = item.icon;
+  const label = t(`nav.${item.id}`);
+  if (variant === "sidebar") {
+    return (
+      <Link
+        href={item.href}
+        aria-current={current ? "page" : undefined}
+        className={`group relative flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-medium transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring ${current ? "bg-sidebar-active text-sidebar-foreground" : "text-sidebar-muted hover:bg-sidebar-active/60 hover:text-sidebar-foreground"}`}
+      >
+        {current ? (
+          <span
+            aria-hidden="true"
+            className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-brand"
+          />
+        ) : null}
+        <Icon className="size-5 shrink-0" />
+        <span className="truncate">{label}</span>
+      </Link>
+    );
+  }
+  return (
+    <Link
+      href={item.href}
+      aria-current={current ? "page" : undefined}
+      className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-control px-1 text-[0.7rem] font-medium leading-tight focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring ${current ? "text-brand" : "text-muted-foreground"}`}
+    >
+      <Icon className="size-5" />
+      <span className="line-clamp-2 max-w-full text-center leading-tight break-words">{label}</span>
+    </Link>
   );
 }

@@ -31,6 +31,13 @@
   --color-info-foreground: var(--info-foreground);
   --color-neutral-surface: var(--neutral-surface);
   --color-neutral-foreground: var(--neutral-foreground);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-soft-foreground: var(--brand-soft-foreground);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -67,6 +74,13 @@
   --info-foreground: #1e3a8a;
   --neutral-surface: #e5e7eb;
   --neutral-foreground: #1f2937;
+  --surface-sunken: #f3f5f8;
+  --sidebar: #0c2f2a;
+  --sidebar-foreground: #e8f3f0;
+  --sidebar-muted: #9fc3ba;
+  --sidebar-active: #17483f;
+  --brand-soft: #e4f2ee;
+  --brand-soft-foreground: #0b4a3d;
 }
 
 [data-theme="dark"] {
@@ -93,6 +107,13 @@
   --info-foreground: #bfdbfe;
   --neutral-surface: #1f2937;
   --neutral-foreground: #e5e7eb;
+  --surface-sunken: #0a1222;
+  --sidebar: #071f1b;
+  --sidebar-foreground: #e6f5f1;
+  --sidebar-muted: #8fb8ad;
+  --sidebar-active: #134039;
+  --brand-soft: #123d36;
+  --brand-soft-foreground: #a7f3e6;
 }
 
 /* Follow the system theme until the user (or the school) chooses one. */
@@ -121,6 +142,13 @@
     --info-foreground: #bfdbfe;
     --neutral-surface: #1f2937;
     --neutral-foreground: #e5e7eb;
+    --surface-sunken: #0a1222;
+    --sidebar: #071f1b;
+    --sidebar-foreground: #e6f5f1;
+    --sidebar-muted: #8fb8ad;
+    --sidebar-active: #134039;
+    --brand-soft: #123d36;
+    --brand-soft-foreground: #a7f3e6;
   }
 }
 

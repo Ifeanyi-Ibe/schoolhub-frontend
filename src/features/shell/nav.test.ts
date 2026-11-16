@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { HomeIcon } from "@/components/ui/icons";
 import { NAV_ITEMS, visibleNav, type NavItem } from "./nav";
 
 describe("visibleNav", () => {
@@ -15,7 +16,7 @@ describe("visibleNav", () => {
   it("hides an item until the user holds its permission", () => {
     const items: NavItem[] = [
       ...NAV_ITEMS,
-      { id: "fees", href: "/fees", labelKey: "x", permission: "fees.reports.read" },
+      { id: "fees", href: "/fees", labelKey: "x", icon: HomeIcon, permission: "fees.reports.read" },
     ];
     expect(visibleNav(items, ["me.profile"]).map((i) => i.id)).not.toContain("fees");
     expect(visibleNav(items, ["fees.reports.read"]).map((i) => i.id)).toContain("fees");
