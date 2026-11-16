@@ -38,8 +38,8 @@ test.describe("people and roles for an administrator", () => {
 
     await page.goto("/people");
     await expect(page.getByRole("heading", { name: "People", exact: true })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "Ada Okafor", exact: true })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "Tunde Bello", exact: true })).toBeVisible();
+    await expect(page.locator("td", { hasText: "Ada Okafor" })).toBeVisible();
+    await expect(page.locator("td", { hasText: "Tunde Bello" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Invite a person" })).toBeEnabled();
   });
 
@@ -64,8 +64,8 @@ test.describe("people and roles for an administrator", () => {
     await page.getByRole("searchbox", { name: "Search by name" }).fill("tunde");
     await page.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page).toHaveURL(/q=tunde/);
-    await expect(page.getByRole("cell", { name: "Tunde Bello", exact: true })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "Ada Okafor", exact: true })).toHaveCount(0);
+    await expect(page.locator("td", { hasText: "Tunde Bello" })).toBeVisible();
+    await expect(page.locator("td", { hasText: "Ada Okafor" })).toHaveCount(0);
 
     await page.getByRole("searchbox", { name: "Search by name" }).fill("nobody-matches");
     await page.getByRole("button", { name: "Search", exact: true }).click();

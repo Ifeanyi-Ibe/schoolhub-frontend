@@ -43,16 +43,20 @@ const runPassword = (tag: string) => `Run-${tag}-${randomUUID().slice(0, 8)}-pas
 
 test.describe.serial("roles and escalation", () => {
   const actor = { email: runAddress("actor"), password: runPassword("actor"), id: "" };
+  // Per-run display name, so the people screen finds this run's account only.
+  const actorName = `E2E Actor ${Date.now().toString(36)}`;
   let inviteOnlyRoleId = "";
+  let inviteOnlyRoleName = "";
 
   test("the administrator creates a custom role with one permission (users.invite)", async ({
     request,
   }) => {
     const admin = await adminAccessToken(request);
+    inviteOnlyRoleName = `e2e-invite-only-${Date.now().toString(36)}`;
     const res = await request.post(url("/api/v1/roles"), {
       headers: { ...apiHeaders(admin), "Idempotency-Key": randomUUID() },
       data: {
-        name: `e2e-invite-only-${Date.now().toString(36)}`,
+        name: inviteOnlyRoleName,
         description: "e2e: invites only",
         permissions: ["users.invite"],
       },
@@ -66,7 +70,7 @@ test.describe.serial("roles and escalation", () => {
 
   test("an account holding only that role is invited and signs in", async ({ page, request }) => {
     const admin = await adminAccessToken(request);
-    actor.id = await inviteUser(request, admin, "E2E Actor", actor.email, [inviteOnlyRoleId]);
+    actor.id = await inviteUser(request, admin, actorName, actor.email, [inviteOnlyRoleId]);
     const body = await latestMessage(request, actor.email);
     const token = /token=([^\s&"<>]+)/.exec(body)?.[1];
     if (!token) throw new Error("no invitation token");
@@ -157,7 +161,13 @@ test.describe.serial("roles and escalation", () => {
     };
     const admins = users.items.filter((u) => u.roles.includes("SchoolAdmin"));
     console.log(`SCHOOLADMIN_COUNT ${admins.length}`);
-    test.skip(admins.length !== 1, "the rule applies only while one administrator is left");
+    // SKIPPED UNLESS the seed has exactly one SchoolAdmin ("solo" school, from the backend). The development seed
+    // has two SchoolAdmins, so this journey does not run today. Removal of the last administrator is refused by
+    // the backend (it returns a stable code); the test records the code when it runs. Tracked in docs/OPEN_ITEMS.md.
+    test.skip(
+      admins.length !== 1,
+      `needs a school with exactly one SchoolAdmin (seed "solo" school); this school has ${admins.length}`,
+    );
 
     const res = await request.put(url(`/api/v1/users/${me.id}/roles`), {
       headers: { ...apiHeaders(admin), "Content-Type": "application/json" },
@@ -176,6 +186,35 @@ test.describe.serial("roles and escalation", () => {
       res.status() === 200 ? { code: "accepted" } : ((await res.json()) as { code?: string });
     console.log(`LAST_ADMIN_REMOVAL status=${res.status()} code=${problem.code}`);
     expect(res.status()).not.toBe(200);
+  });
+
+  test("the administrator removes the e2e- custom role from the spare account on the people screen, and the API agrees", async ({
+    page,
+    request,
+  }) => {
+    expect(actor.id, "the spare account exists").not.toBe("");
+    await page.goto("/login");
+    await page.getByLabel(/Email or phone/).fill(e2e.adminIdentifier);
+    await page.getByLabel(/^Password/).fill(e2e.adminPassword);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL("**/home");
+    await page.goto("/people");
+    await page.getByRole("button", { name: `Roles: ${actorName}` }).click();
+    const dialog = page.getByRole("dialog", { name: `Roles for ${actorName}` });
+    await dialog.getByRole("checkbox", { name: inviteOnlyRoleName }).click();
+    await dialog.getByRole("button", { name: "Save roles" }).click();
+    await expect(page.getByText("Roles updated", { exact: true })).toBeVisible();
+
+    const admin = await adminAccessToken(request);
+    const users = (await (
+      await request.get(url("/api/v1/users?pageSize=200"), {
+        headers: apiHeaders(admin),
+      })
+    ).json()) as { items: Array<{ id: string; roles: string[] }> };
+    const actorView = users.items.find((u) => u.id === actor.id);
+    expect(actorView?.roles ?? [], "the API no longer lists the custom role").not.toContain(
+      inviteOnlyRoleName,
+    );
   });
 
   test("a change to a built-in role is sent to the API and the answer is recorded (no change made)", async ({
