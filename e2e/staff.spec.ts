@@ -38,8 +38,8 @@ test.describe("people and roles for an administrator", () => {
 
     await page.goto("/people");
     await expect(page.getByRole("heading", { name: "People", exact: true })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "Ada Okafor" })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "Tunde Bello" })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Ada Okafor", exact: true })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Tunde Bello", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Invite a person" })).toBeEnabled();
   });
 
@@ -64,12 +64,33 @@ test.describe("people and roles for an administrator", () => {
     await page.getByRole("searchbox", { name: "Search by name" }).fill("tunde");
     await page.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page).toHaveURL(/q=tunde/);
-    await expect(page.getByRole("cell", { name: "Tunde Bello" })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "Ada Okafor" })).toHaveCount(0);
+    await expect(page.getByRole("cell", { name: "Tunde Bello", exact: true })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Ada Okafor", exact: true })).toHaveCount(0);
 
     await page.getByRole("searchbox", { name: "Search by name" }).fill("nobody-matches");
     await page.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page.getByText("No people match this search.")).toBeVisible();
+  });
+
+  test("a role is removed from a person through the contract's PUT, and the list shows the change", async ({
+    page,
+    request,
+  }) => {
+    const TUNDE = "0190a6c2-0000-7000-8000-000000000202";
+    const REGISTRAR = "0190a6c2-0000-7000-8000-000000000102";
+    await page.goto("/people");
+    await page.getByRole("button", { name: "Roles: Tunde Bello" }).click();
+    const dialog = page.getByRole("dialog", { name: /Roles for Tunde Bello/ });
+    await dialog.getByRole("checkbox", { name: "Registrar" }).click();
+    await dialog.getByRole("button", { name: "Save roles" }).click();
+    await expect(page.getByText("Roles updated", { exact: true })).toBeVisible();
+    await expect(dialog).toBeHidden();
+    // Restore the shared fixture so later tests see Tunde as they expect.
+    const restored = await request.put(`${FAKE_API_URL}/api/v1/users/${TUNDE}/roles`, {
+      headers: { authorization: `Bearer ${fakeJwt("admin")}` },
+      data: { roleIds: [REGISTRAR] },
+    });
+    expect(restored.status(), await restored.text()).toBe(200);
   });
 
   test("an invitation sends the Idempotency-Key the contract declares, and confirms it", async ({

@@ -568,6 +568,18 @@ export function startFakeApi(): Promise<Server> {
       });
     }
 
+    const userRoles = /^\/api\/v1\/users\/([^/]+)\/roles$/.exec(path);
+    if (userRoles && req.method === "PUT") {
+      const user = USERS.find((u) => u.id === userRoles[1]);
+      if (!user) return send(res, 404, problem("users.not_found", "User not found"));
+      const ids = (body.roleIds ?? []) as string[];
+      const named = ids.map((id) => ROLES.find((r) => r.id === id));
+      if (named.some((r) => r === undefined))
+        return send(res, 422, problem("roles.not_found", "A role does not exist"));
+      user.roles = named.map((r) => r?.name ?? "");
+      return send(res, 200, user);
+    }
+
     if (path === "/api/v1/students" && req.method === "POST") {
       return send(res, 201, { created: true, echo: body });
     }

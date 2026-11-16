@@ -16,9 +16,12 @@ import { meQuery } from "@/features/shell/api";
 import { useReadOnly } from "@/features/shell/read-only";
 import type { components } from "@/lib/api/schema";
 import { ApiError } from "@/lib/api/unwrap";
-import { peopleQuery } from "./api";
+import { peopleQuery, rolesQuery } from "./api";
 // The invitation form (react-hook-form) loads when the dialog opens, not with the list. It is not needed
 // for the first paint, and on a mid-range phone its script time delays that paint.
+const UserRolesDialog = lazy(() =>
+  import("./UserRolesDialog").then((m) => ({ default: m.UserRolesDialog })),
+);
 const InviteDialog = lazy(() =>
   import("./InviteDialog").then((m) => ({ default: m.InviteDialog })),
 );
@@ -40,6 +43,7 @@ export function PeopleView() {
   const state = parsePeopleQuery(params);
   const [draft, setDraft] = useState(state.q);
   const [inviting, setInviting] = useState(false);
+  const [rolesFor, setRolesFor] = useState<Person | null>(null);
 
   const canSee =
     me.data !== undefined &&
@@ -47,6 +51,9 @@ export function PeopleView() {
   const canInvite =
     me.data !== undefined && holdsAny(me.data.permissions, [PERMISSION.inviteUsers]);
   const people = useQuery({ ...peopleQuery(state), enabled: canSee });
+  const canAssign =
+    me.data !== undefined && holdsAny(me.data.permissions, [PERMISSION.assignRoles]);
+  const roleList = useQuery({ ...rolesQuery, enabled: canAssign });
 
   function go(next: { q: string; page: number }) {
     const query = peopleQueryParams(next).toString();
@@ -93,6 +100,23 @@ export function PeopleView() {
       header: t("columns.status"),
       cell: (p) => <span>{p.status}</span>,
     },
+    ...(canAssign && !readOnly && roleList.data !== undefined
+      ? [
+          {
+            key: "actions",
+            header: "",
+            cell: (p: Person) => (
+              <Button
+                variant="secondary"
+                aria-label={`${t("roles")}: ${p.displayName}`}
+                onClick={() => setRolesFor(p)}
+              >
+                {t("roles")}
+              </Button>
+            ),
+          },
+        ]
+      : []),
   ];
 
   const page = people.data;
@@ -194,6 +218,19 @@ export function PeopleView() {
       {inviting ? (
         <Suspense fallback={null}>
           <InviteDialog open onOpenChange={(open) => setInviting(open)} />
+        </Suspense>
+      ) : null}
+      {rolesFor !== null && roleList.data !== undefined && me.data !== undefined ? (
+        <Suspense fallback={null}>
+          <UserRolesDialog
+            person={rolesFor}
+            roles={roleList.data}
+            mine={me.data.permissions}
+            isSelf={rolesFor.id === me.data.id}
+            onOpenChange={(open) => {
+              if (!open) setRolesFor(null);
+            }}
+          />
         </Suspense>
       ) : null}
     </div>

@@ -284,7 +284,9 @@
       "previous": "Previous page",
       "next": "Next page",
       "pageStatus": "Page {page} of {total}",
-      "readOnlyHint": "This school's account is suspended, so people cannot be invited."
+      "readOnlyHint": "This school's account is suspended, so people cannot be invited.",
+      "roles": "Roles",
+      "editRoles": "Roles"
     },
     "invite": {
       "title": "Invite a person",
@@ -368,6 +370,20 @@
     },
     "permissionArea": {
       "label": "Permission"
+    },
+    "userRoles": {
+      "title": "Roles for {name}",
+      "description": "Untick a role to remove it. Removing a role takes away what it allows.",
+      "current": "Current roles",
+      "none": "This person has no roles.",
+      "ownWarning": "This removes staff access from your own account. You may not be able to return to this page afterwards.",
+      "confirmOwn": "I understand I may lose access to this page",
+      "save": "Save roles",
+      "saving": "Saving roles",
+      "cancel": "Cancel",
+      "saved": "Roles updated",
+      "forbidden": "You do not have permission to change this person's roles.",
+      "refused": "The school system refused this change (code {code}). Nothing was saved."
     }
   },
   "academics": {
