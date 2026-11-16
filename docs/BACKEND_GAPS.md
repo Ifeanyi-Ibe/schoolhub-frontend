@@ -195,11 +195,19 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** no field marks a role as immutable, and the feature spec says system roles are "editable permissions only if plan allows custom roles; never deletable". The SchoolAdmin role is not described as immutable.
 - **Effect:** the screen cannot lock SchoolAdmin on a rule of its own, and a built-in role can be changed on the plan that allows custom roles. The UI must not branch on the role name (CLAUDE.md), so it cannot protect SchoolAdmin itself.
 - **Design-around:** none in the UI. The screen offers built-in roles as editable when the plan allows it.
-- **Status:** Open. Ask the backend for an `isImmutable` flag on `RoleView` (true for SchoolAdmin), and a refusal for writes to it.
+- **Status:** Backend committed `role.system_immutable` (HEAD 729b182). Verified against a HEAD build on 2026-11-16 (`SchoolAdmin`, id `01a1d89d-86b2-7d0b-8f49-7248126c5caf`, 50 permissions): a no-change write answered 200 and left the permissions unchanged; removing `academics.manage` answered 422 `role.system_immutable`, and the permissions were unchanged afterwards. The frontend spec is not yet swapped; the SchoolAdmin journey is to be re-run after the swap.
 
 ### B-22 — Class level section is a free string in the contract, but an enum on the server
 
 - **Contract:** `LevelRequest.section` and `LevelView.section` are `{"type":"string"}`. The contract lists no allowed values.
 - **Server:** the backend parses `section` as its `ClassSection` enum (`SchoolHub.Modules.Academics/Domain/ClassStructure.cs`): `Creche`, `Nursery`, `Primary`, `JuniorSecondary`, `SeniorSecondary`. Any other text is refused with `academics.invalid` (seen on the real backend with a free-text section).
 - **Design-around:** the class-level screen offers exactly those five values, from `CLASS_SECTIONS` in `src/features/academics/rules.ts`, with a comment pointing here. The real-backend journey creates a level with one of them.
-- **Status:** Open. Ask the backend to document the enum in the contract (an `enum` on both schemas). Remove the constant then, and generate the options from the contract.
+- **Status:** The backend committed the enum (HEAD 7c179dc, B-22: 35 properties and query parameters are enums). The frontend spec is not swapped until the B-19 renames land. Then remove the constant and generate the options from the contract.
+
+### B-23 — Nullable response properties are declared non-null
+
+- **Contract:** some optional response properties (for example middle names, guardian emails, optional dates) are declared as non-nullable strings in the spec, although the server can send `null`.
+- **Server:** fixed in HEAD 729b182 for fixed-set (enum) properties only. Other nullable fields may still be declared non-null.
+- **Effect:** generated types can say a value is present when it is not. A `null` reaching a string-only code path can break rendering or validation.
+- **Design-around:** no field is assumed non-null because the generated type says so. Optional display values are rendered with a fallback, and optional dates and emails are checked before use.
+- **Status:** Open. Ask the backend to audit nullable properties against the server models and declare them `nullable` in the contract.
