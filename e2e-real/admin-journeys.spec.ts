@@ -130,9 +130,10 @@ test.describe.serial("a spare account this run invites", () => {
     await signIn(page, spare.email, spare.password);
     await page.waitForURL("**/home");
     await page.goto("/profile");
+    await page.getByRole("button", { name: "Edit: Change password" }).click();
     await page.getByLabel("Current password").fill(spare.password);
     await page.getByLabel("New password").fill(spare.resetPassword);
-    await page.getByRole("button", { name: "Change password" }).click();
+    await page.getByRole("button", { name: "Change password", exact: true }).click();
     await page.waitForURL("**/login?signedOut=1");
     await expect(page.getByText("You have been signed out.")).toBeVisible();
 

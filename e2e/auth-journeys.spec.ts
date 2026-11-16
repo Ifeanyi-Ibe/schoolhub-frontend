@@ -214,9 +214,10 @@ test.describe("tenant isolation and read-only state", () => {
     await signIn(page, "ok@test.invalid");
     await page.waitForURL("**/home");
     await page.goto("/profile");
+    await page.getByRole("button", { name: "Edit: Change password" }).click();
     await page.getByLabel("Current password").fill(TEST_PASSWORD);
     await page.getByLabel("New password").fill("a-brand-new-password");
-    await page.getByRole("button", { name: "Change password" }).click();
+    await page.getByRole("button", { name: "Change password", exact: true }).click();
     await expect(page).toHaveURL(/\/login\?signedOut=1/);
     expect(await cookieNamed(context, COOKIE.at)).toBeUndefined();
   });

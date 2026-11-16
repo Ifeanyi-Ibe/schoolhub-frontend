@@ -2,12 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useId, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { meQuery } from "@/features/shell/api";
 
-// The two forms use react-hook-form. They load after the account summary, so the profile route's
-// first-load JavaScript does not include the form library (scripts/budgets.json, parent group).
+// The two forms use react-hook-form. Each loads when the user opens it with Edit, so the profile page's
+// first-load JavaScript does not include the form library until someone needs it.
 const ContactCard = lazy(() => import("./ProfileForms").then((m) => ({ default: m.ContactCard })));
 const ChangePasswordCard = lazy(() =>
   import("./ProfileForms").then((m) => ({ default: m.ChangePasswordCard })),
@@ -15,6 +16,39 @@ const ChangePasswordCard = lazy(() =>
 
 function FormSkeleton() {
   return <Card className="h-40 animate-pulse bg-muted" aria-hidden="true" />;
+}
+
+/** An Edit button that reveals one form. The form is mounted only while it is open. */
+function EditSection({
+  label,
+  children,
+}: {
+  label: string;
+  children: (close: () => void) => React.ReactNode;
+}) {
+  const t = useTranslations("profile");
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex justify-end">
+        <Button
+          variant="secondary"
+          aria-expanded={open}
+          aria-controls={open ? id : undefined}
+          aria-label={`${t("edit")}: ${label}`}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? t("closeEdit") : t("edit")}
+        </Button>
+      </div>
+      {open ? (
+        <div id={id}>
+          <Suspense fallback={<FormSkeleton />}>{children(() => setOpen(false))}</Suspense>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export function ProfileView() {
@@ -44,12 +78,8 @@ export function ProfileView() {
           <dd>{u.mfaEnabled ? t("on") : t("off")}</dd>
         </dl>
       </Card>
-      <Suspense fallback={<FormSkeleton />}>
-        <ContactCard />
-      </Suspense>
-      <Suspense fallback={<FormSkeleton />}>
-        <ChangePasswordCard />
-      </Suspense>
+      <EditSection label={t("contactTitle")}>{() => <ContactCard />}</EditSection>
+      <EditSection label={t("changeTitle")}>{() => <ChangePasswordCard />}</EditSection>
     </div>
   );
 }
