@@ -29,3 +29,49 @@ export const ALL_CLIENT_NAMESPACES = [
   ...AUTH_NAMESPACES,
   ...APP_NAMESPACES,
 ] as const;
+
+/**
+ * Message paths the light formatter serves to the parent portal and the shared components (see
+ * src/i18n/light.ts). The root layout sends these and no others. Every message here is covered by the
+ * parity test (src/i18n/light.test.ts), which compares the output with intl-messageformat.
+ */
+export const LIGHT_MESSAGE_PATHS = [
+  "common",
+  "network",
+  "pwa",
+  "retry",
+  "shell",
+  "home",
+  "profile",
+  "sessions",
+  "auth",
+  "palette",
+] as const;
+
+/** Keeps only the given dotted paths, nested as in the source (e.g. "auth.login" keeps auth.login). */
+export function pickPaths(
+  messages: Readonly<Record<string, unknown>>,
+  paths: readonly string[],
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const path of paths) {
+    const parts = path.split(".");
+    let source: unknown = messages;
+    for (const part of parts) {
+      if (typeof source !== "object" || source === null) {
+        source = undefined;
+        break;
+      }
+      source = (source as Record<string, unknown>)[part];
+    }
+    if (source === undefined) continue;
+    let target = out;
+    for (const part of parts.slice(0, -1)) {
+      const next = (target[part] ?? {}) as Record<string, unknown>;
+      target[part] = next;
+      target = next;
+    }
+    target[parts[parts.length - 1]!] = source;
+  }
+  return out;
+}

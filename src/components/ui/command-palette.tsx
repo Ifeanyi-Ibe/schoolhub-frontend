@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import { useId, useMemo, useState, type KeyboardEvent } from "react";
 import { Dialog } from "./dialog";
 
@@ -43,7 +43,7 @@ export function CommandPalette({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const t = useTranslations("palette");
+  const t = useLightTranslations("palette");
   return (
     <Dialog open={open} onOpenChange={onOpenChange} title={t("label")}>
       <PaletteBody items={items} onDone={() => onOpenChange(false)} />
@@ -52,7 +52,7 @@ export function CommandPalette({
 }
 
 function PaletteBody({ items, onDone }: { items: readonly PaletteItem[]; onDone: () => void }) {
-  const t = useTranslations("palette");
+  const t = useLightTranslations("palette");
   const listId = useId();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);

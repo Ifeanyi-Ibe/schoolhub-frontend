@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import React, { lazy, Suspense, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,7 +26,7 @@ function EditSection({
   label: string;
   children: (close: () => void) => React.ReactNode;
 }) {
-  const t = useTranslations("profile");
+  const t = useLightTranslations("profile");
   const [open, setOpen] = useState(false);
   const id = useId();
   return (
@@ -52,7 +52,7 @@ function EditSection({
 }
 
 export function ProfileView() {
-  const t = useTranslations("profile");
+  const t = useLightTranslations("profile");
   const me = useQuery(meQuery);
   if (!me.data) {
     return (

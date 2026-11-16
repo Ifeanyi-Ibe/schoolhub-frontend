@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import { extractOneTimeToken } from "./one-time-token";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -36,7 +36,7 @@ function useRetryWindow() {
   return { seconds, start: setSeconds, clear };
 }
 
-type Translate = ReturnType<typeof useTranslations>;
+type Translate = ReturnType<typeof useLightTranslations>;
 
 function loginMessageText(t: Translate, m: LoginMessage, seconds?: number | null): string {
   if (m === "rate") return t("rate", { seconds: seconds ?? 60 });
@@ -47,7 +47,7 @@ function loginMessageText(t: Translate, m: LoginMessage, seconds?: number | null
 
 /** `signedOut` is set when the user was sent here after signing out or changing their password. */
 export function LoginForm({ next, signedOut = false }: { next: string; signedOut?: boolean }) {
-  const t = useTranslations("auth.login");
+  const t = useLightTranslations("auth.login");
   const router = useRouter();
   const form = useForm<{ identifier: string; password: string }>({
     defaultValues: { identifier: "", password: "" },
@@ -136,8 +136,8 @@ export function LoginForm({ next, signedOut = false }: { next: string; signedOut
 // ---- Phone code sign-in (two steps) ----
 
 export function OtpForm({ next }: { next: string }) {
-  const t = useTranslations("auth.otp");
-  const tl = useTranslations("auth.login");
+  const t = useLightTranslations("auth.otp");
+  const tl = useLightTranslations("auth.login");
   const router = useRouter();
   const [phone, setPhone] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -252,8 +252,8 @@ export function OtpForm({ next }: { next: string }) {
 // ---- Second step: authenticator code (or recovery code) ----
 
 export function MfaForm({ next }: { next: string }) {
-  const t = useTranslations("auth.mfa");
-  const tl = useTranslations("auth.login");
+  const t = useLightTranslations("auth.mfa");
+  const tl = useLightTranslations("auth.login");
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
   const retry = useRetryWindow();
@@ -320,8 +320,8 @@ interface EnrollSetup {
 }
 
 export function EnrollForm({ next }: { next: string }) {
-  const t = useTranslations("auth.enroll");
-  const tl = useTranslations("auth.login");
+  const t = useLightTranslations("auth.enroll");
+  const tl = useLightTranslations("auth.login");
   const router = useRouter();
   const [setup, setSetup] = useState<EnrollSetup | null>(null);
   const [recovery, setRecovery] = useState<string[] | null>(null);
@@ -430,8 +430,8 @@ export function EnrollForm({ next }: { next: string }) {
 // ---- Forgot password (always the same answer) ----
 
 export function ForgotForm() {
-  const t = useTranslations("auth.forgot");
-  const tl = useTranslations("auth.login");
+  const t = useLightTranslations("auth.forgot");
+  const tl = useLightTranslations("auth.login");
   const [sent, setSent] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const retry = useRetryWindow();
@@ -529,8 +529,8 @@ function SecretForm<T extends FieldValues>({
 }
 
 export function ResetForm() {
-  const t = useTranslations("auth.reset");
-  const tl = useTranslations("auth.login");
+  const t = useLightTranslations("auth.reset");
+  const tl = useLightTranslations("auth.login");
   const token = useFragmentToken();
   const [done, setDone] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -575,7 +575,7 @@ export function ResetForm() {
 }
 
 export function InviteForm() {
-  const t = useTranslations("auth.invite");
+  const t = useLightTranslations("auth.invite");
   const token = useFragmentToken();
   const [done, setDone] = useState(false);
   const [message, setMessage] = useState<string | null>(null);

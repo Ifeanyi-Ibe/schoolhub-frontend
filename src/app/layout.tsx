@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { LightMessagesProvider } from "@/i18n/light-provider";
 import { headers } from "next/headers";
-import { ALL_CLIENT_NAMESPACES, pickNamespaces } from "@/i18n/client-namespaces";
+import { LIGHT_MESSAGE_PATHS, pickPaths } from "@/i18n/client-namespaces";
 import Script from "next/script";
 import type { ReactNode } from "react";
 import { Providers } from "@/components/providers";
@@ -33,22 +33,22 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   // Reading request headers makes this layout dynamic, which the CSP nonce from src/proxy.ts needs.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   const locale = await getLocale();
-  // Only the namespaces that client components read are sent to the browser (the full catalogue is
-  // used on the server). Keeps the first load within budget.
-  const messages = pickNamespaces(await getMessages(), ALL_CLIENT_NAMESPACES);
+  // Only the paths the light formatter serves are sent to the browser. The full next-intl formatter is
+  // not loaded here: it ships only with the sign-in and staff subtrees (their layouts).
+  const messages = pickPaths(await getMessages(), LIGHT_MESSAGE_PATHS);
 
   return (
     <html lang={locale} className={`${inter.variable} ${plusJakarta.variable}`}>
       <body className="min-h-dvh antialiased">
         {/* Feature detection before the app loads (ADR 0008). Carries the request nonce. */}
         <Script src="/browser-check.js" strategy="beforeInteractive" nonce={nonce} />
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <LightMessagesProvider locale={locale} messages={messages}>
           <CspNonce nonce={nonce} />
           <Providers>
             <OnlineIndicator />
             {children}
           </Providers>
-        </NextIntlClientProvider>
+        </LightMessagesProvider>
       </body>
     </html>
   );

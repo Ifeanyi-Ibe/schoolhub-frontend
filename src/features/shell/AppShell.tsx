@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useSyncExternalStore, type ReactNode } from "react";
@@ -28,7 +28,7 @@ export function AppShell({
   children: ReactNode;
   schoolName: string | null;
 }) {
-  const t = useTranslations("shell");
+  const t = useLightTranslations("shell");
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();

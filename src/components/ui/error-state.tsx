@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertIcon } from "./icons";
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import { problemDetailsForCopy, type ApiProblem } from "@/lib/api/problem";
 import { Button } from "./button";
 import { useToast } from "./toast";
@@ -18,7 +18,7 @@ export interface ErrorStateProps {
  * Copied text never includes request bodies or tokens (see problemDetailsForCopy).
  */
 export function ErrorState({ title, description, problem, onRetry }: ErrorStateProps) {
-  const t = useTranslations("common");
+  const t = useLightTranslations("common");
   const toast = useToast();
 
   async function copy() {

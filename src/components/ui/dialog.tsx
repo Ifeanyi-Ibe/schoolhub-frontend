@@ -2,7 +2,7 @@
 
 import { XIcon } from "./icons";
 import * as RadixDialog from "@radix-ui/react-dialog";
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 
 export interface DialogProps {
@@ -20,7 +20,7 @@ export interface DialogProps {
  * Radix handles focus management; we supply the labels.
  */
 export function Dialog({ open, onOpenChange, title, description, children, footer }: DialogProps) {
-  const t = useTranslations("common");
+  const t = useLightTranslations("common");
   // Radix returns focus to its Trigger; we have none (the caller owns the button), so remember the
   // element focused before opening. A layout effect runs before Radix moves focus into the dialog.
   const returnFocus = useRef<HTMLElement | null>(null);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import { useEffect, useState } from "react";
 
 /**
@@ -26,8 +26,8 @@ export function useCountdown(seconds: number | null): number {
 }
 
 export function RetryCountdown({ seconds, onDone }: { seconds: number; onDone?: () => void }) {
-  const t = useTranslations("auth.login");
-  const tr = useTranslations("retry");
+  const t = useLightTranslations("auth.login");
+  const tr = useLightTranslations("retry");
   const left = useCountdown(seconds);
   useEffect(() => {
     if (left === 0) onDone?.();

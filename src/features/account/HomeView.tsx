@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import { Card, CardTitle } from "@/components/ui/card";
 import { StatusBadge, type StatusTone } from "@/components/ui/status-badge";
 import { meQuery, tenantQuery } from "@/features/shell/api";
@@ -22,7 +22,7 @@ const STATUS_KEY: Record<string, string> = {
 };
 
 export function HomeView() {
-  const t = useTranslations("home");
+  const t = useLightTranslations("home");
   const me = useQuery(meQuery);
   const tenant = useQuery(tenantQuery);
   if (!me.data) {

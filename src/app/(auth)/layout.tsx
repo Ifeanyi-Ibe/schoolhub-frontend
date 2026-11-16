@@ -8,6 +8,8 @@ import { getEnv } from "@/server/env";
 import { loadBranding, type SchoolBranding } from "@/server/branding";
 import { resolveTenant } from "@/server/tenant";
 
+// Sign-in screens read their text through the light formatter (root layout), so no next-intl code ships
+// here. Server-side text (getTranslations) stays on the server.
 export default async function AuthLayout({ children }: { children: ReactNode }) {
   const env = getEnv();
   const h = await headers();

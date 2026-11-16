@@ -2,7 +2,7 @@
 
 import { XIcon } from "./icons";
 import * as RadixToast from "@radix-ui/react-toast";
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import { cn } from "@/lib/utils";
 import type { StatusTone } from "./status-badge";
 import type { ToastItemView } from "./toast-types";
@@ -26,7 +26,7 @@ export default function ToastRegion({
   items: readonly ToastItemView[];
   onDismiss: (id: number) => void;
 }) {
-  const t = useTranslations("common");
+  const t = useLightTranslations("common");
   return (
     <RadixToast.Provider swipeDirection="right" duration={6000}>
       {items.map((item) => (

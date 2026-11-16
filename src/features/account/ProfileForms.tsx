@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -19,7 +19,7 @@ import { unwrap } from "@/lib/api/unwrap";
 type ContactValues = { channel: "email" | "phone"; value: string; code?: string };
 
 export function ContactCard() {
-  const t = useTranslations("profile");
+  const t = useLightTranslations("profile");
   const readOnly = useReadOnly();
   const [sent, setSent] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -103,7 +103,7 @@ export function ContactCard() {
 }
 
 export function ChangePasswordCard() {
-  const t = useTranslations("profile");
+  const t = useLightTranslations("profile");
   const readOnly = useReadOnly();
   const router = useRouter();
   const qc = useQueryClient();

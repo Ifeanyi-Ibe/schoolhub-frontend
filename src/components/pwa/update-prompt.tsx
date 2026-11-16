@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
 
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
  * the banner and button code is not part of the first load for everyone else.
  */
 export default function UpdatePrompt({ onAccept }: { onAccept: () => void }) {
-  const t = useTranslations("pwa");
+  const t = useLightTranslations("pwa");
   return (
     <Banner
       tone="info"

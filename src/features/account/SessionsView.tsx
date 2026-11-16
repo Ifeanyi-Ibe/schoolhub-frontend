@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { useLightTranslations } from "@/i18n/light-provider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { unwrap } from "@/lib/api/unwrap";
 import { formatInstant } from "@/lib/format/dates";
 
 export function SessionsView() {
-  const t = useTranslations("sessions");
+  const t = useLightTranslations("sessions");
   const readOnly = useReadOnly();
   const router = useRouter();
   const qc = useQueryClient();
