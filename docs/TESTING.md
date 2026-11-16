@@ -63,6 +63,17 @@ The run asserts on `__Host-sh_at` and `__Host-sh_rt`, so the prefixed names are 
 
 These journeys run against the SchoolHub .NET API with its development seed (`docs/backend/DEV_SEED.md`). They are the only tests that exercise the real API, the real rate limits and the real TOTP replay rule.
 
+### Start the backend (scripts/dev-backend.sh)
+
+Run this from the frontend repository. It reads the BFF key from `.env.e2e` (never printed), sets Development and the relaxed limits, and starts the API on the port in `E2E_API_BASE_URL`:
+
+```sh
+scripts/dev-backend.sh          # run the API in the foreground
+scripts/dev-backend.sh --seed   # migrate and seed the demo school first
+```
+
+`npm run test:real` runs a preflight first: it checks the API's health and that the BFF key is accepted, and stops at once with a message if either fails (a wrong key answers `bff.key_invalid`).
+
 ### Start the backend from the backend repository
 
 ```sh

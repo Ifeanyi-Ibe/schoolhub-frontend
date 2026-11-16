@@ -98,6 +98,10 @@ async function schemaSource(spec) {
 // generated types only; docs/openapi/v1.json stays byte-for-byte as exported.
 function withoutDevTenantHeader(spec) {
   const copy = structuredClone(spec);
+  // Development-only routes (/api/v1/dev/*) are never client contract, whatever the document holds.
+  for (const path of Object.keys(copy.paths ?? {})) {
+    if (path.startsWith("/api/v1/dev/")) delete copy.paths[path];
+  }
   const drop = (params) =>
     params ? params.filter((p) => !(p && p.in === "header" && p.name === "X-Tenant")) : params;
   for (const item of Object.values(copy.paths ?? {})) {
@@ -116,7 +120,7 @@ async function main() {
   const spec = JSON.parse(specText);
   const outputs = [
     { path: schemaPath, content: await schemaSource(spec) },
-    { path: manifestPath, content: manifestSource(operationsFrom(spec)) },
+    { path: manifestPath, content: manifestSource(operationsFrom(withoutDevTenantHeader(spec))) },
   ];
   const specHash = `${sha256(specText)}  docs/openapi/v1.json\n`;
 
