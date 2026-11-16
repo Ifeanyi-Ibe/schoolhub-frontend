@@ -138,3 +138,12 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 - **WebKit:** one uncaught page error from a `/login/otp` router prefetch.
 - **Firefox:** the axe crash after typing (reported to the engine: pending); the offline journey is skipped in Firefox.
 - **F2 not built:** subjects and mappings, grading and bands, assessment and components, calendar and holidays. Blocked: settings (B-03), academic sessions and rollover (B-19), concurrency (B-05: no If-Match is declared, so none is sent).
+
+## Round: tidy and record (2026-11-16)
+
+- **Role removal (item 5 of the previous round):** the people screen removes roles through `PUT /users/{id}/roles` (contract `SetUserRolesRequest`). Self-removal of staff access needs confirmation; the backend's refusal code is shown. Commit `ba7d81c`.
+- **Chromium, 360px and desktop:** `e2e/staff.spec.ts` 20 of 20 (mobile-360 and desktop). The people rows are found by `td` text at 360px.
+- **Real backend (`npm run test:real`, backend at 037402b, dev seed):** final full run 24 passed, 2 skipped, 1 failed. The failure was a 30 s setup timeout in the sign-out journey (environmental). Run alone it passes (1 of 1). The first full run had shown a stale API key on the running backend (restarted with the key from the env file); the other real-backend failures came from that and are gone. Skips: the last-SchoolAdmin journey (two SchoolAdmins in the seed) and the suspended-school journey (no dedicated seed school).
+- **Firefox 159.0:** the committed axe sign-in journey crashed 5 of 5 runs; the name-locator variant 2 of 5. Still skipped; documented in `docs/TESTING.md`.
+- **WebKit (Playwright image, v1.65.1):** 26 of 26 critical journeys pass (the earlier `/login/otp` prefetch error is resolved by the `prefetch={false}` change).
+- **Items not done this round:** parent shell size (item 2), `/people` LCP (item 3), F2 subjects, grading, assessment and calendar (item 4), settings and academic sessions (item 5, spec not regenerated).

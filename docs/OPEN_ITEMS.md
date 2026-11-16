@@ -205,3 +205,11 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **WebKit (official image):** 25 of 26 critical journeys pass; one uncaught prefetch error on `/login/otp`.
 - **Firefox:** axe content-process crash after typing into the sign-in form (reproduced; reported to the engine as pending); offline journey skipped in Firefox (test-harness limitation, documented).
 - **Dev data:** test-created schools, levels, roles and accounts accumulate in the development database until it is recreated (the nightly job does this).
+
+## Round 2026-11-16 updates
+
+- **Last-SchoolAdmin rule (real backend):** skipped. Needs a school with exactly one SchoolAdmin (a "solo" seed). The development seed has two. Owner: backend seed.
+- **B-20 (SchoolAdmin immutability):** logged in BACKEND_GAPS. The backend accepted a no-op write to a built-in role (200), so the real-backend check records the answer and does not assert a refusal.
+- **Firefox axe crash:** still open. Measured: 5 of 5 crashes with label locators, 2 of 5 with name locators. Skip stays. Engine report pending.
+- **Backend seed:** `seed-demo` fails at `MarkRegisterCommand` (`validation.failed`) on 2026-11-16 after other steps run. The existing data was used. Owner: backend.
+- **Parent cap, LCP, F2 subjects/grading/assessment/calendar, settings and sessions:** unchanged; see the steering round.
