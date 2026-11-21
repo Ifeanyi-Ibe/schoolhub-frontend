@@ -28,7 +28,11 @@ test.describe("class levels for an administrator", () => {
     page,
   }) => {
     await page.goto("/home");
-    await expect(page.getByRole("link", { name: "Academics" })).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Main navigation" })
+        .getByRole("link", { name: "Academics" }),
+    ).toBeVisible();
     await page.goto("/academics/levels");
     await expect(page.getByRole("heading", { name: "Class levels", exact: true })).toBeVisible();
     await expect(page.locator("td", { hasText: "Junior Secondary 1" })).toBeVisible();
@@ -104,7 +108,11 @@ test.describe("class levels without academic permissions", () => {
   }) => {
     await signInAs(context, "ok");
     await page.goto("/home");
-    await expect(page.getByRole("link", { name: "Academics" })).toHaveCount(0);
+    await expect(
+      page
+        .getByRole("navigation", { name: "Main navigation" })
+        .getByRole("link", { name: "Academics" }),
+    ).toHaveCount(0);
     await page.goto("/academics/levels");
     await expect(page.getByText("You do not have access to class levels")).toBeVisible();
   });

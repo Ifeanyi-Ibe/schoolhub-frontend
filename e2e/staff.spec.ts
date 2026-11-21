@@ -33,8 +33,16 @@ test.describe("people and roles for an administrator", () => {
     page,
   }) => {
     await page.goto("/home");
-    await expect(page.getByRole("link", { name: "People" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Roles" })).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Main navigation" })
+        .getByRole("link", { name: "People" }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Main navigation" })
+        .getByRole("link", { name: "Roles" }),
+    ).toBeVisible();
 
     await page.goto("/people");
     await expect(page.getByRole("heading", { name: "People", exact: true })).toBeVisible();
@@ -176,8 +184,16 @@ test.describe("people and roles without staff permissions", () => {
     page,
   }) => {
     await page.goto("/home");
-    await expect(page.getByRole("link", { name: "People" })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Roles" })).toHaveCount(0);
+    await expect(
+      page
+        .getByRole("navigation", { name: "Main navigation" })
+        .getByRole("link", { name: "People" }),
+    ).toHaveCount(0);
+    await expect(
+      page
+        .getByRole("navigation", { name: "Main navigation" })
+        .getByRole("link", { name: "Roles" }),
+    ).toHaveCount(0);
 
     await page.goto("/people");
     await expect(page.getByText("You do not have access to people")).toBeVisible();

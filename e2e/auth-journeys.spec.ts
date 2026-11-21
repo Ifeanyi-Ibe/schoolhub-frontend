@@ -18,7 +18,10 @@ const cookieNamed = async (ctx: BrowserContext, name: string) =>
 test.describe("sign-in page", () => {
   test("shows the school's own name and brand colour, read on the server", async ({ page }) => {
     await page.goto("/login");
-    await expect(page.getByText("Greenfield Academy", { exact: true })).toBeVisible();
+    // The name appears in the brand panel and in the mobile header (one is hidden per viewport).
+    await expect(
+      page.getByText("Greenfield Academy", { exact: true }).filter({ visible: true }),
+    ).toBeVisible();
     // The colour comes from the same-origin /tenant-brand.css stylesheet, so the computed value is the check.
     await expect
       .poll(() =>

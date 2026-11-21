@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { lazy, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
@@ -124,21 +125,21 @@ export function PeopleView() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-display text-2xl font-semibold text-foreground">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("intro")}</p>
-        </div>
-        {canInvite ? (
-          <Button
-            onClick={() => setInviting(true)}
-            disabled={readOnly}
-            className="self-start sm:self-auto"
-          >
-            {t("invite")}
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        title={t("title")}
+        description={t("intro")}
+        actions={
+          canInvite ? (
+            <Button
+              onClick={() => setInviting(true)}
+              disabled={readOnly}
+              className="self-start sm:self-auto"
+            >
+              {t("invite")}
+            </Button>
+          ) : null
+        }
+      />
       {readOnly ? (
         <p role="status" className="text-sm text-muted-foreground">
           {t("readOnlyHint")}

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { lazy, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
@@ -118,17 +119,17 @@ export function LevelsView() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-display text-2xl font-semibold text-foreground">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("intro")}</p>
-        </div>
-        {writable ? (
-          <Button onClick={() => setEditing("new")} className="self-start sm:self-auto">
-            {t("add")}
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        title={t("title")}
+        description={t("intro")}
+        actions={
+          writable ? (
+            <Button onClick={() => setEditing("new")} className="self-start sm:self-auto">
+              {t("add")}
+            </Button>
+          ) : null
+        }
+      />
       {suspended ? (
         <p role="status" className="text-sm text-muted-foreground">
           {t("readOnlyHint")}

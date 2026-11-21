@@ -29,7 +29,7 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
     return <Frame title={tc("unavailable")} body="" />;
   }
   return (
-    <Branded slug={tenant.slug} branding={result.branding}>
+    <Branded slug={tenant.slug} branding={result.branding} panel={await brandPanel()}>
       {children}
     </Branded>
   );
@@ -38,43 +38,78 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
 function Branded({
   slug,
   branding,
+  panel,
   children,
 }: {
   slug: string;
   branding: SchoolBranding;
+  panel: { headline: string; body: string; product: string };
   children: ReactNode;
 }) {
+  const logo = branding.logoUrl ? (
+    // A plain <img>: next/image adds an inline style attribute, which the CSP does not allow.
+    // The logo is a tenant asset served by the BFF, with fixed dimensions.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`/api/bff/api/v1/public/tenants/${slug}/logo`}
+      alt={`${branding.name} logo`}
+      width={56}
+      height={56}
+      loading="eager"
+      decoding="async"
+      className="size-14 rounded-control bg-surface object-contain p-1"
+    />
+  ) : (
+    <span
+      aria-hidden="true"
+      className="inline-flex size-14 items-center justify-center rounded-control bg-surface font-display text-xl font-bold text-brand"
+    >
+      {branding.name.trim().charAt(0).toUpperCase() || "S"}
+    </span>
+  );
   return (
-    <div className="tenant-brand min-h-dvh bg-background">
+    <div className="tenant-brand grid min-h-dvh bg-background lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       {/* Same-origin stylesheet: the school's colours, validated by the route. See tenant-brand.css/route.ts. */}
       {/* A per-tenant stylesheet cannot be imported statically, so this is the one manual link. */}
       {/* eslint-disable-next-line @next/next/no-css-tags */}
       <link rel="stylesheet" href="/tenant-brand.css" precedence="default" />
-      <header className="mx-auto flex max-w-md items-center gap-3 px-4 pt-8">
-        {branding.logoUrl ? (
-          // A plain <img>: next/image adds an inline style attribute, which the CSP does not allow.
-          // The logo is a tenant asset served by the BFF, with fixed dimensions.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={`/api/bff/api/v1/public/tenants/${slug}/logo`}
-            alt={`${branding.name} logo`}
-            width={48}
-            height={48}
-            loading="eager"
-            decoding="async"
-            className="size-12 rounded-control object-contain"
-          />
-        ) : null}
-        <div className="flex flex-col">
-          <p className="font-display text-lg font-semibold text-foreground">{branding.name}</p>
-          {branding.motto ? (
-            <p className="text-sm text-muted-foreground">{branding.motto}</p>
-          ) : null}
+      <aside className="relative hidden overflow-hidden bg-sidebar p-12 text-sidebar-foreground lg:flex lg:flex-col lg:justify-between">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-brand/25 blur-3xl"
+        />
+        <div className="relative flex items-center gap-4">
+          {logo}
+          <div className="min-w-0">
+            <p className="font-display text-xl font-semibold">{branding.name}</p>
+            {branding.motto ? <p className="text-sm text-sidebar-muted">{branding.motto}</p> : null}
+          </div>
         </div>
-      </header>
-      <main id="main" className="mx-auto w-full max-w-md px-4 py-8">
-        {children}
-      </main>
+        <div className="relative max-w-md">
+          <p className="font-display text-3xl font-semibold leading-tight">{panel.headline}</p>
+          <p className="mt-4 text-sm leading-relaxed text-sidebar-muted">{panel.body}</p>
+        </div>
+        <p className="relative text-xs text-sidebar-muted">{panel.product}</p>
+      </aside>
+      <div className="flex min-w-0 flex-col">
+        <header className="mx-auto flex w-full max-w-md items-center gap-3 px-4 pt-8 lg:hidden">
+          {logo}
+          <div className="flex min-w-0 flex-col">
+            <p className="font-display text-lg font-semibold text-foreground">{branding.name}</p>
+            {branding.motto ? (
+              <p className="text-sm text-muted-foreground">{branding.motto}</p>
+            ) : null}
+          </div>
+        </header>
+        <main
+          id="main"
+          className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-10 lg:px-10"
+        >
+          <div className="rounded-card border border-border bg-surface p-6 shadow-raised sm:p-8">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
@@ -86,4 +121,9 @@ function Frame({ title, body }: { title: string; body: string }) {
       {body ? <p className="text-muted-foreground">{body}</p> : null}
     </main>
   );
+}
+
+async function brandPanel() {
+  const t = await getTranslations("auth.brandPanel");
+  return { headline: t("headline"), body: t("body"), product: t("product") };
 }
