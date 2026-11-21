@@ -196,6 +196,9 @@ test.describe.serial("roles and escalation", () => {
     page,
     request,
   }) => {
+    // The people list is paged 20 at a time, and every real run leaves its accounts behind; finding this run's
+    // account takes several pages, so the journey gets more time than the default.
+    test.setTimeout(120_000);
     expect(actor.id, "the spare account exists").not.toBe("");
     await page.goto("/login");
     await page.getByLabel(/Email or phone/).fill(e2e.adminIdentifier);
@@ -208,11 +211,24 @@ test.describe.serial("roles and escalation", () => {
     await page.goto("/people");
     const rolesButton = page.getByRole("button", { name: `Roles: ${actorName}` });
     const next = page.getByRole("button", { name: "Next page" });
-    for (let i = 0; i < 30 && !(await rolesButton.isVisible()); i++) {
+    const firstRow = () =>
+      page
+        .getByRole("button", { name: /^Roles: / })
+        .first()
+        .getAttribute("aria-label");
+    for (let i = 0; i < 30; i++) {
+      // Rows change after the URL does: read them only once they differ from the page before the click.
+      await expect.poll(firstRow, { timeout: 15_000 }).not.toBeNull();
+      if ((await rolesButton.count()) > 0) break;
       if (await next.isDisabled()) break;
+      const before = await firstRow();
       await next.click();
+      await expect.poll(firstRow, { timeout: 15_000 }).not.toBe(before);
       await page.waitForLoadState("networkidle");
     }
+    // Bring the row into view without a smooth scroll: the list re-renders as rows enter the viewport, so a
+    // moving target never settles for the click.
+    await rolesButton.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
     await rolesButton.click();
     const dialog = page.getByRole("dialog", { name: `Roles for ${actorName}` });
     await dialog.getByRole("checkbox", { name: inviteOnlyRoleName }).click();
