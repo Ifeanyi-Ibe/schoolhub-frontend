@@ -59,6 +59,21 @@
         },
         "/settings": {
           "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
+        },
+        "/students": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
+        },
+        "/students/new": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
+        },
+        "/students/0190a6c2-0000-7000-8000-000000000901": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
+        },
+        "/students/import": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
+        },
+        "/students/promotions": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
         }
       },
       "maxRouteSpecificGzipBytes": 40960,
