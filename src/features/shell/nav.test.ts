@@ -33,6 +33,8 @@ describe("visibleNav", () => {
         "/academics/levels",
         "/settings",
         "/students",
+        "/staff",
+        "/my-classes",
       ]).toContain(item.href);
   });
 });
