@@ -154,6 +154,11 @@
     "schoolMissing": {
       "title": "School not found",
       "body": "This web address does not belong to a school on SchoolHub. Check the address, or ask your school for its link."
+    },
+    "brandPanel": {
+      "headline": "Everything your school runs on, in one place.",
+      "body": "Students, staff, academics and fees, with permissions that match each person's role.",
+      "product": "SchoolHub"
     }
   },
   "shell": {
@@ -188,7 +193,15 @@
       "suspended": "Suspended",
       "cancelled": "Cancelled"
     },
-    "title": "Home"
+    "title": "Home",
+    "hero": "Here is what needs your attention today.",
+    "statusLabel": "School status",
+    "planLabel": "Plan",
+    "rolesLabel": "Your roles",
+    "roleCount": "{count, plural, =0 {No roles} one {# role} other {# roles}}",
+    "quickActions": "Go to",
+    "quickActionsHint": "Only the screens your permissions allow are shown.",
+    "noActions": "You have no screens to open yet. Ask a school administrator for access."
   },
   "profile": {
     "title": "Your profile",
@@ -464,6 +477,196 @@
       "forbidden": "You do not have permission to change class levels.",
       "refused": "The school system refused this arm (code {code}). Nothing was saved.",
       "failed": "The arm could not be added. Try again."
+    },
+    "tabs": {
+      "label": "Academic setup",
+      "levels": "Class levels",
+      "subjects": "Subjects",
+      "grading": "Grading",
+      "assessment": "Assessment",
+      "calendar": "Calendar"
+    },
+    "state": {
+      "loading": "Loading…",
+      "errorTitle": "We could not load this",
+      "errorBody": "Check your connection and try again.",
+      "noAccessTitle": "You cannot view academic setup",
+      "noAccessBody": "Ask a school administrator for academics access.",
+      "readOnlyHint": "This school's account is suspended, so changes are turned off.",
+      "forbidden": "You do not have permission to make this change.",
+      "refused": "The school system refused this change (code {code}). Nothing was saved.",
+      "saved": "Saved",
+      "deleted": "Deleted",
+      "copyDetails": "Copy error details",
+      "offlineHint": "You are offline. Changes need a connection.",
+      "cancel": "Cancel"
+    },
+    "rules": {
+      "subject": {
+        "code": "Enter a subject code.",
+        "name": "Enter a subject name.",
+        "category": "Choose a category."
+      },
+      "band": {
+        "number": "Scores must be whole numbers.",
+        "range": "Each band runs from a lower to a higher whole score, between 0 and 100.",
+        "grade": "Enter a grade.",
+        "remark": "Enter a remark for this band."
+      },
+      "bands": {
+        "none": "Add at least one band.",
+        "start": "The lowest band must start at 0.",
+        "end": "The highest band must end at 100.",
+        "overlap": "Two bands overlap. Each score belongs to one band only.",
+        "gap": "A score between two bands has no band. Bands must be continuous."
+      },
+      "component": {
+        "name": "Enter a name for this component.",
+        "max": "The maximum score must be a whole number from 1 to 100.",
+        "nameLength": "A component name can be at most 30 characters.",
+        "weight": "The weight must be a whole number from 0 to 100."
+      },
+      "components": {
+        "none": "Add at least one component.",
+        "total": "The maximum scores must add up to 100. The total is shown below."
+      },
+      "calendar": {
+        "date": "Enter a real date (YYYY-MM-DD).",
+        "type": "Choose a day type.",
+        "name": "Enter a name for this day."
+      }
+    },
+    "subjects": {
+      "title": "Subjects",
+      "intro": "The subjects your school teaches, and which of them each class level takes.",
+      "add": "Add a subject",
+      "edit": "Edit",
+      "delete": "Delete",
+      "columns": {
+        "code": "Code",
+        "name": "Name",
+        "category": "Category"
+      },
+      "emptyTitle": "No subjects yet",
+      "emptyBody": "Add the subjects your school teaches, then choose which ones each class level takes.",
+      "dialogAdd": "Add a subject",
+      "dialogEdit": "Edit subject",
+      "code": "Code",
+      "name": "Name",
+      "category": "Category",
+      "save": "Save subject",
+      "confirmDelete": "Delete {name}? Class mappings that use it will be affected.",
+      "mappingTitle": "Subjects by class level",
+      "mappingIntro": "Tick each subject that this class level takes, and mark the compulsory ones.",
+      "mappingLevel": "Class level",
+      "mappingEmpty": "Choose a class level to see its subjects.",
+      "taken": "Taken",
+      "compulsory": "Compulsory",
+      "saveMappings": "Save subjects for this level",
+      "mappingsSaved": "Subjects saved for this level",
+      "noSubjectsForMapping": "Add subjects first, then map them to class levels."
+    },
+    "category": {
+      "Core": "Core",
+      "Elective": "Elective",
+      "Extra": "Extra"
+    },
+    "grading": {
+      "title": "Grading",
+      "intro": "A grading scheme turns scores into grades and remarks. Bands must cover 0 to 100 with no gap or overlap.",
+      "newScheme": "New grading scheme",
+      "schemeName": "Scheme name",
+      "create": "Create scheme",
+      "schemes": "Schemes",
+      "default": "Default",
+      "setDefault": "Make default",
+      "delete": "Delete scheme",
+      "confirmDelete": "Delete the scheme {name}?",
+      "emptyTitle": "No grading schemes yet",
+      "emptyBody": "Create a scheme, then add its bands.",
+      "choose": "Choose a scheme to edit its bands.",
+      "bandsTitle": "Bands for {name}",
+      "bandColumns": {
+        "min": "From",
+        "max": "To",
+        "grade": "Grade",
+        "remark": "Remark",
+        "gradePoint": "Grade point"
+      },
+      "addBand": "Add band",
+      "removeBand": "Remove band {row}",
+      "saveBands": "Save bands",
+      "bandsSaved": "Bands saved",
+      "bandCount": "{count, plural, =0 {No bands} one {# band} other {# bands}}",
+      "coverage": "Covers 0 to 100 with no gaps or overlaps.",
+      "row": "Band {row}",
+      "schemeNameRequired": "Enter a name for the scheme."
+    },
+    "assessment": {
+      "title": "Assessment",
+      "intro": "An assessment scheme says which components make up a student's total, and their maximum scores.",
+      "newScheme": "New assessment scheme",
+      "schemeName": "Scheme name",
+      "create": "Create scheme",
+      "schemes": "Schemes",
+      "default": "Default",
+      "setDefault": "Make default",
+      "delete": "Delete scheme",
+      "emptyTitle": "No assessment schemes yet",
+      "emptyBody": "Create a scheme, then add its components.",
+      "choose": "Choose a scheme to edit its components.",
+      "componentsTitle": "Components for {name}",
+      "componentColumns": {
+        "name": "Component",
+        "max": "Maximum score",
+        "running": "Running total"
+      },
+      "addComponent": "Add component",
+      "removeComponent": "Remove component {row}",
+      "saveComponents": "Save components",
+      "componentsSaved": "Components saved",
+      "runningTotal": "Total so far: {total} of 100",
+      "totalOk": "The maximum scores add up to 100.",
+      "row": "Component {row}",
+      "schemeNameRequired": "Enter a name for the scheme.",
+      "componentCount": "{count, plural, =0 {No components} one {# component} other {# components}}"
+    },
+    "calendar": {
+      "title": "Academic calendar",
+      "intro": "Days that are not teaching days, and the holidays for a year.",
+      "from": "From",
+      "to": "To",
+      "add": "Add a day",
+      "date": "Date",
+      "type": "Type",
+      "name": "Name",
+      "save": "Save day",
+      "delete": "Delete day",
+      "confirmDelete": "Delete {name} on {date}?",
+      "emptyTitle": "No calendar days in this range",
+      "emptyBody": "Add a non-school day or a holiday, or import the year's public holidays.",
+      "importTitle": "Import public holidays",
+      "importYear": "Year",
+      "import": "Import holidays",
+      "importDone": "Imported {added} holidays. {skipped} were already in the calendar.",
+      "types": {
+        "Holiday": "Holiday",
+        "NonSchoolDay": "Non-school day",
+        "SpecialEvent": "Special event"
+      },
+      "previewTitle": "School days preview",
+      "previewTerm": "Term",
+      "previewChoose": "Choose a term to preview its school days.",
+      "previewNoTerms": "This session has no terms yet.",
+      "totalDays": "Total days",
+      "weekendDays": "Weekend days",
+      "closedDays": "Closed days",
+      "schoolDays": "School days",
+      "columns": {
+        "date": "Date",
+        "type": "Type",
+        "name": "Name"
+      }
     }
   }
 }

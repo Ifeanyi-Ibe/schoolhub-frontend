@@ -110,6 +110,107 @@ const ARMS: Array<{
 ];
 
 // Staff fixtures for the people and roles screens. Names are invented and identifiers are fixed.
+
+// Academic setup fixtures (subjects, mappings, grading, assessment, calendar). Identifiers are fixed.
+const SUBJECTS: Array<{ id: string; code: string; name: string; category: string }> = [
+  {
+    id: "0190a6c2-0000-7000-8000-000000000401",
+    code: "MTH",
+    name: "Mathematics",
+    category: "Core",
+  },
+  { id: "0190a6c2-0000-7000-8000-000000000402", code: "ENG", name: "English", category: "Core" },
+  {
+    id: "0190a6c2-0000-7000-8000-000000000403",
+    code: "CRS",
+    name: "Religious Studies",
+    category: "Elective",
+  },
+];
+const MAPPINGS: Record<string, Array<{ subjectId: string; isCompulsory: boolean }>> = {};
+const GRADING: Array<{
+  id: string;
+  name: string;
+  isDefault: boolean;
+  bands: Array<{
+    id: string;
+    min: number;
+    max: number;
+    grade: string;
+    remark: string;
+    gradePoint: number | null;
+  }>;
+}> = [
+  {
+    id: "0190a6c2-0000-7000-8000-000000000501",
+    name: "Standard grading",
+    isDefault: true,
+    bands: [
+      {
+        id: "0190a6c2-0000-7000-8000-000000000511",
+        min: 0,
+        max: 39,
+        grade: "F",
+        remark: "Fail",
+        gradePoint: 0,
+      },
+      {
+        id: "0190a6c2-0000-7000-8000-000000000512",
+        min: 40,
+        max: 69,
+        grade: "C",
+        remark: "Credit",
+        gradePoint: 3,
+      },
+      {
+        id: "0190a6c2-0000-7000-8000-000000000513",
+        min: 70,
+        max: 100,
+        grade: "A",
+        remark: "Excellent",
+        gradePoint: 5,
+      },
+    ],
+  },
+];
+const ASSESSMENT: Array<{
+  id: string;
+  name: string;
+  isDefault: boolean;
+  total: number;
+  components: Array<{ id: string; name: string; maxScore: number; weight: number; order: number }>;
+}> = [
+  {
+    id: "0190a6c2-0000-7000-8000-000000000601",
+    name: "Termly assessment",
+    isDefault: true,
+    total: 100,
+    components: [
+      {
+        id: "0190a6c2-0000-7000-8000-000000000611",
+        name: "Test",
+        maxScore: 20,
+        weight: 20,
+        order: 1,
+      },
+      {
+        id: "0190a6c2-0000-7000-8000-000000000612",
+        name: "Exam",
+        maxScore: 80,
+        weight: 80,
+        order: 2,
+      },
+    ],
+  },
+];
+const CALENDAR: Array<{ id: string; date: string; type: string; name: string }> = [
+  {
+    id: "0190a6c2-0000-7000-8000-000000000701",
+    date: `${new Date().getUTCFullYear()}-10-01`,
+    type: "Holiday",
+    name: "Independence Day",
+  },
+];
 const PERMISSION_CATALOG = [
   {
     area: "Students",
@@ -578,6 +679,172 @@ export function startFakeApi(): Promise<Server> {
         return send(res, 422, problem("roles.not_found", "A role does not exist"));
       user.roles = named.map((r) => r?.name ?? "");
       return send(res, 200, user);
+    }
+
+    // Academic setup: subjects, mappings, grading, assessment and calendar (contract operations).
+    if (path === "/api/v1/subjects" && req.method === "GET") return send(res, 200, SUBJECTS);
+    if (path === "/api/v1/subjects" && req.method === "POST") {
+      const subject = {
+        id: randomUUID(),
+        code: body.code ?? "",
+        name: body.name ?? "",
+        category: body.category ?? "Core",
+      };
+      SUBJECTS.push(subject);
+      return send(res, 201, subject);
+    }
+    const subjectById = /^\/api\/v1\/subjects\/([^/]+)$/.exec(path);
+    if (subjectById && req.method === "PUT") {
+      const subject = SUBJECTS.find((x) => x.id === subjectById[1]);
+      if (!subject) return send(res, 404, problem("academics.not_found", "Subject not found"));
+      Object.assign(subject, {
+        code: body.code ?? subject.code,
+        name: body.name ?? subject.name,
+        category: body.category ?? subject.category,
+      });
+      return send(res, 200, subject);
+    }
+    if (subjectById && req.method === "DELETE") {
+      const index = SUBJECTS.findIndex((x) => x.id === subjectById[1]);
+      if (index < 0) return send(res, 404, problem("academics.not_found", "Subject not found"));
+      SUBJECTS.splice(index, 1);
+      return res.writeHead(204).end();
+    }
+    const levelSubjects = /^\/api\/v1\/class-levels\/([^/]+)\/subjects$/.exec(path);
+    if (levelSubjects && req.method === "GET")
+      return send(res, 200, MAPPINGS[levelSubjects[1] ?? ""] ?? []);
+    if (levelSubjects && req.method === "PUT") {
+      const rows = (Array.isArray(body) ? body : []) as unknown as Array<{
+        subjectId: string;
+        isCompulsory: boolean;
+      }>;
+      MAPPINGS[levelSubjects[1] ?? ""] = rows.map((r) => ({
+        subjectId: r.subjectId,
+        isCompulsory: r.isCompulsory,
+      }));
+      return send(res, 200, MAPPINGS[levelSubjects[1] ?? ""]);
+    }
+
+    if (path === "/api/v1/grading-schemes" && req.method === "GET") return send(res, 200, GRADING);
+    if (path === "/api/v1/grading-schemes" && req.method === "POST") {
+      const scheme = { id: randomUUID(), name: body.name ?? "", isDefault: false, bands: [] };
+      GRADING.push(scheme);
+      return send(res, 201, scheme);
+    }
+    const gradingBands = /^\/api\/v1\/grading-schemes\/([^/]+)\/bands$/.exec(path);
+    if (gradingBands && req.method === "PUT") {
+      const scheme = GRADING.find((x) => x.id === gradingBands[1]);
+      if (!scheme) return send(res, 404, problem("academics.not_found", "Scheme not found"));
+      const rows = Array.isArray(body) ? (body as unknown as Array<Record<string, unknown>>) : [];
+      scheme.bands = rows.map((r) => ({
+        id: randomUUID(),
+        min: Number(r.min),
+        max: Number(r.max),
+        grade: String(r.grade),
+        remark: String(r.remark),
+        gradePoint:
+          r.gradePoint === null || r.gradePoint === undefined ? null : Number(r.gradePoint),
+      }));
+      return send(res, 200, scheme);
+    }
+    const gradingDefault = /^\/api\/v1\/grading-schemes\/([^/]+)\/set-default$/.exec(path);
+    if (gradingDefault && req.method === "POST") {
+      for (const s of GRADING) s.isDefault = s.id === gradingDefault[1];
+      return send(
+        res,
+        200,
+        GRADING.find((s) => s.id === gradingDefault[1]),
+      );
+    }
+    const gradingById = /^\/api\/v1\/grading-schemes\/([^/]+)$/.exec(path);
+    if (gradingById && req.method === "DELETE") {
+      const index = GRADING.findIndex((x) => x.id === gradingById[1]);
+      if (index < 0) return send(res, 404, problem("academics.not_found", "Scheme not found"));
+      if (GRADING[index]?.isDefault)
+        return send(
+          res,
+          409,
+          problem("grading.default_in_use", "The default scheme cannot be deleted"),
+        );
+      GRADING.splice(index, 1);
+      return res.writeHead(204).end();
+    }
+
+    if (path === "/api/v1/assessment-schemes" && req.method === "GET")
+      return send(res, 200, ASSESSMENT);
+    if (path === "/api/v1/assessment-schemes" && req.method === "POST") {
+      const scheme = {
+        id: randomUUID(),
+        name: body.name ?? "",
+        isDefault: false,
+        total: 0,
+        components: [],
+      };
+      ASSESSMENT.push(scheme);
+      return send(res, 201, scheme);
+    }
+    const assessmentComponents = /^\/api\/v1\/assessment-schemes\/([^/]+)\/components$/.exec(path);
+    if (assessmentComponents && req.method === "PUT") {
+      const scheme = ASSESSMENT.find((x) => x.id === assessmentComponents[1]);
+      if (!scheme) return send(res, 404, problem("academics.not_found", "Scheme not found"));
+      const rows = Array.isArray(body) ? (body as unknown as Array<Record<string, unknown>>) : [];
+      const total = rows.reduce((sum, r) => sum + Number(r.maxScore), 0);
+      if (total !== 100)
+        return send(
+          res,
+          422,
+          problem("assessment.total_not_100", "The maximum scores must add up to 100"),
+        );
+      scheme.components = rows.map((r) => ({
+        id: randomUUID(),
+        name: String(r.name),
+        maxScore: Number(r.maxScore),
+        weight: Number(r.weight),
+        order: Number(r.order),
+      }));
+      scheme.total = total;
+      return send(res, 200, scheme);
+    }
+    const assessmentDefault = /^\/api\/v1\/assessment-schemes\/([^/]+)\/set-default$/.exec(path);
+    if (assessmentDefault && req.method === "POST") {
+      for (const s of ASSESSMENT) s.isDefault = s.id === assessmentDefault[1];
+      return send(
+        res,
+        200,
+        ASSESSMENT.find((s) => s.id === assessmentDefault[1]),
+      );
+    }
+
+    if (path === "/api/v1/calendar/days" && req.method === "GET") {
+      const from = url.searchParams.get("from") ?? "0000-01-01";
+      const to = url.searchParams.get("to") ?? "9999-12-31";
+      return send(
+        res,
+        200,
+        CALENDAR.filter((d) => d.date >= from && d.date <= to).sort((a, b) =>
+          a.date < b.date ? -1 : 1,
+        ),
+      );
+    }
+    if (path === "/api/v1/calendar/days" && req.method === "POST") {
+      const day = {
+        id: randomUUID(),
+        date: String(body.date),
+        type: String(body.type),
+        name: String(body.name),
+      };
+      CALENDAR.push(day);
+      return send(res, 201, day);
+    }
+    const calendarById = /^\/api\/v1\/calendar\/days\/([^/]+)$/.exec(path);
+    if (calendarById && req.method === "DELETE") {
+      const index = CALENDAR.findIndex((d) => d.id === calendarById[1]);
+      if (index < 0) return send(res, 404, problem("calendar.not_found", "Day not found"));
+      CALENDAR.splice(index, 1);
+      return res.writeHead(204).end();
+    }
+    if (path === "/api/v1/calendar/import-holidays" && req.method === "POST") {
+      return send(res, 200, { year: Number(body.year), added: 2, skipped: 1 });
     }
 
     if (path === "/api/v1/students" && req.method === "POST") {
