@@ -3,6 +3,7 @@
 // It records the headers it receives so tests can assert what the BFF forwards.
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
+import { handleStaff } from "./fake-staff.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -590,6 +591,19 @@ export function startFakeApi(): Promise<Server> {
     )
       return;
 
+    // Staff: records, assignments, leave, invitations and class teachers.
+    if (
+      handleStaff({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+      })
+    )
+      return;
+
     if (path === "/api/v1/me") {
       return send(res, 200, {
         id: "00000000-0000-4000-8000-000000000001",
@@ -627,6 +641,9 @@ export function startFakeApi(): Promise<Server> {
                 "students.lifecycle.manage",
                 "students.import.run",
                 "promotions.manage",
+                "staff.read",
+                "staff.write",
+                "staff.assign",
               ]
             : ["me.profile"],
       });
