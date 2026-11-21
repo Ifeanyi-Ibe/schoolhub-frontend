@@ -778,8 +778,19 @@
       "fields": {
         "primaryColor": "Primary colour",
         "secondaryColor": "Secondary colour",
-        "logo": "Logo (file or URL)",
+        "logo": "Logo",
         "reportCardHeader": "Report card header"
+      },
+      "chooseLogo": "Choose a logo",
+      "removeLogo": "Remove logo",
+      "logoHint": "A JPEG or PNG image, up to 3 MB. Save to use it.",
+      "logoSet": "A logo is set.",
+      "logoNone": "No logo yet.",
+      "logoUploaded": "Logo uploaded. Save to use it.",
+      "logoErrors": {
+        "fileType": "Choose a JPEG or PNG image.",
+        "fileEmpty": "The file is empty.",
+        "fileTooLarge": "The logo is larger than 3 MB."
       }
     },
     "policies": {

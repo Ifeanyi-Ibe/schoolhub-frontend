@@ -57,6 +57,8 @@ export const UPLOAD_LIMITS = {
     types: ["text/csv", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
     maxBytes: 5 * 1024 * 1024,
   },
+  // School logo: JPEG or PNG up to 3 MiB (the backend's SchoolLogo rule, FilePurposeRules).
+  logo: { types: ["image/jpeg", "image/png"], maxBytes: 3 * 1024 * 1024 },
 } as const;
 
 export type UploadPurpose = keyof typeof UPLOAD_LIMITS;

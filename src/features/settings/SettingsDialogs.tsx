@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
+import { uploadFile, UploadRefused } from "@/features/files/upload";
 import { ApiError } from "@/lib/api/unwrap";
 import { guardBrandColor, parseHex } from "@/lib/theme/contrast";
 import {
@@ -21,14 +22,96 @@ import {
 
 type Translate = (key: string, values?: Record<string, string>) => string;
 
+/**
+ * The school logo is a verified upload (purpose SchoolLogo). The server stores its file id, never a URL, so the
+ * field is a file picker: the chosen file is uploaded at once, and Save then sets it as the logo.
+ */
+function LogoField({
+  logoId,
+  onUploaded,
+  onRemoved,
+  register,
+}: {
+  logoId: string;
+  onUploaded: (id: string) => void;
+  onRemoved: () => void;
+  register: React.ReactNode;
+}) {
+  const t = useTranslations("settings");
+  const tState = useTranslations("academics.state");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  async function choose(file: File) {
+    setBusy(true);
+    setMessage(null);
+    try {
+      const uploaded = await uploadFile(file, "logo");
+      onUploaded(uploaded.id);
+      setMessage(t("branding.logoUploaded"));
+    } catch (err) {
+      setMessage(
+        err instanceof UploadRefused
+          ? t(`branding.logoErrors.${err.reason}`)
+          : refusal(err, tState),
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {register}
+      <p className="text-sm font-medium text-foreground">{t("branding.fields.logo")}</p>
+      <p className="text-xs text-muted-foreground">
+        {logoId !== "" ? t("branding.logoSet") : t("branding.logoNone")}
+      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="inline-flex min-h-11 cursor-pointer items-center rounded-control border border-border bg-surface px-4 text-sm font-semibold text-foreground shadow-card hover:border-brand/40">
+          <span>{t("branding.chooseLogo")}</span>
+          <input
+            type="file"
+            accept="image/png,image/jpeg"
+            className="sr-only"
+            disabled={busy}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (file) void choose(file);
+            }}
+          />
+        </label>
+        {logoId !== "" ? (
+          <Button variant="ghost" onClick={onRemoved} disabled={busy}>
+            {t("branding.removeLogo")}
+          </Button>
+        ) : null}
+      </div>
+      <p className="text-xs text-muted-foreground">{t("branding.logoHint")}</p>
+      {message ? (
+        <p role="status" className="text-sm text-foreground">
+          {message}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function refusal(err: unknown, tState: (k: string, v?: Record<string, string>) => string): string {
   const problem = err instanceof ApiError ? err.problem : null;
-  return problem?.status === 403
-    ? tState("forbidden")
-    : tState("refused", { code: problem?.code ?? "unknown" });
+  if (problem?.status === 403) return tState("forbidden");
+  const base = tState("refused", { code: problem?.code ?? "unknown" });
+  // The server names the fields it refused and says why; show them so the form can be corrected.
+  const fields = Object.entries(problem?.errors ?? {})
+    .map(([field, messages]) => `${field}: ${messages.join(" ")}`)
+    .join(" ");
+  return fields === "" ? base : `${base} ${fields}`;
 }
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/** The server stores a colour as #RRGGBB only (SettingsCatalog). Shorthand such as #abc is refused, so it is refused here too. */
+const SIX_DIGIT_HEX = /^#[0-9a-fA-F]{6}$/;
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 /** The school's profile. Only the name is required by the screen; the server has the final say. */
@@ -148,6 +231,7 @@ export function BrandingDialog({
   const primary = useWatch({ control: form.control, name: "primaryColor" });
   const secondary = useWatch({ control: form.control, name: "secondaryColor" });
   const primaryGuard = parseHex(primary ?? "") ? guardBrandColor(primary) : null;
+  const logoId = useWatch({ control: form.control, name: "logo" });
   const secondaryGuard = parseHex(secondary ?? "") ? guardBrandColor(secondary) : null;
 
   async function onSubmit(v: Branding) {
@@ -164,7 +248,7 @@ export function BrandingDialog({
 
   // A colour must be a six-digit hex value; the contrast note below says whether it is adjusted.
   const colourCheck = {
-    validate: (value: string) => parseHex(value ?? "") !== null || t("validation.colour"),
+    validate: (value: string) => SIX_DIGIT_HEX.test(value ?? "") || t("validation.colour"),
     required: true as const,
   };
 
@@ -213,7 +297,12 @@ export function BrandingDialog({
           <ContrastNote label={t("branding.fields.primaryColor")} guard={primaryGuard} t={t} />
           <ContrastNote label={t("branding.fields.secondaryColor")} guard={secondaryGuard} t={t} />
         </div>
-        <Input label={t("branding.fields.logo")} {...form.register("logo")} />
+        <LogoField
+          logoId={logoId ?? ""}
+          onUploaded={(id) => form.setValue("logo", id, { shouldDirty: true })}
+          onRemoved={() => form.setValue("logo", "", { shouldDirty: true })}
+          register={<input type="hidden" {...form.register("logo")} />}
+        />
         <div className="flex flex-col gap-1.5">
           <label htmlFor="report-header" className="text-sm font-medium text-foreground">
             {t("branding.fields.reportCardHeader")}

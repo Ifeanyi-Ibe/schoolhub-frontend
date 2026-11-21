@@ -17,6 +17,7 @@ const CONTRACT_PURPOSE: Record<
 > = {
   document: "StudentDocument",
   import: "ImportUpload",
+  logo: "SchoolLogo",
 };
 
 export class UploadRefused extends Error {

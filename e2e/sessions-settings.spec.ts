@@ -102,7 +102,28 @@ test.describe("sessions, terms and rollover for an administrator", () => {
     await branding.getByLabel("Primary colour").fill("#zzzzzz");
     await branding.getByRole("button", { name: "Save", exact: true }).click();
     await expect(branding.getByText("Enter a six-digit colour, such as #0F5C4D.")).toBeVisible();
+    // Shorthand is refused on the screen too: the server stores #RRGGBB only.
+    await branding.getByLabel("Primary colour").fill("#1f4");
+    await branding.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(branding.getByText("Enter a six-digit colour, such as #0F5C4D.")).toBeVisible();
     await branding.getByRole("button", { name: "Cancel" }).click();
+  });
+
+  test("branding: a logo is uploaded as the school logo, then saved with the colours", async ({
+    page,
+  }) => {
+    await page.goto("/settings");
+    await page.getByRole("button", { name: "Edit" }).nth(1).click();
+    const branding = page.getByRole("dialog", { name: "Branding" });
+    await branding.getByLabel("Choose a logo").setInputFiles({
+      name: "logo.png",
+      mimeType: "image/png",
+      buffer: Buffer.from("\x89PNG fake"),
+    });
+    await expect(branding.getByText("Logo uploaded. Save to use it.")).toBeVisible();
+    await expect(branding.getByText("A logo is set.")).toBeVisible();
+    await branding.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(page.getByText("Saved", { exact: true })).toBeVisible();
   });
 
   test("policies save with the toggles and the threshold checked", async ({ page }) => {

@@ -251,6 +251,7 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** `PUT /api/v1/settings/school-profile`, `/branding` and `/policies` declare the request body as `{"type":"object"}` with no properties. The reads (`SchoolProfileView`, `BrandingSettingsView`, `PoliciesView`) are typed.
 - **Design-around:** the settings screens send back the full view they read, with the same field names. The real-backend journey writes each view back with its current values (no change) and checks the backend answers 200 and reads the same values. The request type is cast in `src/features/settings/api.ts` and not hand-typed.
 - **Status:** Open. Ask the backend to declare the three request bodies as the view shapes (or the request schemas), so the client can type them.
+- **Found in use (2026-11-21):** the branding `logo` must be the id of a verified SchoolLogo upload (the backend's message says so; the contract does not). The PUT saves it, but its response echoes the previous logo value; a GET after the PUT returns the new one. The screens refetch after a save, so they show the saved value.
 
 ### B-30 — The file-content step has no declared request body
 
