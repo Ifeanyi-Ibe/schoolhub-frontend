@@ -50,6 +50,10 @@ export function AppShell({
   const readOnly = billingSuspended || Boolean(tenant.data?.suspended);
   const nav = visibleNav(NAV_ITEMS, me.data?.permissions ?? []);
   const school = schoolName ?? tenant.data?.branding?.name ?? "SchoolHub";
+  // The school's logo, through the BFF (the tenant summary holds the API path). Absent, the initial stands in.
+  const schoolLogo = tenant.data?.branding?.logoUrl
+    ? `/api/bff${tenant.data.branding.logoUrl}`
+    : null;
 
   async function onSignOut() {
     await signOut({ queryClient }).catch(() => undefined);
@@ -59,9 +63,9 @@ export function AppShell({
   return (
     <ReadOnlyProvider readOnly={readOnly}>
       <div className="flex min-h-dvh bg-background">
-        <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground md:flex">
+        <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col bg-[linear-gradient(180deg,color-mix(in_oklab,var(--brand)_38%,var(--sidebar))_0%,var(--sidebar)_34%)] text-sidebar-foreground md:flex">
           <div className="flex items-center gap-3 px-5 pb-6 pt-6">
-            <BrandMark name={school} />
+            <BrandMark name={school} logoUrl={schoolLogo} />
             <div className="min-w-0">
               <p className="truncate font-display text-sm font-semibold">{school}</p>
               <p className="text-xs text-sidebar-muted">SchoolHub</p>
@@ -95,7 +99,7 @@ export function AppShell({
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-surface/95 px-4 py-3 backdrop-blur md:hidden">
             <div className="flex min-w-0 items-center gap-3">
-              <BrandMark name={school} small />
+              <BrandMark name={school} logoUrl={schoolLogo} small />
               <p className="truncate font-display text-base font-semibold text-foreground">
                 {school}
               </p>
@@ -135,7 +139,7 @@ export function AppShell({
 
           <main
             id="main"
-            className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 md:px-10 md:pb-12 md:pt-10"
+            className="mx-auto w-full max-w-6xl flex-1 bg-[radial-gradient(60rem_28rem_at_100%_-8%,color-mix(in_oklab,var(--brand)_10%,transparent),transparent_70%)] px-4 pb-28 pt-6 md:px-10 md:pb-12 md:pt-10"
           >
             {me.isPending ? (
               <p role="status" className="text-sm text-muted-foreground">
@@ -156,7 +160,30 @@ export function AppShell({
   );
 }
 
-function BrandMark({ name, small = false }: { name: string; small?: boolean }) {
+function BrandMark({
+  name,
+  logoUrl,
+  small = false,
+}: {
+  name: string;
+  logoUrl: string | null;
+  small?: boolean;
+}) {
+  const size = small ? "size-8" : "size-10";
+  if (logoUrl) {
+    // A plain <img>: next/image adds an inline style attribute, which the CSP does not allow.
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={logoUrl}
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        decoding="async"
+        className={`${size} shrink-0 rounded-control bg-surface object-contain p-0.5`}
+      />
+    );
+  }
   return (
     <span
       aria-hidden="true"

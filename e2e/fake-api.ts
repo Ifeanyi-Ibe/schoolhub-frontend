@@ -77,7 +77,7 @@ function headerSnapshot(req: IncomingMessage): Record<string, string | undefined
 
 const branding = {
   name: "Greenfield Academy",
-  logoUrl: `${FAKE_API_URL}/api/v1/public/tenants/${TENANT}/logo`,
+  logoUrl: `/api/v1/public/tenants/${TENANT}/logo`,
   primaryColor: "#c2410c",
   secondaryColor: "#1e3a8a",
   motto: "Knowledge first",
