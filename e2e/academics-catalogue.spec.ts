@@ -58,21 +58,25 @@ test.describe("academic setup for an administrator", () => {
     await expect(save).toBeDisabled();
 
     // Band 2 now starts at 39: it overlaps band 1 (0 to 39).
-    await page.getByLabel("From").nth(1).fill("39");
+    await page.getByLabel("From", { exact: true }).nth(1).fill("39");
     await expect(
       page.getByText("Two bands overlap. Each score belongs to one band only."),
     ).toBeVisible();
     await expect(save).toBeDisabled();
 
-    await page.getByLabel("From").nth(1).fill("40");
+    await page.getByLabel("From", { exact: true }).nth(1).fill("40");
     await expect(page.getByText("Two bands overlap.")).toHaveCount(0);
-    await page.getByLabel("Remark").nth(1).fill("");
+    await page.getByLabel("Remark", { exact: true }).nth(1).fill("");
     await expect(page.getByText("Enter a remark for this band.")).toBeVisible();
     await expect(save).toBeDisabled();
 
-    // Back to the saved remark, then a real change, so there is something to save.
-    await page.getByLabel("Remark").nth(1).fill("Credit");
-    await page.getByLabel("Grade").nth(1).fill("C+");
+    // Back to the saved remark, then a real change, so there is something to save. The grade is unique to this
+    // run: the fake API is shared by both viewport projects, so a fixed value would already be saved.
+    await page.getByLabel("Remark", { exact: true }).nth(1).fill("Credit");
+    await page
+      .getByLabel("Grade", { exact: true })
+      .nth(1)
+      .fill(`C${Date.now().toString(36).slice(-4)}`);
     await expect(save).toBeEnabled();
     await save.click();
     await expect(page.getByText("Bands saved", { exact: true })).toBeVisible();
@@ -87,12 +91,12 @@ test.describe("academic setup for an administrator", () => {
     await expect(page.getByRole("button", { name: "Save components" })).toBeDisabled();
 
     await page.getByRole("button", { name: "Add component" }).click();
-    await page.getByLabel("Maximum score").nth(2).fill("30");
+    await page.getByLabel("Maximum score", { exact: true }).nth(2).fill("30");
     await expect(page.getByText("The maximum scores must add up to 100.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Save components" })).toBeDisabled();
 
-    await page.getByLabel("Component").nth(2).fill("Project");
-    await page.getByLabel("Maximum score").nth(2).fill("0");
+    await page.getByLabel("Component", { exact: true }).nth(2).fill("Project");
+    await page.getByLabel("Maximum score", { exact: true }).nth(2).fill("0");
     await expect(
       page.getByText("The maximum score must be a whole number from 1 to 100."),
     ).toBeVisible();

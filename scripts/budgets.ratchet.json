@@ -1,10 +1,16 @@
 {
-  "/login": 162666,
-  "/home": 164370,
-  "/profile": 165087,
-  "/sessions": 165840,
-  "/people": 187850,
-  "/roles": 186530,
-  "/roles/0190a6c2-0000-7000-8000-000000000101": 187007,
-  "/academics/levels": 187421
+  "/login": 163355,
+  "/home": 166038,
+  "/profile": 165794,
+  "/sessions": 166541,
+  "/people": 192076,
+  "/roles": 190831,
+  "/roles/0190a6c2-0000-7000-8000-000000000101": 191216,
+  "/academics/levels": 191403,
+  "/academics/subjects": 192695,
+  "/academics/grading": 194031,
+  "/academics/assessment": 193873,
+  "/academics/calendar": 193603,
+  "/academics/sessions": 192639,
+  "/settings": 190928
 }

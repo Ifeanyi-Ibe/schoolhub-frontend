@@ -13,6 +13,7 @@ import { ApiError } from "@/lib/api/unwrap";
 import { createArm, createLevel, updateLevel } from "./api";
 import {
   CLASS_SECTIONS,
+  isClassSection,
   armFieldProblem,
   levelFieldProblem,
   type ArmDraft,
@@ -44,11 +45,13 @@ export function LevelDialog({
 
   async function onSubmit(v: LevelDraft) {
     setMessage(null);
+    const section = v.section.trim();
+    if (!isClassSection(section)) return;
     const input = {
       code: v.code.trim(),
       name: v.name.trim(),
       order: Number(v.order.trim()),
-      section: v.section.trim(),
+      section,
     };
     try {
       if (level) await updateLevel(level.id, input);

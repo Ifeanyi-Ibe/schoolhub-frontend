@@ -22,7 +22,8 @@ describe("newActionKey", () => {
 describe("canAutoRetry", () => {
   it("allows retry only where the contract declares Idempotency-Key", () => {
     expect(canAutoRetry("POST", "/api/v1/payments/manual")).toBe(true);
-    expect(canAutoRetry("POST", "/api/v1/invoices/{id}/adjustments")).toBe(false);
+    // A create the contract does not key (class levels) is never retried automatically.
+    expect(canAutoRetry("POST", "/api/v1/class-levels")).toBe(false);
     expect(canAutoRetry("GET", "/api/v1/students")).toBe(false);
   });
 });
@@ -41,7 +42,7 @@ describe("writePolicyHeaders", () => {
 
     const undeclared = writePolicyHeaders({
       method: "POST",
-      path: "/api/v1/invoices/{id}/adjustments",
+      path: "/api/v1/class-levels",
       idempotencyKey: key,
     });
     expect(undeclared.headers).toEqual({});

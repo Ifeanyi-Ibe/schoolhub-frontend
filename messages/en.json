@@ -171,7 +171,8 @@
       "sessions": "Devices and sessions",
       "people": "People",
       "roles": "Roles",
-      "academics": "Academics"
+      "academics": "Academics",
+      "settings": "Settings"
     },
     "billingTitle": "Read-only: this school's account is suspended",
     "billingBody": "You can view information, but changes are turned off. Ask your school administrator to restore the account.",
@@ -484,7 +485,8 @@
       "subjects": "Subjects",
       "grading": "Grading",
       "assessment": "Assessment",
-      "calendar": "Calendar"
+      "calendar": "Calendar",
+      "sessions": "Sessions and terms"
     },
     "state": {
       "loading": "Loading…",
@@ -499,7 +501,8 @@
       "deleted": "Deleted",
       "copyDetails": "Copy error details",
       "offlineHint": "You are offline. Changes need a connection.",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "archivedNote": "This session is archived and cannot be changed."
     },
     "rules": {
       "subject": {
@@ -534,6 +537,20 @@
         "date": "Enter a real date (YYYY-MM-DD).",
         "type": "Choose a day type.",
         "name": "Enter a name for this day."
+      },
+      "session": {
+        "name": "Enter a name for the session.",
+        "start": "Enter a real start date (YYYY-MM-DD).",
+        "end": "Enter a real end date (YYYY-MM-DD).",
+        "order": "The session ends before it starts. Check the dates.",
+        "nameLength": "A session name can be at most 20 characters."
+      },
+      "term": {
+        "number": "The term number must be a whole number from 1 to 99.",
+        "name": "Enter a name for the term.",
+        "start": "Enter a real start date (YYYY-MM-DD).",
+        "end": "Enter a real end date (YYYY-MM-DD).",
+        "order": "The term ends before it starts. Check the dates."
       }
     },
     "subjects": {
@@ -667,6 +684,126 @@
         "type": "Type",
         "name": "Name"
       }
+    },
+    "sessions": {
+      "title": "Sessions and terms",
+      "intro": "School years (sessions), the terms in each one, and the school days in every term.",
+      "new": "New session",
+      "edit": "Edit",
+      "archive": "Archive",
+      "archived": "Archived",
+      "current": "Current",
+      "start": "From",
+      "end": "To",
+      "dialogNew": "New session",
+      "dialogEdit": "Edit session",
+      "save": "Save session",
+      "confirmArchive": "Archive {name}? An archived session is kept as history and cannot be changed.",
+      "emptyTitle": "No sessions yet",
+      "emptyBody": "Create the school year, then add its terms.",
+      "choose": "Choose a session to see its terms.",
+      "termsTitle": "Terms in {name}",
+      "addTerm": "Add a term",
+      "editTerm": "Edit",
+      "setCurrent": "Make current term",
+      "termColumns": {
+        "number": "No.",
+        "name": "Term",
+        "dates": "Dates",
+        "nextTerm": "Next term begins"
+      },
+      "termDialogNew": "New term",
+      "termDialogEdit": "Edit term",
+      "termSave": "Save term",
+      "noTerms": "This session has no terms yet.",
+      "showDays": "School days",
+      "hideDays": "Hide school days",
+      "daysTitle": "School days in {name}",
+      "totalDays": "Total days",
+      "weekendDays": "Weekend days",
+      "closedDays": "Closed days",
+      "schoolDays": "School days",
+      "rollover": "Start next session",
+      "rolloverTitle": "Start a new session",
+      "rolloverBody": "This creates a new session from the details you enter. Current records stay as they are. Check the dates before you continue.",
+      "rolloverAction": "Start session",
+      "rolloverPending": "Starting the new session. Please wait; nothing has changed yet.",
+      "rolloverDone": "The new session {name} has started.",
+      "rolloverRefused": "The school system refused this change (code {code}). Nothing was saved.",
+      "columns": {
+        "name": "Session",
+        "dates": "Dates",
+        "status": "Status"
+      },
+      "archivedNote": "This session is archived and cannot be changed.",
+      "showTerms": "Show terms"
+    }
+  },
+  "settings": {
+    "title": "School settings",
+    "intro": "The school's details, how it appears to families, and the rules that apply across the system.",
+    "edit": "Edit",
+    "save": "Save",
+    "noAccessTitle": "You cannot change school settings",
+    "noAccessBody": "Ask a school administrator for settings access.",
+    "yes": "Yes",
+    "no": "No",
+    "profile": {
+      "title": "School profile",
+      "intro": "The name, address and contacts printed on documents.",
+      "fields": {
+        "name": "School name",
+        "registrationNo": "Registration number",
+        "address": "Address",
+        "email": "Email",
+        "phones": "Phone numbers",
+        "motto": "Motto",
+        "principalName": "Principal",
+        "lga": "Local government area",
+        "state": "State"
+      }
+    },
+    "branding": {
+      "title": "Branding",
+      "intro": "The school's colours and the header on report cards.",
+      "colourHint": "A six-digit colour, such as #0F5C4D.",
+      "noPreview": "Enter a six-digit colour to check its contrast.",
+      "adjusted": "Adjusted to {accent} so that text on it reads at AA contrast ({ratio}:1).",
+      "passes": "Text on this colour reads at {ratio}:1, which meets AA contrast.",
+      "fields": {
+        "primaryColor": "Primary colour",
+        "secondaryColor": "Secondary colour",
+        "logo": "Logo (file or URL)",
+        "reportCardHeader": "Report card header"
+      }
+    },
+    "policies": {
+      "title": "Policies",
+      "intro": "Numbering, timezone and the rules that gate results, attendance and security.",
+      "toggles": "Rules",
+      "fields": {
+        "timezone": "Timezone",
+        "adminNoFormat": "Staff number format",
+        "receiptNoFormat": "Receipt number format",
+        "invoiceNoFormat": "Invoice number format",
+        "feesClearedThreshold": "Fees cleared threshold (%)",
+        "lateCutoff": "Late cut-off time",
+        "quietHours": "Quiet hours for notifications",
+        "requireFeesCleared": "Results need fees cleared",
+        "absenceAlert": "Alert families on absence",
+        "excusedCountsAsPresent": "Excused absence counts as present",
+        "requireMfaForAdmins": "Require two-step sign-in for administrators",
+        "allowSupportAccess": "Allow support access to this school"
+      }
+    },
+    "validation": {
+      "nameRequired": "Enter the school's name.",
+      "email": "Enter a valid email address.",
+      "colour": "Enter a six-digit colour, such as #0F5C4D.",
+      "required": "This field is required.",
+      "percent": "Enter a whole number from 0 to 100.",
+      "time": "Enter a time as HH:MM, such as 08:30.",
+      "timeHint": "24-hour time, such as 08:30"
     }
   }
 }

@@ -10,7 +10,12 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { ApiError } from "@/lib/api/unwrap";
 import { createCalendarDay, deleteCalendarDay, type CalendarDay } from "./catalogue-api";
-import { CALENDAR_DAY_TYPES, calendarProblems, type CalendarDraft } from "./catalogue-rules";
+import {
+  CALENDAR_DAY_TYPES,
+  calendarProblems,
+  isCalendarDayType,
+  type CalendarDraft,
+} from "./catalogue-rules";
 import { formatCalendarDate } from "./calendar-format";
 
 /** Adds a non-school day, a holiday or a special event. Every field is checked before the request. */
@@ -35,6 +40,7 @@ export function AddCalendarDayDialog({ onOpenChange }: { onOpenChange: (open: bo
     setMessage(null);
     if (calendarProblems(v).length > 0) return;
     try {
+      if (!isCalendarDayType(v.type)) return;
       await createCalendarDay({ date: v.date.trim(), type: v.type, name: v.name.trim() });
       toast({ tone: "success", title: tState("saved") });
       await qc.invalidateQueries({ queryKey: ["calendar-days"] });

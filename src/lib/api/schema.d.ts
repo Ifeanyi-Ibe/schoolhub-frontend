@@ -954,7 +954,9 @@ export interface paths {
         get?: never;
         /**
          * Replace a role's permissions
-         * @description **Requires permission:** `roles.manage`.
+         * @description The administrator role (SchoolAdmin) is immutable. Sending exactly the permissions it holds answers 200 and changes nothing. Any other permissions answer 422 `role.system_immutable`.
+         *
+         *     **Requires permission:** `roles.manage`.
          */
         put: operations["putRolesByIdPermissions"];
         post?: never;
@@ -3100,7 +3102,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * A parent's view of a ward's published report cards (withheld cards are not listed)
+         * A parent's view of a ward's published report cards. A withheld card is listed with feesWithheld true, and its file is refused with assessment.card_withheld
          * @description **Requires permission:** `me.wards`.
          */
         get: operations["getMeWardsByIdReportCards"];
@@ -4346,7 +4348,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Where to fetch a verified file
+         * Where to fetch a verified file: a URL in this API that needs the bearer token (requiresAuth), with no expiry (expiresAt is null)
          * @description **Requires:** a signed-in person.
          */
         get: operations["getFilesByIdDownloadUrl"];
@@ -4718,6 +4720,17 @@ export interface components {
             period: null | string;
             note: null | string;
         };
+        AcademicsSessionView: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: date */
+            startsOn: string;
+            /** Format: date */
+            endsOn: string;
+            isCurrent: boolean;
+            isArchived: boolean;
+        };
         AcceptAdmissionRequest: {
             /** Format: uuid */
             sessionId: string;
@@ -4732,12 +4745,16 @@ export interface components {
             studentId: string;
             admissionNo: string;
         };
+        AcceptedView: {
+            status: string;
+        };
         AcceptInviteRequest: {
             token: string;
             password: string;
         };
         AdjustmentBody: {
-            kind: string;
+            /** @enum {string} */
+            kind: "Credit" | "Debit";
             /** Format: int64 */
             amountKobo: number;
             reason: string;
@@ -4865,6 +4882,9 @@ export interface components {
             /** Format: uuid */
             formTeacherStaffId: null | string;
         };
+        AssessmentRejectBody: {
+            reason: string;
+        };
         AssessmentSchemeView: {
             /** Format: uuid */
             id: string;
@@ -4988,6 +5008,9 @@ export interface components {
         };
         /** @enum {string} */
         AuditOutcome: "Success" | "Denied" | "Failed";
+        AuditRejectBody: {
+            note: string;
+        };
         BandRequest: {
             /** Format: int32 */
             min: number | string;
@@ -5010,10 +5033,17 @@ export interface components {
             /** Format: double */
             gradePoint: null | number | string;
         };
+        BrandingSettingsView: {
+            primaryColor: string;
+            secondaryColor: string;
+            logo: string;
+            reportCardHeader: string;
+        };
         CalendarDayRequest: {
             /** Format: date */
             date: string;
-            type: string;
+            /** @enum {string} */
+            type: "Holiday" | "NonSchoolDay" | "SpecialEvent";
             name: string;
         };
         CalendarDayView: {
@@ -5021,7 +5051,8 @@ export interface components {
             id: string;
             /** Format: date */
             date: string;
-            type: string;
+            /** @enum {string} */
+            type: "Holiday" | "NonSchoolDay" | "SpecialEvent";
             name: string;
         };
         CancelBody: {
@@ -5097,7 +5128,8 @@ export interface components {
             byMethod: components["schemas"]["CollectionByMethod"][];
         };
         CommitImportRequest: {
-            mode: string;
+            /** @enum {string} */
+            mode: "SkipErrors" | "AllOrNothing";
         };
         ComponentRequest: {
             name: string;
@@ -5152,7 +5184,8 @@ export interface components {
             value: string;
         };
         CreateDataRequestBody: {
-            kind: string;
+            /** @enum {string} */
+            kind: "Export" | "Erase";
             subjectType: string;
             /** Format: uuid */
             subjectId: string;
@@ -5212,7 +5245,8 @@ export interface components {
         };
         DiscountBody: {
             name: string;
-            kind: string;
+            /** @enum {string} */
+            kind: "Percentage" | "Fixed";
             /** Format: int64 */
             value: number | string;
             requiresApproval: boolean;
@@ -5245,6 +5279,9 @@ export interface components {
         DownloadUrlView: {
             url: string;
             method: string;
+            requiresAuth: boolean;
+            /** Format: date-time */
+            expiresAt: null | string;
         };
         DriftView: {
             /** Format: int32 */
@@ -5297,7 +5334,8 @@ export interface components {
         };
         FeeItemBody: {
             name: string;
-            category: string;
+            /** @enum {string} */
+            category: "Tuition" | "Pta" | "Uniform" | "Books" | "Transport" | "Exam" | "Other";
             isMandatoryDefault: boolean;
         };
         FeeItemView: {
@@ -5306,6 +5344,34 @@ export interface components {
             name: string;
             category: string;
             isMandatoryDefault: boolean;
+        };
+        FeesInvoiceView: {
+            /** Format: uuid */
+            id: string;
+            invoiceNo: string;
+            /** Format: uuid */
+            studentId: string;
+            /** Format: uuid */
+            termId: string;
+            status: string;
+            /** Format: date-time */
+            issuedAt: string;
+            /** Format: date */
+            dueDate: string;
+            /** Format: int64 */
+            subtotalKobo: number;
+            /** Format: int64 */
+            discountKobo: number;
+            /** Format: int64 */
+            adjustmentKobo: number;
+            /** Format: int64 */
+            totalKobo: number;
+            /** Format: int64 */
+            paidKobo: number;
+            /** Format: int64 */
+            balanceKobo: number;
+            voidReason: null | string;
+            lines: components["schemas"]["InvoiceLineView"][];
         };
         FeesPanel: {
             /** Format: int64 */
@@ -5318,6 +5384,25 @@ export interface components {
             debtorCount: number | string;
             /** Format: double */
             collectedPercent: number | string;
+        };
+        FeesPaymentView: {
+            /** Format: uuid */
+            id: string;
+            receiptNo: null | string;
+            /** Format: uuid */
+            studentId: null | string;
+            /** Format: int64 */
+            amountKobo: number;
+            method: string;
+            reference: string;
+            status: string;
+            /** Format: date-time */
+            paidAt: null | string;
+            gatewayTransactionId: null | string;
+            reversalRequested: boolean;
+            reversalReason: null | string;
+            /** Format: date-time */
+            reversedAt: null | string;
         };
         FileView: {
             /** Format: uuid */
@@ -5345,7 +5430,8 @@ export interface components {
             termId: string;
             /** Format: uuid */
             classArmId: string;
-            layout: string;
+            /** @enum {string} */
+            layout: "Primary" | "Secondary";
             forceIncomplete: boolean;
         };
         GenerateCardsView: {
@@ -5383,8 +5469,10 @@ export interface components {
             subjectType: string;
             /** Format: uuid */
             subjectId: string;
-            purpose: string;
-            channel: null | string;
+            /** @enum {string} */
+            purpose: "Messaging" | "Photography" | "ThirdPartyProcessing";
+            /** @enum {null|string} */
+            channel: "Any" | "Sms" | "Email" | "WhatsApp" | "InApp" | null;
             source: string;
         };
         GrantDiscountBody: {
@@ -5439,6 +5527,18 @@ export interface components {
             canPickup: boolean;
             /** Format: int32 */
             priority: number | string;
+        };
+        IdentitySessionView: {
+            /** Format: uuid */
+            id: string;
+            device: null | string;
+            ipAddress: null | string;
+            /** Format: date-time */
+            startedAt: string;
+            /** Format: date-time */
+            lastUsedAt: string;
+            active: boolean;
+            current: boolean;
         };
         ImportHolidaysRequest: {
             /** Format: int32 */
@@ -5537,20 +5637,10 @@ export interface components {
             phone: null | string;
             roleIds: null | string[];
         };
-        InvoiceView: {
-            /** Format: uuid */
-            id: string;
-            /** Format: date */
-            periodStart: string;
-            /** Format: date */
-            dueOn: string;
+        InvoiceLineView: {
+            description: string;
             /** Format: int64 */
             amountKobo: number;
-            currency: string;
-            status: string;
-            /** Format: date-time */
-            paidAt: null | string;
-            paymentReference: null | string;
         };
         JobView: {
             /** Format: uuid */
@@ -5565,7 +5655,8 @@ export interface components {
         };
         JsonElement: unknown;
         LeaveRequest: {
-            status: string;
+            /** @enum {string} */
+            status: "Withdrawn" | "Transferred";
             /** Format: date */
             effectiveOn: string;
         };
@@ -5636,7 +5727,8 @@ export interface components {
             name: string;
             /** Format: int32 */
             order: number | string;
-            section: string;
+            /** @enum {string} */
+            section: "Creche" | "Nursery" | "Primary" | "JuniorSecondary" | "SeniorSecondary";
         };
         LevelView: {
             /** Format: uuid */
@@ -5645,7 +5737,8 @@ export interface components {
             name: string;
             /** Format: int32 */
             order: number | string;
-            section: string;
+            /** @enum {string} */
+            section: "Creche" | "Nursery" | "Primary" | "JuniorSecondary" | "SeniorSecondary";
         };
         LinkUpdateRequest: {
             relationship: null | string;
@@ -5676,7 +5769,8 @@ export interface components {
             studentId: string;
             /** Format: int64 */
             amountKobo: number;
-            method: string;
+            /** @enum {string} */
+            method: "Cash" | "Pos" | "Cheque" | "Transfer" | "Card";
             reference: string;
             /** Format: date */
             paidOn: null | string;
@@ -5690,6 +5784,10 @@ export interface components {
             /** Format: uuid */
             subjectId: string;
             isCompulsory: boolean;
+        };
+        MarkedReadView: {
+            /** Format: int32 */
+            marked: number | string;
         };
         MarkOutcome: {
             /** Format: uuid */
@@ -5774,7 +5872,8 @@ export interface components {
             assignments: components["schemas"]["AssignmentView"][];
         };
         NoteRequest: {
-            category: string;
+            /** @enum {string} */
+            category: "Pastoral" | "Disciplinary";
             text: string;
         };
         NoteView: {
@@ -5805,7 +5904,8 @@ export interface components {
         OutcomeOverride: {
             /** Format: uuid */
             studentId: string;
-            outcome: string;
+            /** @enum {string} */
+            outcome: "Promote" | "Repeat" | "Graduate";
         };
         PagedResultOfAnnouncementView: {
             items: components["schemas"]["AnnouncementView"][];
@@ -5840,6 +5940,28 @@ export interface components {
             /** Format: int32 */
             totalPages?: number | string;
         };
+        PagedResultOfFeesInvoiceView: {
+            items: components["schemas"]["FeesInvoiceView"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalCount: number | string;
+            /** Format: int32 */
+            totalPages?: number | string;
+        };
+        PagedResultOfFeesPaymentView: {
+            items: components["schemas"]["FeesPaymentView"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalCount: number | string;
+            /** Format: int32 */
+            totalPages?: number | string;
+        };
         PagedResultOfImportRowView: {
             items: components["schemas"]["ImportRowView"][];
             /** Format: int32 */
@@ -5862,30 +5984,8 @@ export interface components {
             /** Format: int32 */
             totalPages?: number | string;
         };
-        PagedResultOfInvoiceView: {
-            items: components["schemas"]["InvoiceView"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalCount: number | string;
-            /** Format: int32 */
-            totalPages?: number | string;
-        };
         PagedResultOfMessageView: {
             items: components["schemas"]["MessageView"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalCount: number | string;
-            /** Format: int32 */
-            totalPages?: number | string;
-        };
-        PagedResultOfPaymentView: {
-            items: components["schemas"]["PaymentView"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -5908,6 +6008,17 @@ export interface components {
         };
         PagedResultOfStudentListItem: {
             items: components["schemas"]["StudentListItem"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalCount: number | string;
+            /** Format: int32 */
+            totalPages?: number | string;
+        };
+        PagedResultOfTenancyInvoiceView: {
+            items: components["schemas"]["TenancyInvoiceView"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -5954,15 +6065,6 @@ export interface components {
             /** Format: uuid */
             invoiceId: null | string;
         };
-        PaymentView: {
-            /** Format: uuid */
-            invoiceId: string;
-            invoiceStatus: string;
-            /** Format: int64 */
-            amountKobo: number;
-            reference: string;
-            tenantStatus: string;
-        };
         PermissionArea: {
             area: string;
             permissions: components["schemas"]["PermissionItem"][];
@@ -5985,6 +6087,21 @@ export interface components {
             openInvoicesKobo: number;
             /** Format: int32 */
             overdueInvoices: number | string;
+        };
+        PoliciesView: {
+            adminNoFormat: string;
+            receiptNoFormat: string;
+            invoiceNoFormat: string;
+            "results.requireFeesCleared": boolean;
+            /** Format: int32 */
+            "results.feesClearedThresholdPct": number | string;
+            "attendance.absenceAlert": boolean;
+            "attendance.excusedCountsAsPresent": boolean;
+            "attendance.lateCutoff": string;
+            "notifications.quietHours": string;
+            "security.requireMfaForAdmins": boolean;
+            "security.allowSupportAccess": boolean;
+            timezone: string;
         };
         PreferenceChange: {
             category: string;
@@ -6015,7 +6132,8 @@ export interface components {
             expiresAt: string;
         };
         PresignUploadRequest: {
-            purpose: string;
+            /** @enum {string} */
+            purpose: "StudentPhoto" | "StudentDocument" | "StaffDocument" | "SchoolLogo" | "ReportCard" | "Receipt" | "ImportUpload" | "Export";
             contentType: string;
             /** Format: int64 */
             sizeBytes: number | string;
@@ -6111,7 +6229,8 @@ export interface components {
             firstName: string;
             middleName: null | string;
             lastName: string;
-            gender: string;
+            /** @enum {string} */
+            gender: "Female" | "Male";
             /** Format: date */
             dateOfBirth: string;
             guardianFirstName: string;
@@ -6163,13 +6282,17 @@ export interface components {
             rejected: number | string;
             rows: components["schemas"]["ScoreRowOutcome"][];
         };
+        RecoveryCodesView: {
+            recoveryCodes: string[];
+        };
         RefreshRequest: {
             refreshToken: string;
         };
         RegisterEntry: {
             /** Format: uuid */
             studentId: string;
-            status: string;
+            /** @enum {string} */
+            status: "Present" | "Absent" | "Late" | "Excused";
             arrivalTime: null | string;
             note: null | string;
             clientId: null | string;
@@ -6192,7 +6315,8 @@ export interface components {
             firstName: string;
             middleName: null | string;
             lastName: string;
-            gender: string;
+            /** @enum {string} */
+            gender: "Female" | "Male";
             /** Format: date */
             dateOfBirth: string;
             address: null | string;
@@ -6226,9 +6350,6 @@ export interface components {
             sessionId: string;
             /** Format: uuid */
             classArmId: string;
-        };
-        RejectBody: {
-            reason: string;
         };
         RemarkBody: {
             remark: null | string;
@@ -6305,6 +6426,20 @@ export interface components {
             closedDays: number | string;
             /** Format: int32 */
             schoolDays: number | string;
+        };
+        SchoolProfileView: {
+            name: string;
+            address: string;
+            /** @description Phone number, stored and returned in E.164 (for example `+234…`). Local forms such as `080…` are accepted on input and normalised. */
+            phones: string;
+            email: string;
+            logo: string;
+            motto: string;
+            principalName: string;
+            principalSignature: string;
+            lga: string;
+            state: string;
+            registrationNo: string;
         };
         ScoreCell: {
             /** Format: uuid */
@@ -6383,18 +6518,6 @@ export interface components {
             /** Format: date */
             endsOn: string;
         };
-        SessionView: {
-            /** Format: uuid */
-            id: string;
-            device: null | string;
-            ipAddress: null | string;
-            /** Format: date-time */
-            startedAt: string;
-            /** Format: date-time */
-            lastUsedAt: string;
-            active: boolean;
-            current: boolean;
-        };
         SetUserRolesRequest: {
             roleIds: string[];
         };
@@ -6411,17 +6534,20 @@ export interface components {
             firstName: string;
             middleName: null | string;
             lastName: string;
-            gender: string;
+            /** @enum {string} */
+            gender: "Female" | "Male";
             /** Format: date */
             dateOfBirth: string;
             /** @description Phone number, stored and returned in E.164 (for example `+234…`). Local forms such as `080…` are accepted on input and normalised. */
             phone: string;
             email: null | string;
             address: null | string;
-            staffType: string;
+            /** @enum {string} */
+            staffType: "Teaching" | "NonTeaching" | "Admin" | "Management";
             jobTitle: string;
             department: null | string;
-            employmentType: string;
+            /** @enum {string} */
+            employmentType: "FullTime" | "PartTime" | "Contract" | "Volunteer";
             /** Format: date */
             hireDate: string;
         };
@@ -6531,8 +6657,10 @@ export interface components {
             id: string;
             admissionNo: string;
             fullName: string;
-            gender: string;
-            status: string;
+            /** @enum {string} */
+            gender: "Female" | "Male";
+            /** @enum {string} */
+            status: "Applicant" | "Active" | "Suspended" | "Withdrawn" | "Transferred" | "Graduated";
             /** Format: uuid */
             currentClassArmId: null | string;
         };
@@ -6585,7 +6713,8 @@ export interface components {
         SubjectRequest: {
             code: string;
             name: string;
-            category: string;
+            /** @enum {string} */
+            category: "Core" | "Elective" | "Extra";
         };
         SubjectResultView: {
             /** Format: uuid */
@@ -6605,7 +6734,8 @@ export interface components {
             id: string;
             code: string;
             name: string;
-            category: string;
+            /** @enum {string} */
+            category: "Core" | "Elective" | "Extra";
         };
         SubmitOutcome: {
             /** Format: uuid */
@@ -6661,6 +6791,30 @@ export interface components {
             body: string;
             variables: string[];
             isCustomised: boolean;
+        };
+        TenancyInvoiceView: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            periodStart: string;
+            /** Format: date */
+            dueOn: string;
+            /** Format: int64 */
+            amountKobo: number;
+            currency: string;
+            status: string;
+            /** Format: date-time */
+            paidAt: null | string;
+            paymentReference: null | string;
+        };
+        TenancyPaymentView: {
+            /** Format: uuid */
+            invoiceId: string;
+            invoiceStatus: string;
+            /** Format: int64 */
+            amountKobo: number;
+            reference: string;
+            tenantStatus: string;
         };
         TenantExportView: {
             /** Format: uuid */
@@ -6763,13 +6917,15 @@ export interface components {
             reason: string;
         };
         TraitRequest: {
-            kind: string;
+            /** @enum {string} */
+            kind: "Affective" | "Psychomotor";
             name: string;
         };
         TraitView: {
             /** Format: uuid */
             id: string;
-            kind: string;
+            /** @enum {string} */
+            kind: "Affective" | "Psychomotor";
             name: string;
         };
         TransferArmRequest: {
@@ -6800,7 +6956,8 @@ export interface components {
             firstName: null | string;
             middleName: null | string;
             lastName: null | string;
-            gender: null | string;
+            /** @enum {null|string} */
+            gender: "Female" | "Male" | null;
             /** Format: date */
             dateOfBirth: null | string;
             address: null | string;
@@ -6849,6 +7006,15 @@ export interface components {
             /** Format: uuid */
             currentClassArmId: null | string;
             relationship: string;
+        };
+        WebhookOutcomeView: {
+            outcome: string;
+        };
+        WebhookReceiptView: {
+            /** Format: int32 */
+            received: number | string;
+            /** Format: int32 */
+            applied: number | string;
         };
     };
     responses: never;
@@ -7315,7 +7481,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["SchoolProfileView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -7368,7 +7534,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["SchoolProfileView"];
                 };
             };
             /** @description Bad Request */
@@ -7453,7 +7619,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["BrandingSettingsView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -7506,7 +7672,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["BrandingSettingsView"];
                 };
             };
             /** @description Bad Request */
@@ -7591,7 +7757,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["PoliciesView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -7644,7 +7810,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["PoliciesView"];
                 };
             };
             /** @description Bad Request */
@@ -7826,7 +7992,10 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
             };
             /** @description Not Modified */
             304: {
@@ -7922,7 +8091,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PagedResultOfInvoiceView"];
+                    "application/json": components["schemas"]["PagedResultOfTenancyInvoiceView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -7980,7 +8149,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaymentView"];
+                    "application/json": components["schemas"]["TenancyPaymentView"];
                 };
             };
             /** @description A field failed validation. The `errors` map names each field. */
@@ -8010,7 +8179,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -8774,6 +8943,15 @@ export interface operations {
             };
         };
         responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecoveryCodesView"];
+                };
+            };
             /** @description A field failed validation. The `errors` map names each field. */
             400: {
                 headers: {
@@ -8854,6 +9032,13 @@ export interface operations {
             };
         };
         responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description A field failed validation. The `errors` map names each field. */
             400: {
                 headers: {
@@ -9223,6 +9408,13 @@ export interface operations {
             };
         };
         responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Bad Request */
             400: {
                 headers: {
@@ -9379,6 +9571,15 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcceptedView"];
+                };
+            };
             /** @description Bad Request */
             400: {
                 headers: {
@@ -9457,6 +9658,13 @@ export interface operations {
             };
         };
         responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Bad Request */
             400: {
                 headers: {
@@ -9709,6 +9917,13 @@ export interface operations {
             };
         };
         responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Bad Request */
             400: {
                 headers: {
@@ -9774,7 +9989,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AcceptedView"];
+                };
             };
             /** @description A field failed validation. The `errors` map names each field. */
             400: {
@@ -9827,6 +10044,13 @@ export interface operations {
             };
         };
         responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Bad Request */
             400: {
                 headers: {
@@ -9892,7 +10116,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AcceptedView"];
+                };
             };
             /** @description A field failed validation. The `errors` map names each field. */
             400: {
@@ -10016,7 +10242,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SessionView"][];
+                    "application/json": components["schemas"]["IdentitySessionView"][];
                 };
             };
             /** @description Unauthorized */
@@ -10333,7 +10559,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Unprocessable Entity */
+            /** @description The change is refused. For the administrator role the code is `role.system_immutable` (any change to its permissions). Other refusals name their rule in `code`. */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -10418,7 +10644,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Unprocessable Entity */
+            /** @description Refused. The administrator role is never deleted: `role.system_immutable`. Other system roles: `role.system_protected`. A role a user still holds is `role.in_use` (409). */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -10970,7 +11196,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SessionView"][];
+                    "application/json": components["schemas"]["AcademicsSessionView"][];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -11023,7 +11249,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SessionView"];
+                    "application/json": components["schemas"]["AcademicsSessionView"];
                 };
             };
             /** @description Bad Request */
@@ -11114,7 +11340,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SessionView"];
+                    "application/json": components["schemas"]["AcademicsSessionView"];
                 };
             };
             /** @description A field failed validation. The `errors` map names each field. */
@@ -11210,7 +11436,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SessionView"];
+                    "application/json": components["schemas"]["AcademicsSessionView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -11858,6 +12084,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
                 headers: {
@@ -12187,6 +12420,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
                 headers: {
@@ -12485,6 +12725,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
                 headers: {
@@ -13021,6 +13268,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
                 headers: {
@@ -13635,6 +13889,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
                 headers: {
@@ -14065,7 +14326,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SessionView"];
+                    "application/json": components["schemas"]["AcademicsSessionView"];
                 };
             };
             /** @description Bad Request */
@@ -14138,14 +14399,14 @@ export interface operations {
     getStudents: {
         parameters: {
             query?: {
-                Q?: string;
-                ClassArmId?: string;
-                Status?: string;
-                Gender?: string;
-                SessionId?: string;
-                Page?: number | string;
-                PageSize?: number | string;
-                Sort?: string;
+                q?: string;
+                classArmId?: string;
+                status?: "Applicant" | "Active" | "Suspended" | "Withdrawn" | "Transferred" | "Graduated";
+                gender?: "Female" | "Male";
+                sessionId?: string;
+                page?: number | string;
+                pageSize?: number | string;
+                sort?: "name" | "admissionNo" | "admittedOn";
             };
             header?: never;
             path?: never;
@@ -16208,7 +16469,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -16255,7 +16516,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "text/csv": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -16526,7 +16789,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "text/csv": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -16642,7 +16907,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -16979,8 +17244,8 @@ export interface operations {
         parameters: {
             query?: {
                 q?: string;
-                staffType?: string;
-                status?: string;
+                staffType?: "Teaching" | "NonTeaching" | "Admin" | "Management";
+                status?: "Active" | "OnLeave" | "Resigned" | "Terminated";
                 page?: number | string;
                 pageSize?: number | string;
             };
@@ -18834,7 +19099,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -19072,7 +19339,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -19179,7 +19446,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -19695,7 +19962,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -20155,7 +20424,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -20257,7 +20526,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/pdf": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -20466,7 +20737,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/pdf": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -20488,6 +20761,15 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description The ward's card is withheld until the school fees are cleared (`assessment.card_withheld`). The card is listed with feesWithheld true. */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -20580,7 +20862,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -20702,7 +20984,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RejectBody"];
+                "application/json": components["schemas"]["AssessmentRejectBody"];
             };
         };
         responses: {
@@ -21581,7 +21863,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -21765,7 +22047,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -21819,7 +22101,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PagedResultOfInvoiceView"];
+                    "application/json": components["schemas"]["PagedResultOfFeesInvoiceView"];
                 };
             };
             /** @description Bad Request */
@@ -21879,7 +22161,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InvoiceView"];
+                    "application/json": components["schemas"]["FeesInvoiceView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -21943,7 +22225,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InvoiceView"];
+                    "application/json": components["schemas"]["FeesInvoiceView"];
                 };
             };
             /** @description A field failed validation. The `errors` map names each field. */
@@ -22025,7 +22307,10 @@ export interface operations {
     postInvoicesByIdAdjustments: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
+                "Idempotency-Key": string;
+            };
             path: {
                 id: string;
             };
@@ -22040,10 +22325,12 @@ export interface operations {
             /** @description OK */
             200: {
                 headers: {
+                    /** @description Present and `true` when the stored response was replayed. */
+                    "Idempotency-Replayed"?: boolean;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InvoiceView"];
+                    "application/json": components["schemas"]["FeesInvoiceView"];
                 };
             };
             /** @description Bad Request */
@@ -22091,9 +22378,11 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description A duplicate or a concurrent change (`conflict.duplicate`, `concurrency.conflict`). */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -22142,7 +22431,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PagedResultOfInvoiceView"];
+                    "application/json": components["schemas"]["PagedResultOfFeesInvoiceView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -22201,7 +22490,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/pdf": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -22267,7 +22558,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaymentView"];
+                    "application/json": components["schemas"]["FeesPaymentView"];
                 };
             };
             /** @description Bad Request */
@@ -22400,7 +22691,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -22505,7 +22796,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -22555,7 +22846,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaymentView"];
+                    "application/json": components["schemas"]["FeesPaymentView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -22618,7 +22909,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PagedResultOfPaymentView"];
+                    "application/json": components["schemas"]["PagedResultOfFeesPaymentView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -22707,7 +22998,10 @@ export interface operations {
     postPaymentsUnallocatedByIdAssign: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Client-generated key, 8 to 128 letters, digits, hyphens or underscores. The same key with the same request replays the stored response (`Idempotency-Replayed: true`). */
+                "Idempotency-Key": string;
+            };
             path: {
                 id: string;
             };
@@ -22722,10 +23016,12 @@ export interface operations {
             /** @description OK */
             200: {
                 headers: {
+                    /** @description Present and `true` when the stored response was replayed. */
+                    "Idempotency-Replayed"?: boolean;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaymentView"];
+                    "application/json": components["schemas"]["FeesPaymentView"];
                 };
             };
             /** @description A field failed validation. The `errors` map names each field. */
@@ -22773,9 +23069,11 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description A duplicate or a concurrent change (`conflict.duplicate`, `concurrency.conflict`). */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
+                    /** @description Seconds to wait before the next request. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -22821,7 +23119,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaymentView"];
+                    "application/json": components["schemas"]["FeesPaymentView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -22880,7 +23178,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/pdf": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -22943,7 +23243,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaymentView"];
+                    "application/json": components["schemas"]["FeesPaymentView"];
                 };
             };
             /** @description A field failed validation. The `errors` map names each field. */
@@ -23039,7 +23339,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaymentView"];
+                    "application/json": components["schemas"]["FeesPaymentView"];
                 };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
@@ -23333,7 +23633,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["WebhookOutcomeView"];
+                };
             };
             /** @description Unauthorized */
             401: {
@@ -23927,7 +24229,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -24270,7 +24572,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -24579,7 +24881,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -24726,7 +25028,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -24895,7 +25197,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MarkedReadView"];
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -24953,7 +25257,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["WebhookReceiptView"];
+                };
             };
             /** @description Unauthorized */
             401: {
@@ -24998,7 +25304,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "text/plain": string;
+                };
             };
             /** @description Forbidden */
             403: {
@@ -25034,7 +25342,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["WebhookReceiptView"];
+                };
             };
             /** @description Unauthorized */
             401: {
@@ -25072,7 +25382,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["WebhookReceiptView"];
+                };
             };
             /** @description Unauthorized */
             401: {
@@ -25208,7 +25520,13 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/pdf": string;
+                    "image/jpeg": string;
+                    "image/png": string;
+                    "text/csv": string;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -25621,16 +25939,16 @@ export interface operations {
     getAuditLogs: {
         parameters: {
             query?: {
-                Cursor?: string;
-                PageSize?: number | string;
-                ActorUserId?: string;
-                Action?: string;
-                EntityType?: string;
-                EntityId?: string;
-                Outcome?: string;
-                CorrelationId?: string;
-                From?: string;
-                To?: string;
+                cursor?: string;
+                pageSize?: number | string;
+                actorUserId?: string;
+                action?: string;
+                entityType?: string;
+                entityId?: string;
+                outcome?: string;
+                correlationId?: string;
+                from?: string;
+                to?: string;
             };
             header?: never;
             path?: never;
@@ -25912,7 +26230,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "text/csv": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -26309,7 +26629,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -26491,7 +26811,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RejectBody"];
+                "application/json": components["schemas"]["AuditRejectBody"];
             };
         };
         responses: {
@@ -26596,7 +26916,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {
@@ -26688,7 +27010,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description The same key is still being processed (`idempotency.in_progress`). Retry after the `Retry-After` seconds. */
+            /** @description Two meanings share this status. `idempotency.in_progress`: the same `Idempotency-Key` is still being processed; wait the `Retry-After` seconds and retry with the same key. A business conflict (for example `conflict.duplicate`) carries no `Retry-After`; do not retry it unchanged. */
             409: {
                 headers: {
                     /** @description Seconds to wait before the next request. */
@@ -26797,7 +27119,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/zip": string;
+                };
             };
             /** @description Missing, expired or invalid access token (`auth.token_invalid`). */
             401: {

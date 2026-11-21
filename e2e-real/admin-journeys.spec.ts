@@ -47,6 +47,8 @@ test.describe("a school the token does not belong to", () => {
   test("a session from one school is refused on another school's host (tenant mismatch)", async ({
     request,
   }) => {
+    // Waits for the next authenticator time step when the previous one is already used (see support/totp.ts).
+    test.setTimeout(90_000);
     const platform = await platformAccessToken(request);
     const slug = `e2e-${Date.now().toString(36)}`;
     await createSchool(request, platform, slug);
@@ -163,6 +165,8 @@ test.describe.serial("a spare account this run invites", () => {
     page,
     request,
   }) => {
+    // Waits for the next authenticator time step when the previous one is already used (see support/totp.ts).
+    test.setTimeout(90_000);
     const first = await userAccessToken(request, spare.email, spare.resetPassword);
     if (!first.body.accessToken) throw new Error(`sign-in before MFA answered ${first.status}`);
     spare.mfaSecret = await enrolMfa(request, first.body.accessToken);

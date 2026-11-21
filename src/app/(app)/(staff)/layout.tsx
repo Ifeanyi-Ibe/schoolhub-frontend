@@ -7,7 +7,7 @@ import { pickNamespaces } from "@/i18n/client-namespaces";
 
 export default async function StaffLayout({ children }: { children: ReactNode }) {
   const locale = await getLocale();
-  const messages = pickNamespaces(await getMessages(), ["staff", "academics"]);
+  const messages = pickNamespaces(await getMessages(), ["staff", "academics", "settings"]);
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       {children}

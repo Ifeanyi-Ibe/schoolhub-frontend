@@ -9,6 +9,7 @@ export const PERMISSION = {
   manageRoles: "roles.manage",
   academicsRead: "academics.read",
   academicsManage: "academics.manage",
+  settingsManage: "settings.manage",
 } as const;
 
 export const PEOPLE_PAGE_SIZE = 20;

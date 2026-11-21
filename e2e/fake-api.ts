@@ -211,6 +211,79 @@ const CALENDAR: Array<{ id: string; date: string; type: string; name: string }> 
     name: "Independence Day",
   },
 ];
+
+// School settings and academic sessions (contract operations, typed since the B-19 renames).
+const SCHOOL_PROFILE = {
+  name: "Greenfield Academy",
+  address: "12 Marina Road, Lagos",
+  phones: "+2348000000100",
+  email: "office@greenfield.test.invalid",
+  logo: "",
+  motto: "Knowledge first",
+  principalName: "Mrs T. Adeyemi",
+  principalSignature: "",
+  lga: "Lagos Island",
+  state: "Lagos",
+  registrationNo: "RC-000001",
+};
+const BRANDING = {
+  primaryColor: "#0f5c4d",
+  secondaryColor: "#c2410c",
+  logo: "",
+  reportCardHeader: "Greenfield Academy",
+};
+const POLICIES: Record<string, unknown> = {
+  adminNoFormat: "GFA/{year}/{seq}",
+  receiptNoFormat: "RCP-{seq}",
+  invoiceNoFormat: "INV-{seq}",
+  "results.requireFeesCleared": false,
+  "results.feesClearedThresholdPct": 100,
+  "attendance.absenceAlert": true,
+  "attendance.excusedCountsAsPresent": true,
+  "attendance.lateCutoff": "08:30",
+  "notifications.quietHours": "21:00-06:00",
+  "security.requireMfaForAdmins": true,
+  "security.allowSupportAccess": false,
+  timezone: "Africa/Lagos",
+};
+const ACADEMIC_SESSIONS: Array<{
+  id: string;
+  name: string;
+  startsOn: string;
+  endsOn: string;
+  isCurrent: boolean;
+  isArchived: boolean;
+}> = [
+  {
+    id: "0190a6c2-0000-7000-8000-000000000801",
+    name: "2026/2027",
+    startsOn: "2026-09-07",
+    endsOn: "2027-07-23",
+    isCurrent: true,
+    isArchived: false,
+  },
+];
+const TERMS: Array<{
+  id: string;
+  sessionId: string;
+  number: number;
+  name: string;
+  startsOn: string;
+  endsOn: string;
+  nextTermBegins: string | null;
+  isCurrent: boolean;
+}> = [
+  {
+    id: "0190a6c2-0000-7000-8000-000000000811",
+    sessionId: "0190a6c2-0000-7000-8000-000000000801",
+    number: 1,
+    name: "First term",
+    startsOn: "2026-09-07",
+    endsOn: "2026-12-18",
+    nextTermBegins: "2027-01-11",
+    isCurrent: true,
+  },
+];
 const PERMISSION_CATALOG = [
   {
     area: "Students",
@@ -519,6 +592,7 @@ export function startFakeApi(): Promise<Server> {
                 "students.read",
                 "academics.read",
                 "academics.manage",
+                "settings.manage",
               ]
             : ["me.profile"],
       });
@@ -845,6 +919,127 @@ export function startFakeApi(): Promise<Server> {
     }
     if (path === "/api/v1/calendar/import-holidays" && req.method === "POST") {
       return send(res, 200, { year: Number(body.year), added: 2, skipped: 1 });
+    }
+
+    // School settings (reads are typed; PUT bodies are declared as objects).
+    if (path === "/api/v1/settings/school-profile" && req.method === "GET")
+      return send(res, 200, SCHOOL_PROFILE);
+    if (path === "/api/v1/settings/school-profile" && req.method === "PUT") {
+      Object.assign(SCHOOL_PROFILE, body);
+      return send(res, 200, SCHOOL_PROFILE);
+    }
+    if (path === "/api/v1/settings/branding" && req.method === "GET")
+      return send(res, 200, BRANDING);
+    if (path === "/api/v1/settings/branding" && req.method === "PUT") {
+      Object.assign(BRANDING, body);
+      return send(res, 200, BRANDING);
+    }
+    if (path === "/api/v1/settings/policies" && req.method === "GET")
+      return send(res, 200, POLICIES);
+    if (path === "/api/v1/settings/policies" && req.method === "PUT") {
+      Object.assign(POLICIES, body);
+      return send(res, 200, POLICIES);
+    }
+
+    // Academic sessions, terms, school days and rollover.
+    if (path === "/api/v1/sessions" && req.method === "GET")
+      return send(res, 200, ACADEMIC_SESSIONS);
+    if (path === "/api/v1/sessions" && req.method === "POST") {
+      const session = {
+        id: randomUUID(),
+        name: String(body.name),
+        startsOn: String(body.startsOn),
+        endsOn: String(body.endsOn),
+        isCurrent: false,
+        isArchived: false,
+      };
+      ACADEMIC_SESSIONS.push(session);
+      return send(res, 201, session);
+    }
+    const sessionById = /^\/api\/v1\/sessions\/([^/]+)$/.exec(path);
+    if (sessionById && req.method === "PUT") {
+      const session = ACADEMIC_SESSIONS.find((x) => x.id === sessionById[1]);
+      if (!session) return send(res, 404, problem("sessions.not_found", "Session not found"));
+      Object.assign(session, {
+        name: String(body.name),
+        startsOn: String(body.startsOn),
+        endsOn: String(body.endsOn),
+      });
+      return send(res, 200, session);
+    }
+    const sessionArchive = /^\/api\/v1\/sessions\/([^/]+)\/archive$/.exec(path);
+    if (sessionArchive && req.method === "POST") {
+      const session = ACADEMIC_SESSIONS.find((x) => x.id === sessionArchive[1]);
+      if (!session) return send(res, 404, problem("sessions.not_found", "Session not found"));
+      session.isArchived = true;
+      return send(res, 200, session);
+    }
+    const sessionTerms = /^\/api\/v1\/sessions\/([^/]+)\/terms$/.exec(path);
+    if (sessionTerms && req.method === "GET")
+      return send(
+        res,
+        200,
+        TERMS.filter((t) => t.sessionId === sessionTerms[1]),
+      );
+    if (sessionTerms && req.method === "POST") {
+      const term = {
+        id: randomUUID(),
+        sessionId: sessionTerms[1] ?? "",
+        number: Number(body.number),
+        name: String(body.name),
+        startsOn: String(body.startsOn),
+        endsOn: String(body.endsOn),
+        nextTermBegins: (body.nextTermBegins as string | null) ?? null,
+        isCurrent: false,
+      };
+      TERMS.push(term);
+      return send(res, 201, term);
+    }
+    const termById = /^\/api\/v1\/terms\/([^/]+)$/.exec(path);
+    if (termById && req.method === "PUT") {
+      const term = TERMS.find((x) => x.id === termById[1]);
+      if (!term) return send(res, 404, problem("terms.not_found", "Term not found"));
+      Object.assign(term, {
+        number: Number(body.number),
+        name: String(body.name),
+        startsOn: String(body.startsOn),
+        endsOn: String(body.endsOn),
+        nextTermBegins: (body.nextTermBegins as string | null) ?? null,
+      });
+      return send(res, 200, term);
+    }
+    const termCurrent = /^\/api\/v1\/terms\/([^/]+)\/set-current$/.exec(path);
+    if (termCurrent && req.method === "POST") {
+      const term = TERMS.find((x) => x.id === termCurrent[1]);
+      if (!term) return send(res, 404, problem("terms.not_found", "Term not found"));
+      for (const x of TERMS) if (x.sessionId === term.sessionId) x.isCurrent = x.id === term.id;
+      return send(res, 200, term);
+    }
+    const termDays = /^\/api\/v1\/terms\/([^/]+)\/school-days$/.exec(path);
+    if (termDays && req.method === "GET") {
+      const term = TERMS.find((x) => x.id === termDays[1]);
+      if (!term) return send(res, 404, problem("terms.not_found", "Term not found"));
+      return send(res, 200, {
+        termId: term.id,
+        startsOn: term.startsOn,
+        endsOn: term.endsOn,
+        totalDays: 105,
+        weekendDays: 30,
+        closedDays: 5,
+        schoolDays: 70,
+      });
+    }
+    if (path === "/api/v1/academics/rollover" && req.method === "POST") {
+      const session = {
+        id: randomUUID(),
+        name: String(body.name),
+        startsOn: String(body.startsOn),
+        endsOn: String(body.endsOn),
+        isCurrent: false,
+        isArchived: false,
+      };
+      ACADEMIC_SESSIONS.push(session);
+      return send(res, 201, session);
     }
 
     if (path === "/api/v1/students" && req.method === "POST") {

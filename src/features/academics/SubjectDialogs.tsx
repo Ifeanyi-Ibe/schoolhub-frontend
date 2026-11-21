@@ -10,7 +10,12 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { ApiError } from "@/lib/api/unwrap";
 import { createSubject, deleteSubject, updateSubject, type Subject } from "./catalogue-api";
-import { SUBJECT_CATEGORIES, subjectProblems, type SubjectDraft } from "./catalogue-rules";
+import {
+  SUBJECT_CATEGORIES,
+  isSubjectCategory,
+  subjectProblems,
+  type SubjectDraft,
+} from "./catalogue-rules";
 
 /** Adds a subject, or edits one. Every field is checked before the request; a refusal shows its code. */
 export function SubjectDialog({
@@ -43,6 +48,7 @@ export function SubjectDialog({
     setMessage(null);
     const problems = subjectProblems(v);
     if (problems.length > 0) return;
+    if (!isSubjectCategory(v.category)) return;
     const input = { code: v.code.trim(), name: v.name.trim(), category: v.category };
     try {
       if (subject) await updateSubject(subject.id, input);

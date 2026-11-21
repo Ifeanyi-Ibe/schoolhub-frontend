@@ -9,6 +9,7 @@ const TABS = [
   { id: "subjects", href: "/academics/subjects" },
   { id: "grading", href: "/academics/grading" },
   { id: "assessment", href: "/academics/assessment" },
+  { id: "sessions", href: "/academics/sessions" },
   { id: "calendar", href: "/academics/calendar" },
 ] as const;
 

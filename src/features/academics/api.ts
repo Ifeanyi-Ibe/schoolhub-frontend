@@ -4,6 +4,7 @@
 import { apiClient } from "@/lib/api/client";
 import { writePolicyHeaders } from "@/lib/api/idempotency";
 import { unwrap } from "@/lib/api/unwrap";
+import type { ClassSection } from "./rules";
 
 export const levelsQuery = {
   queryKey: ["class-levels"] as const,
@@ -26,7 +27,7 @@ export interface LevelInput {
   code: string;
   name: string;
   order: number;
-  section: string;
+  section: ClassSection;
 }
 
 export async function createLevel(input: LevelInput) {

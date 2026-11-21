@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  sessionProblems,
+  termProblems,
   calendarProblems,
   checkBands,
   checkComponents,
@@ -136,5 +138,29 @@ describe("subjects and calendar days", () => {
       "calendar.type",
       "calendar.name",
     ]);
+  });
+});
+
+describe("sessions and terms", () => {
+  it("needs a name and real dates, with the end on or after the start", () => {
+    expect(
+      sessionProblems({ name: "2026/2027", startsOn: "2026-09-07", endsOn: "2027-07-23" }),
+    ).toEqual([]);
+    expect(sessionProblems({ name: "", startsOn: "2026-09-07", endsOn: "2026-09-06" })).toEqual([
+      "session.name",
+      "session.order",
+    ]);
+    expect(sessionProblems({ name: "x", startsOn: "nope", endsOn: "2027-02-30" })).toEqual([
+      "session.start",
+      "session.end",
+    ]);
+  });
+
+  it("needs a term number from 1 to 99, a name and ordered dates", () => {
+    const ok = { number: "1", name: "First term", startsOn: "2026-09-07", endsOn: "2026-12-18" };
+    expect(termProblems(ok)).toEqual([]);
+    expect(termProblems({ ...ok, number: "0" })).toContain("term.number");
+    expect(termProblems({ ...ok, number: "1.5" })).toContain("term.number");
+    expect(termProblems({ ...ok, endsOn: "2026-01-01" })).toEqual(["term.order"]);
   });
 });

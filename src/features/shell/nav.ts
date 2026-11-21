@@ -4,6 +4,7 @@ import {
   DevicesIcon,
   HomeIcon,
   PeopleIcon,
+  SettingsIcon,
   ShieldIcon,
   UserIcon,
 } from "@/components/ui/icons";
@@ -45,6 +46,13 @@ export const NAV_ITEMS: readonly NavItem[] = [
     href: "/academics/levels",
     labelKey: "shell.nav.academics",
     anyOf: ["academics.read", "academics.manage"],
+  },
+  {
+    id: "settings",
+    href: "/settings",
+    labelKey: "shell.nav.settings",
+    icon: SettingsIcon,
+    permission: "settings.manage",
   },
 ];
 

@@ -156,10 +156,19 @@ export async function userAccessToken(
 
 /** Enrol the signed-in user in MFA and confirm it with the first code. Returns the secret. */
 export async function enrolMfa(request: APIRequestContext, userToken: string): Promise<string> {
-  const start = await request.post(url("/api/v1/me/mfa/enroll"), {
+  // Starting enrolment has no side effect until it is confirmed, so a server-side 500 on it is retried. The
+  // backend reports intermittent database protocol errors under concurrent queries (BACKEND_GAPS B-29).
+  let start = await request.post(url("/api/v1/me/mfa/enroll"), {
     headers: headers(userToken, e2e.schoolSlug),
     failOnStatusCode: false,
   });
+  for (let attempt = 1; attempt < 3 && start.status() === 500; attempt++) {
+    await new Promise((r) => setTimeout(r, 1000));
+    start = await request.post(url("/api/v1/me/mfa/enroll"), {
+      headers: headers(userToken, e2e.schoolSlug),
+      failOnStatusCode: false,
+    });
+  }
   const setup = (await start.json()) as { secret?: string; code?: string };
   if (start.status() !== 200 || !setup.secret)
     throw new Error(`MFA enrolment answered ${start.status()} ${setup.code ?? ""}`);

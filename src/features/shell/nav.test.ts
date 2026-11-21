@@ -22,7 +22,7 @@ describe("visibleNav", () => {
     expect(visibleNav(items, ["fees.reports.read"]).map((i) => i.id)).toContain("fees");
   });
 
-  it("only lists pages that exist in F1", () => {
+  it("only lists pages that exist", () => {
     for (const item of NAV_ITEMS)
       expect([
         "/home",
@@ -31,6 +31,7 @@ describe("visibleNav", () => {
         "/people",
         "/roles",
         "/academics/levels",
+        "/settings",
       ]).toContain(item.href);
   });
 });

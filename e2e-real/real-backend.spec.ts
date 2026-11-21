@@ -27,7 +27,8 @@ test("the school's name comes from the backend's public branding", async ({ page
   );
   const name = ((await res.json()) as { name: string }).name;
   await page.goto("/login");
-  await expect(page.getByText(name, { exact: true })).toBeVisible();
+  // The name appears in the sidebar (desktop) and the header (mobile); one of them is hidden.
+  await expect(page.getByText(name, { exact: true }).filter({ visible: true })).toBeVisible();
 });
 
 test("a wrong password reads the same as the backend's uniform error", async ({ page }) => {
@@ -160,6 +161,8 @@ test("the sessions page loads", async ({ page }) => {
 test("platform developer: TOTP sign-in with a fresh code; the same code is then refused (replay)", async ({
   request,
 }) => {
+  // Waits for the next authenticator time step when the previous one is already used (see support/totp.ts).
+  test.setTimeout(90_000);
   const secret = e2e.platformTotpSecret;
   // First use: a fresh code for the current step.
   const first = await platformLogin(request);

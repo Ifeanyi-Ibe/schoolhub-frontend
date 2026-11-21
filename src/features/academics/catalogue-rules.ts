@@ -2,14 +2,26 @@
 // authoritative; these functions catch what the screen can see before a request is made. They return
 // message codes, and each code is translated from the catalogue (academics.rules.*) by the component.
 
+import type { components } from "@/lib/api/schema";
+
 /**
- * Enumerations the backend parses. The contract types these as free strings with no values listed, so the
- * screens offer exactly the backend's values (SchoolHub.Modules.Academics: Domain/ClassStructure.cs for
- * SubjectCategory, Domain/CalendarDayType.cs for CalendarDayType). Until the contract documents them
- * (BACKEND_GAPS B-25), these constants are the source of the options.
+ * Subject categories and calendar day types, from the contract (SubjectRequest.category and
+ * CalendarDayRequest.type, enums since B-25). The backend refuses any other value.
  */
-export const SUBJECT_CATEGORIES = ["Core", "Elective", "Extra"] as const;
-export const CALENDAR_DAY_TYPES = ["Holiday", "NonSchoolDay", "SpecialEvent"] as const;
+export type SubjectCategory = components["schemas"]["SubjectRequest"]["category"];
+export type CalendarDayType = components["schemas"]["CalendarDayRequest"]["type"];
+export const SUBJECT_CATEGORIES: readonly SubjectCategory[] = ["Core", "Elective", "Extra"];
+export const CALENDAR_DAY_TYPES: readonly CalendarDayType[] = [
+  "Holiday",
+  "NonSchoolDay",
+  "SpecialEvent",
+];
+export function isSubjectCategory(value: string): value is SubjectCategory {
+  return (SUBJECT_CATEGORIES as readonly string[]).includes(value);
+}
+export function isCalendarDayType(value: string): value is CalendarDayType {
+  return (CALENDAR_DAY_TYPES as readonly string[]).includes(value);
+}
 
 export const SCORE_MAX = 100;
 export const ASSESSMENT_TOTAL = 100;
@@ -175,5 +187,47 @@ export function calendarProblems(draft: CalendarDraft): string[] {
   if (!(CALENDAR_DAY_TYPES as readonly string[]).includes(draft.type))
     problems.push("calendar.type");
   if (draft.name.trim() === "") problems.push("calendar.name");
+  return problems;
+}
+
+// Academic sessions and terms -------------------------------------------------------------------------
+
+export interface SessionDraft {
+  name: string;
+  startsOn: string;
+  endsOn: string;
+}
+
+/** The backend's limit on a session name (the rollover request validates it at 20 characters). */
+export const SESSION_NAME_MAX = 20;
+
+/** A session needs a name, and real dates with the end on or after the start. */
+export function sessionProblems(draft: SessionDraft): string[] {
+  const problems: string[] = [];
+  if (draft.name.trim() === "") problems.push("session.name");
+  else if (draft.name.trim().length > SESSION_NAME_MAX) problems.push("session.nameLength");
+  if (!isIsoDate(draft.startsOn)) problems.push("session.start");
+  if (!isIsoDate(draft.endsOn)) problems.push("session.end");
+  else if (isIsoDate(draft.startsOn) && draft.endsOn < draft.startsOn)
+    problems.push("session.order");
+  return problems;
+}
+
+export interface TermDraft {
+  number: string;
+  name: string;
+  startsOn: string;
+  endsOn: string;
+}
+
+/** A term needs a positive whole number, a name, and real dates with the end on or after the start. */
+export function termProblems(draft: TermDraft): string[] {
+  const problems: string[] = [];
+  const n = wholeNumber(draft.number);
+  if (n === null || n < 1 || n > 99) problems.push("term.number");
+  if (draft.name.trim() === "") problems.push("term.name");
+  if (!isIsoDate(draft.startsOn)) problems.push("term.start");
+  if (!isIsoDate(draft.endsOn)) problems.push("term.end");
+  else if (isIsoDate(draft.startsOn) && draft.endsOn < draft.startsOn) problems.push("term.order");
   return problems;
 }

@@ -58,7 +58,7 @@ test.describe.serial("academic setup", () => {
     await page.goto("/academics/grading");
     await page.getByLabel("Scheme name").fill(schemeName);
     await page.getByRole("button", { name: "Create scheme" }).click();
-    await expect(page.getByRole("button", { name: new RegExp(schemeName) })).toBeVisible();
+    await expect(page.getByRole("button", { name: new RegExp(`^${schemeName}`) })).toBeVisible();
 
     const rows: Array<[string, string, string, string]> = [
       ["0", "39", "F", "Fail"],
@@ -68,10 +68,10 @@ test.describe.serial("academic setup", () => {
     for (let i = 0; i < rows.length; i++) {
       await page.getByRole("button", { name: "Add band" }).click();
       const [min, max, grade, remark] = rows[i]!;
-      await page.getByLabel("From").nth(i).fill(min);
-      await page.getByLabel("To").nth(i).fill(max);
-      await page.getByLabel("Grade").nth(i).fill(grade);
-      await page.getByLabel("Remark").nth(i).fill(remark);
+      await page.getByLabel("From", { exact: true }).nth(i).fill(min);
+      await page.getByLabel("To", { exact: true }).nth(i).fill(max);
+      await page.getByLabel("Grade", { exact: true }).nth(i).fill(grade);
+      await page.getByLabel("Remark", { exact: true }).nth(i).fill(remark);
     }
     await expect(page.getByRole("button", { name: "Save bands" })).toBeEnabled();
     await page.getByRole("button", { name: "Save bands" }).click();
@@ -100,7 +100,9 @@ test.describe.serial("academic setup", () => {
     await page.goto("/academics/assessment");
     await page.getByLabel("Scheme name").fill(assessmentName);
     await page.getByRole("button", { name: "Create scheme" }).click();
-    await expect(page.getByRole("button", { name: new RegExp(assessmentName) })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: new RegExp(`^${assessmentName}`) }),
+    ).toBeVisible();
 
     for (const [i, [name, max]] of (
       [
@@ -109,8 +111,8 @@ test.describe.serial("academic setup", () => {
       ] as const
     ).entries()) {
       await page.getByRole("button", { name: "Add component" }).click();
-      await page.getByLabel("Component").nth(i).fill(name);
-      await page.getByLabel("Maximum score").nth(i).fill(max);
+      await page.getByLabel("Component", { exact: true }).nth(i).fill(name);
+      await page.getByLabel("Maximum score", { exact: true }).nth(i).fill(max);
     }
     await expect(page.getByText("Total so far: 100 of 100")).toBeVisible();
     await page.getByRole("button", { name: "Save components" }).click();
@@ -133,8 +135,8 @@ test.describe.serial("academic setup", () => {
   }) => {
     await signInAdmin(page);
     await page.goto(`/academics/calendar`);
-    await page.getByLabel("From").fill("2031-01-01");
-    await page.getByLabel("To").fill("2031-12-31");
+    await page.getByLabel("From", { exact: true }).fill("2031-01-01");
+    await page.getByLabel("To", { exact: true }).fill("2031-12-31");
     await page.getByRole("button", { name: "Add a day" }).click();
     const dialog = page.getByRole("dialog", { name: "Add a day" });
     await dialog.getByLabel("Date").fill(holiday.date);

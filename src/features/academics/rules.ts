@@ -1,20 +1,23 @@
 // Validation for class levels and arms. The server's rules are authoritative; these only catch what the
 // form can see before a request is made, and each message comes from the catalogue.
 
+import type { components } from "@/lib/api/schema";
+
 /**
- * The sections a class level accepts. The contract types `section` as a free string, but the backend
- * parses it as its ClassSection enum (SchoolHub.Modules.Academics/Domain/ClassStructure.cs), and any other
- * text is refused with academics.invalid. Until the contract documents the enum (BACKEND_GAPS B-22), the
- * screen offers exactly these values.
+ * The sections a class level accepts, from the contract (LevelRequest.section, an enum since B-22). The
+ * backend refuses any other text with academics.invalid, so the screen offers exactly these.
  */
-export const CLASS_SECTIONS = [
+export type ClassSection = components["schemas"]["LevelRequest"]["section"];
+export const CLASS_SECTIONS: readonly ClassSection[] = [
   "Creche",
   "Nursery",
   "Primary",
   "JuniorSecondary",
   "SeniorSecondary",
-] as const;
-export type ClassSection = (typeof CLASS_SECTIONS)[number];
+];
+export function isClassSection(value: string): value is ClassSection {
+  return (CLASS_SECTIONS as readonly string[]).includes(value);
+}
 
 export interface LevelDraft {
   code: string;

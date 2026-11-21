@@ -30,7 +30,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/calendar/days/{id}",
@@ -43,7 +50,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/class-levels/{id}",
@@ -56,7 +70,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/domain-traits/{id}",
@@ -69,7 +90,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/files/{id}",
@@ -80,7 +108,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/grading-schemes/{id}",
@@ -93,7 +126,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/me/sessions/{id}",
@@ -104,7 +144,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/notifications/templates/{key}",
@@ -117,7 +162,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "notifications.templates.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "notifications.templates.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/roles/{id}",
@@ -130,7 +182,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "roles.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "roles.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/staff/{id}",
@@ -143,7 +202,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/students/{id}",
@@ -156,7 +222,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.delete"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.delete"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/students/{id}/documents/{documentId}",
@@ -169,7 +242,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/students/{id}/guardians/{guardianId}",
@@ -182,7 +262,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "DELETE /api/v1/subjects/{id}",
@@ -195,7 +282,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/admissions",
@@ -208,7 +302,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/announcements",
@@ -221,7 +322,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "announcements.send"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "announcements.send"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/announcements/{id}",
@@ -234,7 +342,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "announcements.send"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "announcements.send"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/assessment-schemes",
@@ -247,7 +362,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/assessment/jobs/{id}",
@@ -260,7 +382,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/assessment/results/class",
@@ -273,7 +402,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/assessment/results/class/export",
@@ -286,7 +422,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/assessment/results/students/{id}",
@@ -299,7 +442,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/assessment/score-sheets",
@@ -312,7 +462,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/attendance/class-arms/{id}",
@@ -325,7 +482,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "attendance.mark"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "attendance.mark"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/attendance/class-arms/{id}/absentees",
@@ -338,7 +502,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "attendance.mark"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "attendance.mark"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/attendance/class-arms/{id}/class-summary",
@@ -351,7 +522,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "attendance.mark"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "attendance.mark"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/attendance/class-arms/{id}/term-summary",
@@ -364,7 +542,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "attendance.mark"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "attendance.mark"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/attendance/class-arms/{id}/term-summary.xlsx",
@@ -377,7 +562,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "attendance.export"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "attendance.export"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/attendance/students/{id}",
@@ -390,7 +582,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "attendance.mark"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "attendance.mark"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/audit-logs",
@@ -403,7 +602,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "audit.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "audit.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/audit-logs/exports/{id}",
@@ -416,7 +622,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "audit.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "audit.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/audit-logs/exports/{id}/download",
@@ -429,7 +642,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "audit.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "audit.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/audit-logs/{id}",
@@ -442,7 +662,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "audit.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "audit.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/billing/invoices",
@@ -455,7 +682,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "settings.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "settings.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/billing/subscription",
@@ -468,7 +702,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "settings.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "settings.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/calendar/days",
@@ -481,7 +722,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/class-arms/{id}/teachers",
@@ -494,7 +742,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/class-levels",
@@ -507,7 +762,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/class-levels/{id}/arms",
@@ -520,7 +782,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/class-levels/{id}/subjects",
@@ -533,7 +802,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/compliance/consents",
@@ -546,7 +822,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/compliance/data-requests",
@@ -559,7 +842,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/compliance/data-requests/{id}",
@@ -572,7 +862,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/compliance/data-requests/{id}/export",
@@ -585,7 +882,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/compliance/tenant-export/{id}",
@@ -598,7 +902,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/compliance/tenant-export/{id}/download",
@@ -611,7 +922,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/dashboard/admin",
@@ -624,7 +942,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "dashboard.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "dashboard.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/domain-traits",
@@ -637,7 +962,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/fees/discounts",
@@ -650,7 +982,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.structures.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.structures.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/fees/items",
@@ -663,7 +1002,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.structures.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.structures.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/fees/reconciliation",
@@ -676,7 +1022,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.reports.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.reports.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/fees/reports/collection",
@@ -689,7 +1042,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.reports.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.reports.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/fees/reports/debtors",
@@ -702,7 +1062,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.reports.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.reports.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/fees/structures",
@@ -715,7 +1082,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.structures.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.structures.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/fees/structures/{id}",
@@ -728,7 +1102,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.structures.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.structures.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/files/{id}/content",
@@ -739,7 +1120,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/files/{id}/download-url",
@@ -750,7 +1136,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/grading-schemes",
@@ -763,7 +1154,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/guardians/{id}",
@@ -776,7 +1174,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/invoices",
@@ -789,7 +1194,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.reports.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.reports.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/invoices/{id}",
@@ -802,7 +1214,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.reports.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.reports.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/invoices/{id}/pdf",
@@ -815,7 +1234,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.reports.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.reports.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me",
@@ -826,7 +1252,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/assignments",
@@ -839,7 +1270,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.profile"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.profile"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/notification-preferences",
@@ -852,7 +1290,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.notifications"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.notifications"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/notifications",
@@ -865,7 +1310,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.notifications"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.notifications"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/report-cards/{id}/download",
@@ -878,7 +1330,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.wards"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.wards"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/sessions",
@@ -889,7 +1348,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/tenant",
@@ -900,7 +1364,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/wards",
@@ -913,7 +1382,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.wards"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.wards"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/wards/{id}",
@@ -926,7 +1402,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.wards"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.wards"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/wards/{id}/attendance",
@@ -939,7 +1422,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.wards"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.wards"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/wards/{id}/invoices",
@@ -952,7 +1442,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.wards"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.wards"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/wards/{id}/report-cards",
@@ -965,7 +1462,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.wards"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.wards"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/me/wards/{id}/results",
@@ -978,7 +1482,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.wards"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.wards"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/notifications/messages",
@@ -991,7 +1502,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "notifications.messages.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "notifications.messages.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/notifications/sms-wallet",
@@ -1004,7 +1522,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "notifications.messages.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "notifications.messages.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/notifications/stats",
@@ -1017,7 +1542,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "notifications.messages.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "notifications.messages.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/notifications/templates",
@@ -1030,7 +1562,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "notifications.templates.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "notifications.templates.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/payments",
@@ -1043,7 +1582,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.reports.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.reports.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/payments/unallocated",
@@ -1056,7 +1602,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.reports.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.reports.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/payments/verify",
@@ -1069,7 +1622,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.pay"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.pay"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/payments/{id}",
@@ -1082,7 +1642,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.pay"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.pay"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/payments/{id}/receipt",
@@ -1095,7 +1662,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.pay"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.pay"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/permissions",
@@ -1108,7 +1682,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "roles.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "roles.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/platform/metrics",
@@ -1121,7 +1702,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "platform.metrics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "platform.metrics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/platform/tenants",
@@ -1134,7 +1722,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "platform.tenants.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "platform.tenants.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/platform/tenants/{id}",
@@ -1147,7 +1742,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "platform.tenants.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "platform.tenants.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/public/tenants/{slug}/branding",
@@ -1158,7 +1760,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/public/tenants/{slug}/logo",
@@ -1169,7 +1776,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/report-cards",
@@ -1182,7 +1794,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/report-cards/{id}/download",
@@ -1195,7 +1814,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/roles",
@@ -1208,7 +1834,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "roles.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "roles.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/sessions",
@@ -1221,7 +1854,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/sessions/{id}/terms",
@@ -1234,7 +1874,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/settings/branding",
@@ -1247,7 +1894,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "settings.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "settings.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/settings/policies",
@@ -1260,7 +1914,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "settings.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "settings.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/settings/school-profile",
@@ -1273,7 +1934,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "settings.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "settings.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/staff",
@@ -1286,7 +1954,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "staff.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "staff.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/staff/{id}",
@@ -1299,7 +1974,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "staff.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "staff.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/staff/{id}/assignments",
@@ -1312,7 +1994,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "staff.assign"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "staff.assign"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/staff/{id}/leave",
@@ -1325,7 +2014,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "staff.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "staff.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/students",
@@ -1338,7 +2034,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/students/import/template",
@@ -1351,7 +2054,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.import.run"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.import.run"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/students/import/{id}",
@@ -1364,7 +2074,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.import.run"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.import.run"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/students/import/{id}/errors.csv",
@@ -1377,7 +2094,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.import.run"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.import.run"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/students/import/{id}/rows",
@@ -1390,7 +2114,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.import.run"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.import.run"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/students/{id}",
@@ -1403,7 +2134,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/students/{id}/documents",
@@ -1416,7 +2154,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/students/{id}/ledger",
@@ -1429,7 +2174,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.reports.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.reports.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/students/{id}/notes",
@@ -1442,7 +2194,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.notes.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.notes.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/subjects",
@@ -1455,7 +2214,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/terms/{id}/school-days",
@@ -1468,7 +2234,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/users",
@@ -1481,7 +2254,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "GET /api/v1/webhooks/whatsapp",
@@ -1492,7 +2272,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PATCH /api/v1/guardians/{id}",
@@ -1505,7 +2290,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PATCH /api/v1/me",
@@ -1516,7 +2308,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PATCH /api/v1/me/wards/{id}/guardian",
@@ -1529,7 +2326,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.wards"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.wards"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PATCH /api/v1/students/{id}",
@@ -1542,7 +2346,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PATCH /api/v1/students/{id}/guardians/{guardianId}",
@@ -1555,7 +2366,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/academics/rollover",
@@ -1568,7 +2386,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/admissions/{id}/accept",
@@ -1581,7 +2406,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.lifecycle.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.lifecycle.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/admissions/{id}/reject",
@@ -1594,7 +2426,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.lifecycle.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.lifecycle.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/announcements",
@@ -1607,7 +2446,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "announcements.send"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "announcements.send"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/announcements/audience-preview",
@@ -1620,7 +2466,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "announcements.send"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "announcements.send"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/announcements/{id}/cancel",
@@ -1633,7 +2486,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "announcements.send"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "announcements.send"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/announcements/{id}/send",
@@ -1646,7 +2506,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "announcements.send"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "announcements.send"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/assessment-schemes",
@@ -1659,7 +2526,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/assessment-schemes/{id}/set-default",
@@ -1672,7 +2546,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/assessment/amendments",
@@ -1685,7 +2566,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.amend.request"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.amend.request"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/assessment/amendments/{id}/approve",
@@ -1698,7 +2586,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.amend.approve"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.amend.approve"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/assessment/amendments/{id}/reject",
@@ -1711,7 +2606,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.amend.approve"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.amend.approve"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/assessment/compute",
@@ -1724,7 +2626,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.approve"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.approve"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/assessment/score-sheets",
@@ -1737,7 +2646,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/assessment/score-sheets/{id}/approve",
@@ -1750,7 +2666,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.approve"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.approve"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/assessment/score-sheets/{id}/reopen",
@@ -1763,7 +2686,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.approve"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.approve"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/assessment/score-sheets/{id}/submit",
@@ -1776,7 +2706,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/attendance/class-arms/{id}/{date}/reopen",
@@ -1789,7 +2726,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "attendance.edit.past"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "attendance.edit.past"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/attendance/class-arms/{id}/{date}/submit",
@@ -1802,7 +2746,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "attendance.mark"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "attendance.mark"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/audit-logs/export",
@@ -1815,7 +2766,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "audit.read"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "audit.read"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/invites/accept",
@@ -1826,7 +2784,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/login",
@@ -1837,7 +2800,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/logout",
@@ -1848,7 +2816,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/logout-all",
@@ -1859,7 +2832,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/mfa/enrollment",
@@ -1870,7 +2848,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/mfa/enrollment/confirm",
@@ -1881,7 +2864,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/mfa/verify",
@@ -1892,7 +2880,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/otp/request",
@@ -1903,7 +2896,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/otp/verify",
@@ -1914,7 +2912,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/password/forgot",
@@ -1925,7 +2928,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/password/reset",
@@ -1936,7 +2944,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/auth/refresh",
@@ -1947,7 +2960,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/billing/pay",
@@ -1960,7 +2978,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "settings.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "settings.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/calendar/days",
@@ -1973,7 +2998,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/calendar/import-holidays",
@@ -1986,7 +3018,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/class-levels",
@@ -1999,7 +3038,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/class-levels/{id}/arms",
@@ -2012,7 +3058,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/compliance/consents",
@@ -2025,7 +3078,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/compliance/consents/{id}/withdraw",
@@ -2038,7 +3098,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/compliance/data-requests",
@@ -2051,7 +3118,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/compliance/data-requests/{id}/approve",
@@ -2064,7 +3138,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/compliance/data-requests/{id}/reject",
@@ -2077,7 +3158,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/compliance/tenant-export",
@@ -2090,7 +3178,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "compliance.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "compliance.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/domain-traits",
@@ -2103,7 +3198,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/fees/discounts",
@@ -2116,7 +3218,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.structures.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.structures.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/fees/items",
@@ -2129,7 +3238,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.structures.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.structures.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/fees/structures",
@@ -2142,7 +3258,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.structures.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.structures.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/fees/structures/{id}/activate",
@@ -2155,7 +3278,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.structures.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.structures.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/files/presign-upload",
@@ -2166,7 +3296,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/files/{id}/complete",
@@ -2177,7 +3312,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/grading-schemes",
@@ -2190,7 +3330,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/grading-schemes/{id}/set-default",
@@ -2203,7 +3350,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/guardians/{id}/portal-invite",
@@ -2216,7 +3370,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.invite"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.invite"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/invoices/generate",
@@ -2229,20 +3390,34 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.invoices.create"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.invoices.create"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/invoices/{id}/adjustments",
     "method": "POST",
     "path": "/api/v1/invoices/{id}/adjustments",
     "tag": "Fees",
-    "idempotent": false,
+    "idempotent": true,
     "ifMatch": false,
     "access": "permission",
     "permissions": [
       "fees.invoices.create"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.invoices.create"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/invoices/{id}/void",
@@ -2255,7 +3430,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.invoices.void"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.invoices.void"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/leave/{id}/approve",
@@ -2268,7 +3450,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "staff.assign"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "staff.assign"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/leave/{id}/reject",
@@ -2281,7 +3470,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "staff.assign"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "staff.assign"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/me/contact/confirm",
@@ -2292,7 +3488,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/me/contact/request",
@@ -2303,7 +3504,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/me/mfa/confirm",
@@ -2314,7 +3520,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/me/mfa/disable",
@@ -2325,7 +3536,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/me/mfa/enroll",
@@ -2336,7 +3552,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/me/notifications/read-all",
@@ -2349,7 +3570,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.notifications"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.notifications"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/me/notifications/{id}/read",
@@ -2362,7 +3590,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.notifications"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.notifications"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/me/password",
@@ -2373,7 +3608,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/me/payments/initialize",
@@ -2386,7 +3626,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.pay"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.pay"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/notifications/messages/{id}/retry",
@@ -2399,7 +3646,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "notifications.messages.retry"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "notifications.messages.retry"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/notifications/templates/{key}/preview",
@@ -2412,7 +3666,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "notifications.templates.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "notifications.templates.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/payments/initialize",
@@ -2425,7 +3686,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.payments.record"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.payments.record"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/payments/manual",
@@ -2438,20 +3706,34 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.payments.record"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.payments.record"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/payments/unallocated/{id}/assign",
     "method": "POST",
     "path": "/api/v1/payments/unallocated/{id}/assign",
     "tag": "Fees",
-    "idempotent": false,
+    "idempotent": true,
     "ifMatch": false,
     "access": "permission",
     "permissions": [
       "fees.payments.record"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.payments.record"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/payments/{id}/reverse-approve",
@@ -2464,7 +3746,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.payments.approve"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.payments.approve"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/payments/{id}/reverse-request",
@@ -2477,7 +3766,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.payments.reverse"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.payments.reverse"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/auth/login",
@@ -2488,7 +3784,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/auth/mfa/enrollment",
@@ -2499,7 +3800,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/auth/mfa/enrollment/confirm",
@@ -2510,7 +3816,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/auth/mfa/verify",
@@ -2521,7 +3832,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/auth/refresh",
@@ -2532,7 +3848,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/billing/sweep",
@@ -2545,7 +3866,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "platform.billing.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "platform.billing.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/tenants",
@@ -2558,7 +3886,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "platform.tenants.create"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "platform.tenants.create"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/tenants/{id}/cancel",
@@ -2571,7 +3906,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "platform.tenants.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "platform.tenants.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/tenants/{id}/reactivate",
@@ -2584,7 +3926,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "platform.tenants.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "platform.tenants.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/tenants/{id}/suspend",
@@ -2597,7 +3946,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "platform.tenants.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "platform.tenants.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/platform/tenants/{tenantId}/sms-credits",
@@ -2610,7 +3966,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "platform.sms.topup"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "platform.sms.topup"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/promotions/commit",
@@ -2623,7 +3986,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "promotions.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "promotions.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/promotions/preview",
@@ -2636,7 +4006,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "promotions.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "promotions.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/public/{slug}/admissions",
@@ -2647,7 +4024,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [
+        "admissions"
+      ],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/report-cards/generate",
@@ -2660,7 +4044,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.approve"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.approve"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/report-cards/publish",
@@ -2673,7 +4064,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.publish"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.publish"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/roles",
@@ -2686,7 +4084,16 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "roles.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "roles.manage"
+      ],
+      "x-feature": [
+        "customRoles"
+      ],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/sessions",
@@ -2699,7 +4106,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/sessions/{id}/archive",
@@ -2712,7 +4126,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/sessions/{id}/terms",
@@ -2725,7 +4146,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/staff",
@@ -2738,7 +4166,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "staff.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "staff.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/staff/{id}/deactivate",
@@ -2751,7 +4186,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/staff/{id}/invite-user",
@@ -2764,7 +4206,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.invite"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.invite"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/staff/{id}/leave",
@@ -2777,7 +4226,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "staff.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "staff.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/staff/{id}/reactivate",
@@ -2790,7 +4246,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students",
@@ -2803,7 +4266,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/import",
@@ -2816,7 +4286,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.import.run"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.import.run"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/import/{id}/commit",
@@ -2829,7 +4306,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.import.run"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.import.run"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/{id}/discounts",
@@ -2842,7 +4326,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.structures.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.structures.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/{id}/discounts/{assignmentId}/approve",
@@ -2855,7 +4346,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.discounts.approve"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.discounts.approve"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/{id}/documents",
@@ -2868,7 +4366,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/{id}/graduate",
@@ -2881,7 +4386,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.lifecycle.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.lifecycle.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/{id}/guardians",
@@ -2894,7 +4406,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/{id}/notes",
@@ -2907,7 +4426,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.notes.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.notes.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/{id}/reinstate",
@@ -2920,7 +4446,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.lifecycle.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.lifecycle.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/{id}/transfer-arm",
@@ -2933,7 +4466,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.lifecycle.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.lifecycle.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/students/{id}/withdraw",
@@ -2946,7 +4486,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "students.lifecycle.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "students.lifecycle.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/subjects",
@@ -2959,7 +4506,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/terms/{id}/set-current",
@@ -2972,7 +4526,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/users/invite",
@@ -2985,7 +4546,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.invite"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.invite"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/users/{id}/disable",
@@ -2998,7 +4566,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/users/{id}/enable",
@@ -3011,7 +4586,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/users/{id}/resend-invite",
@@ -3024,7 +4606,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.invite"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.invite"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/users/{id}/reset-mfa",
@@ -3037,7 +4626,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/users/{id}/unlock",
@@ -3050,7 +4646,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "users.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "users.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/webhooks/email/{provider}",
@@ -3061,7 +4664,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/webhooks/paystack",
@@ -3072,7 +4680,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/webhooks/sms/{provider}",
@@ -3083,7 +4696,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "POST /api/v1/webhooks/whatsapp",
@@ -3094,7 +4712,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "anonymous",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/announcements/{id}",
@@ -3107,7 +4730,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "announcements.send"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "announcements.send"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/arms/{id}",
@@ -3120,7 +4750,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/assessment-schemes/{id}/components",
@@ -3133,7 +4770,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/assessment/ratings/students/{id}",
@@ -3146,7 +4790,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/assessment/remarks/students/{id}/principal",
@@ -3159,7 +4810,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.approve"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.approve"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/assessment/remarks/students/{id}/teacher",
@@ -3172,7 +4830,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/assessment/score-sheets/{id}/scores",
@@ -3185,7 +4850,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "results.scores.enter"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "results.scores.enter"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": true
+    }
   },
   {
     "id": "PUT /api/v1/attendance/class-arms/{id}/{date}",
@@ -3198,7 +4870,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "attendance.mark"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "attendance.mark"
+      ],
+      "x-feature": [],
+      "x-idempotent": true,
+      "x-offline-sync": true
+    }
   },
   {
     "id": "PUT /api/v1/class-levels/{id}",
@@ -3211,7 +4890,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/class-levels/{id}/subjects",
@@ -3224,7 +4910,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/domain-traits/{id}",
@@ -3237,7 +4930,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/fees/structures/{id}/lines",
@@ -3250,7 +4950,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "fees.structures.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "fees.structures.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/files/{id}/content",
@@ -3261,7 +4968,12 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "ifMatch": false,
     "access": "signed-in",
     "permissions": [],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/grading-schemes/{id}/bands",
@@ -3274,7 +4986,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/me/notification-preferences",
@@ -3287,7 +5006,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "me.notifications"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "me.notifications"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/notifications/templates/{key}",
@@ -3300,7 +5026,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "notifications.templates.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "notifications.templates.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/roles/{id}/permissions",
@@ -3313,7 +5046,16 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "roles.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "roles.manage"
+      ],
+      "x-feature": [
+        "customRoles"
+      ],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/sessions/{id}",
@@ -3326,7 +5068,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/settings/branding",
@@ -3339,7 +5088,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "settings.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "settings.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/settings/policies",
@@ -3352,7 +5108,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "settings.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "settings.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/settings/school-profile",
@@ -3365,7 +5128,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "settings.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "settings.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/staff/{id}",
@@ -3378,7 +5148,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "staff.write"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "staff.write"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/staff/{id}/assignments",
@@ -3391,7 +5168,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "staff.assign"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "staff.assign"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/subjects/{id}",
@@ -3404,7 +5188,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/terms/{id}",
@@ -3417,7 +5208,14 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "academics.manage"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "academics.manage"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   },
   {
     "id": "PUT /api/v1/users/{id}/roles",
@@ -3430,6 +5228,13 @@ export const OPERATIONS: readonly OperationInfo[] = [
     "permissions": [
       "roles.assign"
     ],
-    "extensions": {}
+    "extensions": {
+      "x-required-permission": [
+        "roles.assign"
+      ],
+      "x-feature": [],
+      "x-idempotent": false,
+      "x-offline-sync": false
+    }
   }
 ];
