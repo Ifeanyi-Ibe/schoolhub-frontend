@@ -8,6 +8,15 @@ import { getEnv } from "@/server/env";
 import { loadBranding, type SchoolBranding } from "@/server/branding";
 import { resolveTenant } from "@/server/tenant";
 
+// The sign-in background: the school's own colour (--brand, set per school), darkened toward black, so the white
+// text keeps its contrast whatever colour the school picks. Only classes are used (no inline style),
+// because the Content-Security-Policy does not allow style attributes.
+const BRAND_GRADIENT =
+  "bg-[linear-gradient(150deg,color-mix(in_oklab,var(--brand)_80%,white)_0%,var(--brand)_42%,color-mix(in_oklab,var(--brand)_60%,black)_78%,color-mix(in_oklab,var(--brand)_35%,black)_100%)]";
+const BRAND_LIGHT = "bg-[radial-gradient(circle_at_85%_0%,rgb(255_255_255/0.16),transparent_55%)]";
+const BRAND_DOTS =
+  "bg-[radial-gradient(rgb(255_255_255/0.12)_1px,transparent_1px)] bg-[length:22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent_80%)]";
+
 // Sign-in screens read their text through the light formatter (root layout), so no next-intl code ships
 // here. Server-side text (getTranslations) stays on the server.
 export default async function AuthLayout({ children }: { children: ReactNode }) {
@@ -43,7 +52,7 @@ function Branded({
 }: {
   slug: string;
   branding: SchoolBranding;
-  panel: { headline: string; body: string; product: string };
+  panel: BrandPanel;
   children: ReactNode;
 }) {
   const logo = branding.logoUrl ? (
@@ -73,10 +82,22 @@ function Branded({
       {/* A per-tenant stylesheet cannot be imported statically, so this is the one manual link. */}
       {/* eslint-disable-next-line @next/next/no-css-tags */}
       <link rel="stylesheet" href="/tenant-brand.css" precedence="default" />
-      <aside className="relative hidden overflow-hidden bg-sidebar p-12 text-sidebar-foreground lg:flex lg:flex-col lg:justify-between">
+      <aside
+        className={`${BRAND_GRADIENT} relative hidden overflow-hidden p-12 text-sidebar-foreground lg:flex lg:flex-col lg:justify-between`}
+      >
+        {/* Soft light from the top corner, a faint dot grid fading down, and an edge highlight: depth without images. */}
+        <div aria-hidden="true" className={`pointer-events-none absolute inset-0 ${BRAND_LIGHT}`} />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-brand/25 blur-3xl"
+          className={`pointer-events-none absolute inset-0 opacity-60 ${BRAND_DOTS}`}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-32 -top-32 size-[28rem] rounded-full bg-brand/30 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-40 -left-24 size-[22rem] rounded-full bg-brand/20 blur-3xl"
         />
         <div className="relative flex items-center gap-4">
           {logo}
@@ -85,27 +106,66 @@ function Branded({
             {branding.motto ? <p className="text-sm text-sidebar-muted">{branding.motto}</p> : null}
           </div>
         </div>
-        <div className="relative max-w-md">
-          <p className="font-display text-3xl font-semibold leading-tight">{panel.headline}</p>
-          <p className="mt-4 text-sm leading-relaxed text-sidebar-muted">{panel.body}</p>
+        <div className="relative max-w-lg">
+          <p className="font-display text-4xl font-semibold leading-tight tracking-tight">
+            {panel.headline}
+          </p>
+          <p className="mt-4 text-base leading-relaxed text-sidebar-muted">{panel.body}</p>
+          <div className="mt-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sidebar-muted">
+              {panel.pointsLabel}
+            </p>
+            <ul className="mt-4 flex flex-col gap-3">
+              {panel.points.map((point) => (
+                <li key={point} className="flex items-start gap-3 text-sm leading-relaxed">
+                  <span
+                    aria-hidden="true"
+                    className="mt-1.5 inline-block size-2 shrink-0 rounded-full bg-sidebar-foreground/80 shadow-[0_0_0_4px_rgb(255_255_255/0.12)]"
+                  />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <p className="relative text-xs text-sidebar-muted">{panel.product}</p>
+        <p className="relative text-xs tracking-wide text-sidebar-muted">{panel.product}</p>
       </aside>
       <div className="flex min-w-0 flex-col">
-        <header className="mx-auto flex w-full max-w-md items-center gap-3 px-4 pt-8 lg:hidden">
-          {logo}
-          <div className="flex min-w-0 flex-col">
-            <p className="font-display text-lg font-semibold text-foreground">{branding.name}</p>
-            {branding.motto ? (
-              <p className="text-sm text-muted-foreground">{branding.motto}</p>
-            ) : null}
+        <header
+          className={`${BRAND_GRADIENT} relative overflow-hidden text-sidebar-foreground lg:hidden`}
+        >
+          <div
+            aria-hidden="true"
+            className={`pointer-events-none absolute inset-0 ${BRAND_LIGHT}`}
+          />
+          <div
+            aria-hidden="true"
+            className={`pointer-events-none absolute inset-0 opacity-60 ${BRAND_DOTS}`}
+          />
+          <div className="relative mx-auto flex w-full max-w-md items-center gap-3 px-4 pb-14 pt-8">
+            {logo}
+            <div className="flex min-w-0 flex-col">
+              <p className="font-display text-lg font-semibold">{branding.name}</p>
+              {branding.motto ? (
+                <p className="text-sm text-sidebar-muted">{branding.motto}</p>
+              ) : null}
+            </div>
           </div>
         </header>
         <main
           id="main"
-          className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-10 lg:px-10"
+          className="mx-auto -mt-8 flex w-full max-w-md flex-1 flex-col justify-center px-4 pb-10 lg:mt-0 lg:px-10 lg:py-10"
         >
-          <div className="rounded-card border border-border bg-surface p-6 shadow-raised sm:p-8">
+          <div className="relative overflow-hidden rounded-card border border-border bg-surface p-6 shadow-raised sm:p-8">
+            {/* A brand strip across the top of the card, so the form reads as this school's sign-in. */}
+            <div
+              aria-hidden="true"
+              className={`${BRAND_GRADIENT} absolute inset-x-0 top-0 h-1.5`}
+            />
+            <p className="mb-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              <span aria-hidden="true" className="inline-block size-1.5 rounded-full bg-brand" />
+              {panel.welcome}
+            </p>
             {children}
           </div>
         </main>
@@ -123,7 +183,23 @@ function Frame({ title, body }: { title: string; body: string }) {
   );
 }
 
-async function brandPanel() {
+interface BrandPanel {
+  headline: string;
+  body: string;
+  product: string;
+  pointsLabel: string;
+  welcome: string;
+  points: string[];
+}
+
+async function brandPanel(): Promise<BrandPanel> {
   const t = await getTranslations("auth.brandPanel");
-  return { headline: t("headline"), body: t("body"), product: t("product") };
+  return {
+    headline: t("headline"),
+    body: t("body"),
+    product: t("product"),
+    pointsLabel: t("pointsLabel"),
+    welcome: t("welcome"),
+    points: [t("points.students"), t("points.staff"), t("points.secure")],
+  };
 }

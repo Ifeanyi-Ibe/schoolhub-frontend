@@ -158,7 +158,14 @@
     "brandPanel": {
       "headline": "Everything your school runs on, in one place.",
       "body": "Students, staff, academics and fees, with permissions that match each person's role.",
-      "product": "SchoolHub"
+      "product": "SchoolHub",
+      "points": {
+        "students": "Student records, admissions and fees in one place",
+        "staff": "Staff, class assignments and leave, with approvals",
+        "secure": "Permissions that match each person's role, checked on every request"
+      },
+      "pointsLabel": "What SchoolHub covers",
+      "welcome": "Welcome back"
     }
   },
   "shell": {
