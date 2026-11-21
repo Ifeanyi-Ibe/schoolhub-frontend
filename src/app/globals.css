@@ -42,11 +42,13 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-control: 0.625rem;
-  --radius-card: 0.875rem;
+  --radius-control: 0.75rem;
+  --radius-card: 1rem;
+  --radius-dialog: 1.25rem;
 
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.08);
-  --shadow-raised: 0 4px 12px rgb(15 23 42 / 0.1), 0 2px 4px rgb(15 23 42 / 0.06);
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 2px 8px -2px rgb(15 23 42 / 0.06);
+  --shadow-raised: 0 1px 2px rgb(15 23 42 / 0.06), 0 16px 40px -12px rgb(15 23 42 / 0.22);
+  --shadow-brand: 0 1px 2px rgb(15 23 42 / 0.12), inset 0 1px 0 rgb(255 255 255 / 0.12);
 }
 
 :root,
@@ -175,6 +177,34 @@
   :focus-visible {
     outline: 3px solid var(--ring);
     outline-offset: 2px;
+  }
+}
+
+/* Desktop tables: a quiet header band, rows that respond to the pointer, and generous cell padding. */
+@media (min-width: 48rem) {
+  .responsive-table thead th {
+    background: color-mix(in oklab, var(--muted) 60%, transparent);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .responsive-table tbody tr {
+    transition: background-color 120ms ease;
+  }
+  .responsive-table tbody tr:hover {
+    background: color-mix(in oklab, var(--muted) 45%, transparent);
+  }
+  .responsive-table tbody tr:last-child td {
+    border-bottom-color: transparent;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
   }
 }
 

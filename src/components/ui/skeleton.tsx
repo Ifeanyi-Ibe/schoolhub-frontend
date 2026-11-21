@@ -6,7 +6,10 @@ export function Skeleton({ className }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={cn("rounded-control bg-muted motion-safe:animate-pulse", className)}
+      className={cn(
+        "rounded-control bg-gradient-to-r from-muted via-surface to-muted bg-[length:200%_100%] motion-safe:animate-[shimmer_1.6s_ease-in-out_infinite]",
+        className,
+      )}
     />
   );
 }

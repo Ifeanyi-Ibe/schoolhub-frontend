@@ -22,7 +22,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={inputId} className="text-sm font-medium text-foreground">
+      <label htmlFor={inputId} className="text-sm font-semibold text-foreground">
         {label}
         {required ? (
           <span className="ml-1 text-danger" aria-hidden="true">
@@ -42,9 +42,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
         className={cn(
-          "min-h-11 w-full rounded-control border bg-surface px-3 text-base text-foreground",
-          "placeholder:text-muted-foreground focus-visible:outline-3 focus-visible:outline-offset-0 focus-visible:outline-ring",
-          error ? "border-danger" : "border-input-border",
+          "min-h-11 w-full rounded-control border bg-surface px-3.5 text-base text-foreground shadow-card",
+          "placeholder:text-muted-foreground/70 transition-[border-color,box-shadow] duration-150",
+          "hover:border-brand/50 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/25",
+          "disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-70",
+          error ? "border-danger focus-visible:ring-danger/25" : "border-input-border",
           className,
         )}
         {...rest}

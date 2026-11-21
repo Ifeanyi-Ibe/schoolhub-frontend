@@ -32,7 +32,7 @@ export function Dialog({ open, onOpenChange, title, description, children, foote
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
-        <RadixDialog.Overlay className="fixed inset-0 z-40 bg-foreground/40 motion-safe:animate-in motion-safe:fade-in-0" />
+        <RadixDialog.Overlay className="fixed inset-0 z-40 bg-foreground/35 backdrop-blur-[2px] motion-safe:animate-in motion-safe:fade-in-0" />
         <RadixDialog.Content
           onCloseAutoFocus={(event) => {
             const el = returnFocus.current;
@@ -41,11 +41,11 @@ export function Dialog({ open, onOpenChange, title, description, children, foote
               el.focus();
             }
           }}
-          className="fixed inset-x-0 bottom-0 z-50 flex max-h-[90dvh] flex-col gap-4 overflow-y-auto rounded-t-card bg-surface-raised p-6 shadow-raised sm:inset-x-auto sm:left-1/2 sm:top-1/2 sm:bottom-auto sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-card"
+          className="fixed inset-x-0 bottom-0 z-50 flex max-h-[90dvh] flex-col gap-5 overflow-y-auto rounded-t-dialog border border-border bg-surface-raised p-6 shadow-raised sm:inset-x-auto sm:left-1/2 sm:top-1/2 sm:bottom-auto sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-dialog"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <RadixDialog.Title className="font-display text-lg font-semibold text-foreground">
+              <RadixDialog.Title className="font-display text-xl font-semibold tracking-tight text-foreground">
                 {title}
               </RadixDialog.Title>
               {description ? (
@@ -56,7 +56,7 @@ export function Dialog({ open, onOpenChange, title, description, children, foote
             </div>
             <RadixDialog.Close
               aria-label={t("close")}
-              className="inline-flex size-11 shrink-0 items-center justify-center rounded-control hover:bg-muted"
+              className="inline-flex size-11 shrink-0 items-center justify-center rounded-control text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <XIcon className="size-5" aria-hidden="true" />
             </RadixDialog.Close>

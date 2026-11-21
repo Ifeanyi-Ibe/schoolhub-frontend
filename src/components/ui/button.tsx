@@ -5,17 +5,19 @@ import { cn } from "@/lib/utils";
 
 // 44px minimum target on every size (WCAG 2.2 target size; brief: 44px touch targets).
 export const buttonVariants = cva(
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-control px-4 text-sm font-semibold " +
-    "transition-colors motion-safe:transition-colors disabled:cursor-not-allowed disabled:opacity-60 " +
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-control px-4 text-sm font-semibold tracking-tight " +
+    "transition-[background-color,box-shadow,transform,color] duration-150 ease-out active:scale-[0.98] motion-reduce:transform-none " +
+    "disabled:cursor-not-allowed disabled:opacity-55 disabled:active:scale-100 " +
     "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring",
   {
     variants: {
       variant: {
-        primary: "bg-brand text-on-brand hover:brightness-110",
-        secondary: "bg-surface text-foreground border border-input-border hover:bg-muted",
+        primary: "bg-brand text-on-brand shadow-brand hover:bg-brand/90 hover:shadow-raised",
+        secondary:
+          "bg-surface text-foreground border border-border shadow-card hover:border-brand/40 hover:bg-brand-soft/50",
         ghost: "bg-transparent text-foreground hover:bg-muted",
         danger:
-          "bg-danger-surface text-danger-foreground border border-danger/40 hover:brightness-95",
+          "bg-danger-surface text-danger-foreground border border-danger/30 hover:bg-danger-surface/70",
       },
       size: {
         default: "",
