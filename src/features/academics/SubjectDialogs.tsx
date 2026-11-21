@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { ApiError } from "@/lib/api/unwrap";
 import { createSubject, deleteSubject, updateSubject, type Subject } from "./catalogue-api";
@@ -100,23 +101,18 @@ export function SubjectDialog({
           {...form.register("code", { onChange: () => setMessage(null) })}
         />
         <Input label={t("name")} error={fieldError("name")} {...form.register("name")} />
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="subject-category" className="text-sm font-medium text-foreground">
-            {t("category")}
-          </label>
-          <select
-            id="subject-category"
-            className="min-h-11 w-full rounded-control border border-input-border bg-surface px-3 text-base text-foreground"
-            aria-invalid={fieldError("category") ? true : undefined}
-            {...form.register("category")}
-          >
-            {SUBJECT_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {tCat(c)}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Select
+          id="subject-category"
+          label={t("category")}
+          error={fieldError("category")}
+          {...form.register("category")}
+        >
+          {SUBJECT_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {tCat(c)}
+            </option>
+          ))}
+        </Select>
         {message ? (
           <p role="alert" className="text-sm text-danger-foreground">
             {message}

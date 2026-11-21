@@ -242,8 +242,8 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 ### B-29 — Intermittent database protocol errors under concurrent queries (500 internal.error)
 
 - **Observed:** on the development backend (2026-11-21), the log shows `Npgsql.NpgsqlException: Received backend message BindComplete while expecting ParseCompleteMessage` and `ArgumentOutOfRangeException` while iterating query results on one `AppDbContext`. The same family as B-24 (`reader is closed`). A client sees `500 internal.error`, for example when starting authenticator enrolment (`POST /api/v1/me/mfa/enroll`).
-- **Effect:** intermittent 500s on user search (B-24) and on enrolment. Real-backend journeys that hit them fail at random.
-- **Design-around:** the enrolment start call is retried on a 500 (it has no effect until confirmed). Other calls are not retried.
+- **Effect:** intermittent 500s on user search (B-24), on enrolment, and on `GET /api/v1/roles` (seen 2026-11-21 in the real-backend suite). Real-backend journeys that hit them fail at random.
+- **Design-around:** the enrolment start and the role-list read are retried on a 500 (both are safe to repeat). Other calls are not retried.
 - **Status:** Open. Ask the backend to check for concurrent use of one database context or connection within a request (the likely cause for both B-24 and B-29).
 
 ### B-28 — School settings PUT request bodies are declared as a bare object

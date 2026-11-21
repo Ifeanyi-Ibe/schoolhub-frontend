@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { DevicesIcon } from "@/components/ui/icons";
+import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { sessionsQuery } from "@/features/shell/api";
 import { useReadOnly } from "@/features/shell/read-only";
@@ -29,7 +31,7 @@ export function SessionsView() {
       setMessage(t("revoked"));
       await qc.invalidateQueries({ queryKey: ["sessions"] });
     } catch {
-      setMessage("That device could not be signed out. Try again.");
+      setMessage(t("revokeFailed"));
     }
   }
 
@@ -43,23 +45,39 @@ export function SessionsView() {
     router.replace("/login?signedOut=1");
   }
 
+  const list = sessions.data ?? [];
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-display text-2xl font-semibold text-foreground">{t("title")}</h1>
+      <PageHeader
+        title={t("title")}
+        description={t("intro")}
+        actions={
+          <Button variant="danger" disabled={readOnly} onClick={signOutEverywhere}>
+            {t("signOutEverywhere")}
+          </Button>
+        }
+      />
       {message ? (
-        <p role="status" className="text-sm">
+        <p
+          role="status"
+          className="rounded-control bg-info-surface px-4 py-3 text-sm text-info-foreground"
+        >
           {message}
         </p>
       ) : null}
-      {sessions.data && sessions.data.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("empty")}</p>
+      {sessions.data && list.length === 0 ? (
+        <p className="rounded-card border border-dashed border-border px-5 py-8 text-center text-sm text-muted-foreground">
+          {t("empty")}
+        </p>
       ) : null}
-      <ul className="flex flex-col gap-3">
-        {(sessions.data ?? []).map((s) => (
+      <ul className="grid gap-4 sm:grid-cols-2">
+        {list.map((s) => (
           <li key={s.id}>
-            <Card className="flex flex-col gap-2">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-semibold">{s.device ?? t("unknownDevice")}</p>
+            <Card className="flex h-full flex-col gap-4">
+              <div className="flex items-start justify-between gap-3">
+                <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-control bg-brand-soft text-brand-soft-foreground">
+                  <DevicesIcon className="size-5" />
+                </span>
                 {s.current ? (
                   <StatusBadge tone="info">{t("current")}</StatusBadge>
                 ) : s.active ? (
@@ -68,31 +86,25 @@ export function SessionsView() {
                   <StatusBadge tone="neutral">{t("inactive")}</StatusBadge>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground">
-                {t("lastUsed", { when: formatInstant(s.lastUsedAt) })}
-              </p>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-display text-base font-semibold text-foreground">
+                  {s.device ?? t("unknownDevice")}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {t("lastUsed", { when: formatInstant(s.lastUsedAt) })}
+                </p>
+              </div>
               {!s.current && s.active ? (
-                <Button
-                  variant="secondary"
-                  disabled={readOnly}
-                  onClick={() => revoke(s.id)}
-                  className="self-start"
-                >
-                  {t("revoke")}
-                </Button>
+                <div className="flex border-t border-border/70 pt-4">
+                  <Button variant="secondary" disabled={readOnly} onClick={() => revoke(s.id)}>
+                    {t("revoke")}
+                  </Button>
+                </div>
               ) : null}
             </Card>
           </li>
         ))}
       </ul>
-      <Button
-        variant="danger"
-        disabled={readOnly}
-        onClick={signOutEverywhere}
-        className="self-start"
-      >
-        {t("signOutEverywhere")}
-      </Button>
     </div>
   );
 }

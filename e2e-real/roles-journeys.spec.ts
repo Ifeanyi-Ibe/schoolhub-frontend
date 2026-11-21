@@ -20,10 +20,18 @@ const apiHeaders = (token: string) => ({
 });
 
 async function rolesOf(request: APIRequestContext, token: string) {
-  const res = await request.get(url("/api/v1/roles"), {
+  // A read can be repeated safely. The backend answers an intermittent database protocol error as 500 (B-29).
+  let res = await request.get(url("/api/v1/roles"), {
     headers: apiHeaders(token),
     failOnStatusCode: false,
   });
+  for (let attempt = 1; attempt < 3 && res.status() === 500; attempt++) {
+    await new Promise((r) => setTimeout(r, 1000));
+    res = await request.get(url("/api/v1/roles"), {
+      headers: apiHeaders(token),
+      failOnStatusCode: false,
+    });
+  }
   const body: unknown = await res.json().catch(() => null);
   if (res.status() !== 200 || !Array.isArray(body)) {
     const code = (body as { code?: string } | null)?.code ?? "no code";

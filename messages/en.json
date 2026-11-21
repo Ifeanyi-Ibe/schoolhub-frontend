@@ -249,7 +249,9 @@
     "revoke": "Sign out this device",
     "revoked": "That device has been signed out.",
     "empty": "There are no other devices signed in.",
-    "signOutEverywhere": "Sign out everywhere"
+    "signOutEverywhere": "Sign out everywhere",
+    "revokeFailed": "That device could not be signed out. Try again.",
+    "intro": "Where you are signed in. Sign out any device you no longer use."
   },
   "retry": {
     "seconds": "Try again in {seconds} s"

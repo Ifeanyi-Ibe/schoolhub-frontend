@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import type { components } from "@/lib/api/schema";
 import { ApiError } from "@/lib/api/unwrap";
@@ -112,27 +113,19 @@ export function LevelDialog({
           error={form.formState.errors.name?.message}
           {...form.register("name", { validate: check("name") })}
         />
-        <label className="flex flex-col gap-1.5 text-sm font-medium">
-          {t("section")}
-          <select
-            required
-            aria-invalid={form.formState.errors.section ? true : undefined}
-            className="min-h-11 rounded-control border border-input-border bg-surface px-3 text-base"
-            {...form.register("section", { validate: check("section") })}
-          >
-            <option value="">{t("sectionChoose")}</option>
-            {CLASS_SECTIONS.map((value) => (
-              <option key={value} value={value}>
-                {t(`sections.${value}`)}
-              </option>
-            ))}
-          </select>
-          {form.formState.errors.section ? (
-            <span role="alert" className="text-sm font-medium text-danger">
-              {form.formState.errors.section.message}
-            </span>
-          ) : null}
-        </label>
+        <Select
+          label={t("section")}
+          required
+          error={form.formState.errors.section?.message}
+          {...form.register("section", { validate: check("section") })}
+        >
+          <option value="">{t("sectionChoose")}</option>
+          {CLASS_SECTIONS.map((value) => (
+            <option key={value} value={value}>
+              {t(`sections.${value}`)}
+            </option>
+          ))}
+        </Select>
         <Input
           label={t("order")}
           inputMode="numeric"

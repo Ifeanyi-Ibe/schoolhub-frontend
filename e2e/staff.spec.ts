@@ -142,7 +142,7 @@ test.describe("people and roles for an administrator", () => {
     page,
   }) => {
     await page.goto("/roles");
-    await expect(page.getByRole("cell", { name: "SchoolAdmin" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /SchoolAdmin/ })).toBeVisible();
     await expect(page.getByRole("button", { name: "New role" })).toBeEnabled();
   });
 

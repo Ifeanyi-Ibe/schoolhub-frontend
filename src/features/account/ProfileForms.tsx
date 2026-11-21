@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { postAuth } from "@/features/auth/http";
 import { passwordRules, requiredText } from "@/features/auth/rules";
 import { useReadOnly } from "@/features/shell/read-only";
@@ -59,17 +60,10 @@ export function ContactCard() {
     <Card>
       <CardTitle>{t("contactTitle")}</CardTitle>
       <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="mt-4 flex flex-col gap-4">
-        <label className="flex flex-col gap-1.5 text-sm font-medium">
-          {t("channel")}
-          <select
-            className="min-h-11 rounded-control border border-input-border bg-surface px-3 text-base"
-            disabled={readOnly || sent}
-            {...form.register("channel")}
-          >
-            <option value="email">{t("channelEmail")}</option>
-            <option value="phone">{t("channelPhone")}</option>
-          </select>
-        </label>
+        <Select label={t("channel")} disabled={readOnly || sent} {...form.register("channel")}>
+          <option value="email">{t("channelEmail")}</option>
+          <option value="phone">{t("channelPhone")}</option>
+        </Select>
         <Input
           label={t("value")}
           disabled={readOnly || sent}

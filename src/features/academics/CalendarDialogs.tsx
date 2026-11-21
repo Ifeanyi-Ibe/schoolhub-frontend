@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { ApiError } from "@/lib/api/unwrap";
 import { createCalendarDay, deleteCalendarDay, type CalendarDay } from "./catalogue-api";
@@ -88,22 +89,13 @@ export function AddCalendarDayDialog({ onOpenChange }: { onOpenChange: (open: bo
           error={fieldError("date")}
           {...form.register("date")}
         />
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="calendar-type" className="text-sm font-medium text-foreground">
-            {t("type")}
-          </label>
-          <select
-            id="calendar-type"
-            className="min-h-11 w-full rounded-control border border-input-border bg-surface px-3 text-base text-foreground"
-            {...form.register("type")}
-          >
-            {CALENDAR_DAY_TYPES.map((c) => (
-              <option key={c} value={c}>
-                {tType(c)}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Select id="calendar-type" label={t("type")} {...form.register("type")}>
+          {CALENDAR_DAY_TYPES.map((c) => (
+            <option key={c} value={c}>
+              {tType(c)}
+            </option>
+          ))}
+        </Select>
         <Input label={t("name")} error={fieldError("name")} {...form.register("name")} />
         {message ? (
           <p role="alert" className="text-sm text-danger-foreground">

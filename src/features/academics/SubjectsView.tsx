@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { lazy, Suspense, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { Card, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
@@ -128,14 +129,11 @@ export function SubjectsView() {
         <CardTitle>{t("mappingTitle")}</CardTitle>
         <p className="mt-1 text-sm text-muted-foreground">{t("mappingIntro")}</p>
         <div className="mt-4 max-w-sm">
-          <label htmlFor="mapping-level" className="text-sm font-medium text-foreground">
-            {t("mappingLevel")}
-          </label>
-          <select
+          <Select
             id="mapping-level"
+            label={t("mappingLevel")}
             value={levelId}
             onChange={(e) => setLevelId(e.target.value)}
-            className="mt-1.5 min-h-11 w-full rounded-control border border-input-border bg-surface px-3 text-base text-foreground"
           >
             <option value="">{t("mappingEmpty")}</option>
             {(levels.data ?? []).map((l) => (
@@ -143,7 +141,7 @@ export function SubjectsView() {
                 {l.name}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         {levelId !== "" ? (
           <Suspense fallback={<SkeletonList rows={3} label={tState("loading")} />}>
