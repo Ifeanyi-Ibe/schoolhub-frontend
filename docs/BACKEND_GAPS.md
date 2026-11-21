@@ -53,6 +53,7 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Impact:** F2 settings screens cannot be typed from the contract. Writing our own types would break the "no hand-written API types" rule.
 - **Design-around:** none without a hand-written type. Hold the settings screens until the contract declares fields.
 - **Status:** Blocking for F2 settings and for B-02's branding fields.
+- **Status:** Resolved for the reads: the swapped spec types the three settings views. The PUT bodies are still untyped (B-28).
 
 ### B-04 — The error body in the contract omits `code`, `traceId` and `errors`
 
@@ -164,7 +165,7 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Observed:** the backend defines three view records with the same name in different modules: `SessionView` (identity device sessions, and academic sessions), `PaymentView`, and `InvoiceView`. The OpenAPI document keeps one schema per name, so `GET, POST /api/v1/sessions` and `PUT /api/v1/sessions/{id}` are documented with the device-session shape (`device`, `ipAddress`, `active`, `current`, `additionalProperties: false`). The backend's academic `SessionView` is `Id, Name, StartsOn, EndsOn, IsCurrent, IsArchived` (`src/SchoolHub.Modules.Academics/Features/Sessions/Sessions.cs`).
 - **Effect:** the generated client types an academic session as a device session. Any screen built on it would be wrong, so the academic sessions screens are blocked. The payment and invoice views (F6) are at risk for the same reason.
 - **Design-around:** none. The frontend does not hand-write the shape from the backend code (CLAUDE.md: types come from the generated client).
-- **Status:** Open, blocking academic sessions (F2) and the fees screens (F6). Ask the backend to give each record a unique schema name (for example `AcademicSessionView`) and to regenerate the document.
+- **Status:** Resolved in the backend (b96a5aa) and in the frontend spec since 2026-11-21: unique schema ids (`AcademicsSessionView`, `IdentitySessionView`, `InvoiceView`, `PaymentView`). The screens use the typed shapes.
 
 | Spec name                                              | Contract                                               |
 | ------------------------------------------------------ | ------------------------------------------------------ |
@@ -195,14 +196,14 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** no field marks a role as immutable, and the feature spec says system roles are "editable permissions only if plan allows custom roles; never deletable". The SchoolAdmin role is not described as immutable.
 - **Effect:** the screen cannot lock SchoolAdmin on a rule of its own, and a built-in role can be changed on the plan that allows custom roles. The UI must not branch on the role name (CLAUDE.md), so it cannot protect SchoolAdmin itself.
 - **Design-around:** none in the UI. The screen offers built-in roles as editable when the plan allows it.
-- **Status:** Backend committed `role.system_immutable` (HEAD 729b182). Verified against a HEAD build on 2026-11-16 (`SchoolAdmin`, id `01a1d89d-86b2-7d0b-8f49-7248126c5caf`, 50 permissions): a no-change write answered 200 and left the permissions unchanged; removing `academics.manage` answered 422 `role.system_immutable`, and the permissions were unchanged afterwards. The frontend spec is not yet swapped; the SchoolAdmin journey is to be re-run after the swap.
+- **Status:** Resolved (verified): the backend's `role.system_immutable` answers a permission removal with 422 and a no-change write with 200 (see the entry above). The contract declares no flag; the UI relies on the API.
 
 ### B-22 — Class level section is a free string in the contract, but an enum on the server
 
 - **Contract:** `LevelRequest.section` and `LevelView.section` are `{"type":"string"}`. The contract lists no allowed values.
 - **Server:** the backend parses `section` as its `ClassSection` enum (`SchoolHub.Modules.Academics/Domain/ClassStructure.cs`): `Creche`, `Nursery`, `Primary`, `JuniorSecondary`, `SeniorSecondary`. Any other text is refused with `academics.invalid` (seen on the real backend with a free-text section).
 - **Design-around:** the class-level screen offers exactly those five values, from `CLASS_SECTIONS` in `src/features/academics/rules.ts`, with a comment pointing here. The real-backend journey creates a level with one of them.
-- **Status:** The backend committed the enum (HEAD 7c179dc, B-22: 35 properties and query parameters are enums). The frontend spec is not swapped until the B-19 renames land. Then remove the constant and generate the options from the contract.
+- **Status:** Resolved: the contract now declares `LevelRequest.section` as an enum. The class-level section options are typed from the contract (`ClassSection` in `src/features/academics/rules.ts`).
 
 ### B-23 — Nullable response properties are declared non-null
 
@@ -224,7 +225,7 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** `SubjectRequest.category`, `SubjectView.category`, `CalendarDayRequest.type` and `CalendarDayView.type` are `{"type":"string"}` with no values listed.
 - **Server:** the backend parses them as enums: `SubjectCategory` (`Core`, `Elective`, `Extra`, `SchoolHub.Modules.Academics/Domain/ClassStructure.cs`) and `CalendarDayType` (`Holiday`, `NonSchoolDay`, `SpecialEvent`, `Domain/CalendarDayType.cs`).
 - **Design-around:** the subject and calendar screens offer exactly those values (`SUBJECT_CATEGORIES`, `CALENDAR_DAY_TYPES` in `src/features/academics/catalogue-rules.ts`), with a comment pointing here. The real-backend journey checks a `SpecialEvent` day is accepted.
-- **Status:** Open. Ask the backend to declare the enums in the contract, as for B-22. Then generate the options from the contract.
+- **Status:** Resolved: the contract now declares `SubjectRequest.category` and `CalendarDayRequest.type` as enums. The options are typed from the contract (`src/features/academics/catalogue-rules.ts`).
 
 ### B-26 — Assessment component weight has no stated meaning
 
@@ -236,4 +237,17 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 
 - **Contract:** `GET /api/v1/sessions` and `POST /api/v1/sessions` answer `SessionView`, which describes a signed-in device (`device`, `ipAddress`, `startedAt`). Academic sessions (the school year, with terms) have no shape of their own in the reviewed spec.
 - **Effect:** the calendar's school-days preview cannot pick a session and term from the typed contract, so it is not built. The academic session and rollover screens are blocked on the same shape.
-- **Status:** Blocked on B-19 in the backend HEAD spec, which gives each shape a unique schema. The spec swap is the step that unblocks this (not done; see OPEN_ITEMS).
+- **Status:** Resolved: `GET /api/v1/sessions` now answers `AcademicsSessionView` (the device list is `/api/v1/me/sessions`, `IdentitySessionView`). The school-days preview and rollover use the typed shapes.
+
+### B-29 — Intermittent database protocol errors under concurrent queries (500 internal.error)
+
+- **Observed:** on the development backend (2026-11-21), the log shows `Npgsql.NpgsqlException: Received backend message BindComplete while expecting ParseCompleteMessage` and `ArgumentOutOfRangeException` while iterating query results on one `AppDbContext`. The same family as B-24 (`reader is closed`). A client sees `500 internal.error`, for example when starting authenticator enrolment (`POST /api/v1/me/mfa/enroll`).
+- **Effect:** intermittent 500s on user search (B-24) and on enrolment. Real-backend journeys that hit them fail at random.
+- **Design-around:** the enrolment start call is retried on a 500 (it has no effect until confirmed). Other calls are not retried.
+- **Status:** Open. Ask the backend to check for concurrent use of one database context or connection within a request (the likely cause for both B-24 and B-29).
+
+### B-28 — School settings PUT request bodies are declared as a bare object
+
+- **Contract:** `PUT /api/v1/settings/school-profile`, `/branding` and `/policies` declare the request body as `{"type":"object"}` with no properties. The reads (`SchoolProfileView`, `BrandingSettingsView`, `PoliciesView`) are typed.
+- **Design-around:** the settings screens send back the full view they read, with the same field names. The real-backend journey writes each view back with its current values (no change) and checks the backend answers 200 and reads the same values. The request type is cast in `src/features/settings/api.ts` and not hand-typed.
+- **Status:** Open. Ask the backend to declare the three request bodies as the view shapes (or the request schemas), so the client can type them.

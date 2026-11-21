@@ -239,3 +239,12 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Real backend:** port 5152 is still held by another backend process (pid 73319, `School-Management` working copy, key does not match `.env.e2e`). The academic journeys and the B-24 search defect cannot be checked until the port is free.
 - **Part 3:** `/people` LCP not started.
 - **Backend gaps logged this round:** B-25 (enum values not in the contract: subject category, calendar type), B-26 (assessment component weight meaning), B-27 (the /sessions shape).
+
+## Open after the round of 2026-11-21 (later)
+
+- **Real backend:** green (33 passed, 3 skipped with reasons). The backend is the `School-Management` working copy (uncommitted changes there); its HEAD has the spec this repo now uses.
+- **Backend defects, open:** B-24 (user search answers 500), B-29 (intermittent database protocol errors; enrolment start is retried in the test helper).
+- **Contract, open:** B-26 (component weight meaning), B-28 (settings PUT bodies untyped; screens send the full view back; the real journey verifies the write).
+- **Parent cap target:** `/home`, `/profile`, `/sessions` 5 to 6 KB over the 160,000 B target. The cap holds.
+- **Part 3 (`/people` LCP):** not started.
+- **Rate-limit journey:** needs the backend started with `scripts/dev-backend.sh --real-limits` and `E2E_REAL_LIMITS=1`; passed once in that mode.
