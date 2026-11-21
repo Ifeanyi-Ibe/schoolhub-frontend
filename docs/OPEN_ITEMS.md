@@ -231,3 +231,11 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Spec swap:** the backend HEAD export is ready (B-19 renames, typed settings). Swap with `npm run api:sync -- --write` once you approve; then settings and sessions can be built.
 - **Not started:** Part 3 (`/people` LCP) and Part 4 (F2 subjects, grading, assessment, calendar; settings and sessions wait for the swap).
 - **Design:** sign-in, home, and the list screens are not restyled yet.
+
+## Open after the round of 2026-11-21
+
+- **Full gate, size step:** `/home` 165,393 B over its ratchet ceiling 164,370 B; staff routes over their ceilings (see PROGRESS). Decision needed: accept and record new ceilings, or cut the code. Not loosened here.
+- **Spec swap (needed for settings, sessions, rollover, school-days preview):** approve `npm run api:sync -- --write`. The backend HEAD export has the B-19 renames and typed settings. The write was denied by the auto-mode classifier in this session; it has not been retried.
+- **Real backend:** port 5152 is still held by another backend process (pid 73319, `School-Management` working copy, key does not match `.env.e2e`). The academic journeys and the B-24 search defect cannot be checked until the port is free.
+- **Part 3:** `/people` LCP not started.
+- **Backend gaps logged this round:** B-25 (enum values not in the contract: subject category, calendar type), B-26 (assessment component weight meaning), B-27 (the /sessions shape).

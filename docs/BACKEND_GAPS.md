@@ -218,3 +218,22 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Effect:** the people screen's search box fails on the real backend. The fake API used by the browser tests answers search, so the defect is only visible in the real-backend suite. The suite pages through the list instead of searching.
 - **Design-around:** the real-backend journey pages through the list ("Next page") to find its account. No journey searches.
 - **Status:** Open. Ask the backend to fix the query (a likely concurrent use of one database context for the results and the count).
+
+### B-25 — Subject category and calendar day type are free strings in the contract, enums on the server
+
+- **Contract:** `SubjectRequest.category`, `SubjectView.category`, `CalendarDayRequest.type` and `CalendarDayView.type` are `{"type":"string"}` with no values listed.
+- **Server:** the backend parses them as enums: `SubjectCategory` (`Core`, `Elective`, `Extra`, `SchoolHub.Modules.Academics/Domain/ClassStructure.cs`) and `CalendarDayType` (`Holiday`, `NonSchoolDay`, `SpecialEvent`, `Domain/CalendarDayType.cs`).
+- **Design-around:** the subject and calendar screens offer exactly those values (`SUBJECT_CATEGORIES`, `CALENDAR_DAY_TYPES` in `src/features/academics/catalogue-rules.ts`), with a comment pointing here. The real-backend journey checks a `SpecialEvent` day is accepted.
+- **Status:** Open. Ask the backend to declare the enums in the contract, as for B-22. Then generate the options from the contract.
+
+### B-26 — Assessment component weight has no stated meaning
+
+- **Contract:** `ComponentRequest.weight` is an integer 0 to 100 (the backend validates that range) with no description.
+- **Design-around:** the screen sends the component's maximum score as its weight, so the weights add up to the same 100 as the maximum scores. A different meaning would change the saved value.
+- **Status:** Open. Ask the backend to document what `weight` means and whether it must total 100.
+
+### B-27 — The `/sessions` shape in the contract is the device-session shape
+
+- **Contract:** `GET /api/v1/sessions` and `POST /api/v1/sessions` answer `SessionView`, which describes a signed-in device (`device`, `ipAddress`, `startedAt`). Academic sessions (the school year, with terms) have no shape of their own in the reviewed spec.
+- **Effect:** the calendar's school-days preview cannot pick a session and term from the typed contract, so it is not built. The academic session and rollover screens are blocked on the same shape.
+- **Status:** Blocked on B-19 in the backend HEAD spec, which gives each shape a unique schema. The spec swap is the step that unblocks this (not done; see OPEN_ITEMS).
