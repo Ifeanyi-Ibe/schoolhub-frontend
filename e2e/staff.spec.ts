@@ -65,6 +65,22 @@ test.describe("people and roles for an administrator", () => {
     expect(html).toContain("Tunde Bello");
   });
 
+  test("with JavaScript off, the server HTML shows the people screen's content (the first paint needs no script)", async ({
+    browser,
+  }, info) => {
+    test.skip(info.project.name !== "mobile-360", "one viewport");
+    const context = await browser.newContext({
+      javaScriptEnabled: false,
+      viewport: { width: 360, height: 780 },
+    });
+    await signInAs(context, "admin");
+    const page = await context.newPage();
+    await page.goto("/people", { waitUntil: "load" });
+    await expect(page.getByText("Staff accounts for this school")).toBeVisible();
+    await expect(page.locator("td", { hasText: "Ada Okafor" })).toBeVisible();
+    await context.close();
+  });
+
   test("the search is in the URL, so the filtered list can be shared and the empty state is clear", async ({
     page,
   }) => {

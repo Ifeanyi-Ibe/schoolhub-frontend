@@ -72,3 +72,17 @@ export async function prefetchSignedIn(reads: readonly PrefetchRead[]): Promise<
   );
   return dehydrate(client);
 }
+
+/**
+ * The data of one prefetched query, for a Server Component to pass to a client component as a prop. Using
+ * it as initialData renders the content in the server HTML (the cache alone did not; see docs/OPEN_ITEMS.md,
+ * the LCP investigation).
+ */
+export function prefetchedData<T>(
+  state: DehydratedState,
+  queryKey: readonly unknown[],
+): T | undefined {
+  const wanted = JSON.stringify(queryKey);
+  const hit = state.queries.find((q) => JSON.stringify(q.queryKey) === wanted);
+  return hit?.state.data as T | undefined;
+}

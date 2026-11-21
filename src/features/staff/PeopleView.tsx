@@ -34,13 +34,20 @@ type Person = components["schemas"]["UserView"];
  * Staff accounts. The search and page live in the URL, so a filtered view can be bookmarked and the
  * back button returns to the same page. Permission is read from GET /me; nothing checks role names.
  */
-export function PeopleView() {
+export function PeopleView({
+  initialMe,
+  initialList,
+}: {
+  /** Server-read data (see the people page): rendered in the server HTML, then kept current by the cache. */
+  initialMe?: components["schemas"]["MeView"] | undefined;
+  initialList?: components["schemas"]["PagedResultOfUserView"] | undefined;
+} = {}) {
   const t = useTranslations("staff.people");
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
   const readOnly = useReadOnly();
-  const me = useQuery(meQuery);
+  const me = useQuery({ ...meQuery, initialData: initialMe });
   const state = parsePeopleQuery(params);
   const [draft, setDraft] = useState(state.q);
   const [inviting, setInviting] = useState(false);
@@ -51,7 +58,7 @@ export function PeopleView() {
     holdsAny(me.data.permissions, [PERMISSION.inviteUsers, PERMISSION.manageUsers]);
   const canInvite =
     me.data !== undefined && holdsAny(me.data.permissions, [PERMISSION.inviteUsers]);
-  const people = useQuery({ ...peopleQuery(state), enabled: canSee });
+  const people = useQuery({ ...peopleQuery(state), enabled: canSee, initialData: initialList });
   const canAssign =
     me.data !== undefined && holdsAny(me.data.permissions, [PERMISSION.assignRoles]);
   const roleList = useQuery({ ...rolesQuery, enabled: canAssign });

@@ -6,7 +6,8 @@ import { PeopleView } from "@/features/staff/PeopleView";
 import { peopleQuery } from "@/features/staff/api";
 import { parsePeopleQuery } from "@/features/staff/rules";
 import { meQuery, tenantQuery } from "@/features/shell/api";
-import { prefetchSignedIn } from "@/server/prefetch";
+import { prefetchedData, prefetchSignedIn } from "@/server/prefetch";
+import type { components } from "@/lib/api/schema";
 
 export default async function PeoplePage({
   searchParams,
@@ -27,9 +28,17 @@ export default async function PeoplePage({
       query: { ...(state.q !== "" ? { q: state.q } : {}), page: state.page, pageSize: 20 },
     },
   ]);
+  // The account and the first page are passed as props too, so the server HTML holds the content (not only the
+  // serialized cache). The cache keeps them current after hydration.
   return (
     <HydrationBoundary state={dehydrated}>
-      <PeopleView />
+      <PeopleView
+        initialMe={prefetchedData<components["schemas"]["MeView"]>(dehydrated, meQuery.queryKey)}
+        initialList={prefetchedData<components["schemas"]["PagedResultOfUserView"]>(
+          dehydrated,
+          list.queryKey,
+        )}
+      />
     </HydrationBoundary>
   );
 }
