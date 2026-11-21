@@ -3,6 +3,7 @@
 // It records the headers it receives so tests can assert what the BFF forwards.
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
+import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { contractProblems, violations } from "./contract.ts";
@@ -391,7 +392,9 @@ export function startFakeApi(): Promise<Server> {
     received.set(path + url.search, headerSnapshot(req));
     const bodyText = req.method === "GET" ? "" : await readBody(req);
     // Like the real API: a body without a JSON content type is refused (415). Keeps the BFF honest.
-    if (bodyText && !String(req.headers["content-type"] ?? "").includes("json")) {
+    // A file's bytes (PUT .../content) are raw, not JSON: they are not parsed.
+    const rawUpload = req.method === "PUT" && /\/api\/v1\/files\/[^/]+\/content$/.test(path);
+    if (bodyText && !rawUpload && !String(req.headers["content-type"] ?? "").includes("json")) {
       return send(res, 415, problem("request.unsupported_media_type", "Unsupported media type"));
     }
     // Every API request must match the contract. A mismatch is recorded and fails the run (global
@@ -411,7 +414,15 @@ export function startFakeApi(): Promise<Server> {
         return send(res, 500, problem("contract.violation", problems.join("; ")));
       }
     }
-    const body = (bodyText ? JSON.parse(bodyText) : {}) as Record<string, string | undefined>;
+    let parsed: unknown = {};
+    if (bodyText && !rawUpload) {
+      try {
+        parsed = JSON.parse(bodyText);
+      } catch {
+        parsed = {};
+      }
+    }
+    const body = parsed as Record<string, string | undefined>;
     const label = labelOf(req.headers.authorization);
     const tenantHeader = (req.headers["x-tenant"] as string | undefined) ?? TENANT;
 
@@ -566,6 +577,19 @@ export function startFakeApi(): Promise<Server> {
     const writesBlocked = label === "suspended" && req.method !== "GET";
     if (writesBlocked) return send(res, 402, problem("billing.suspended", "Account suspended"));
 
+    // Students: records, guardians, documents, notes, files, bulk import and promotions.
+    if (
+      handleStudents({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+      })
+    )
+      return;
+
     if (path === "/api/v1/me") {
       return send(res, 200, {
         id: "00000000-0000-4000-8000-000000000001",
@@ -593,6 +617,16 @@ export function startFakeApi(): Promise<Server> {
                 "academics.read",
                 "academics.manage",
                 "settings.manage",
+                "students.read",
+                "students.write",
+                "students.sensitive.read",
+                "students.delete",
+                "students.notes.read",
+                "students.notes.write",
+                "students.duplicates.override",
+                "students.lifecycle.manage",
+                "students.import.run",
+                "promotions.manage",
               ]
             : ["me.profile"],
       });

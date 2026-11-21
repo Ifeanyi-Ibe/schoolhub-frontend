@@ -140,7 +140,7 @@ test.describe("BFF", () => {
     // A unique probe per run: other tests post to the same path.
     const probe = `probe-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const res = await request.post(`/api/bff/api/v1/students?probe=${probe}`, {
-      data: validStudent(),
+      data: validStudent({ lastName: `Probe${probe.slice(-12)}` }),
       headers: {
         ...CSRF,
         ...ORIGIN,
@@ -149,7 +149,10 @@ test.describe("BFF", () => {
       },
     });
     expect(res.status()).toBe(201);
-    expect(await res.json()).toMatchObject({ created: true, echo: { firstName: "Ada" } });
+    expect(await res.json()).toMatchObject({
+      capacityWarning: false,
+      student: { firstName: "Ada" },
+    });
     const seen = await (
       await request.get(
         `${FAKE_API_URL}/__received?path=${encodeURIComponent(`/api/v1/students?probe=${probe}`)}`,

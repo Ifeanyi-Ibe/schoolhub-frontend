@@ -87,7 +87,10 @@ export function contractProblems(
 
   const body = op.requestBody;
   if (!body) {
-    if (bodyText) problems.push("body sent to an operation with no request body");
+    // BACKEND_GAPS B-30: the file-content step carries the raw file, which the contract does not declare. The
+    // only exception: a PUT of a file's bytes to /api/v1/files/{id}/content, with any content type.
+    const rawFileBytes = method === "PUT" && /^\/api\/v1\/files\/[^/]+\/content$/.test(pathname);
+    if (bodyText && !rawFileBytes) problems.push("body sent to an operation with no request body");
     return problems;
   }
   if (!bodyText) {
