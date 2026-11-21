@@ -1,6 +1,7 @@
 import type { IconComponent } from "@/components/ui/icons";
 import {
   AcademicIcon,
+  BookIcon,
   DevicesIcon,
   HomeIcon,
   PeopleIcon,
@@ -26,6 +27,13 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { id: "home", icon: HomeIcon, href: "/home", labelKey: "shell.nav.home" },
   { id: "profile", icon: UserIcon, href: "/profile", labelKey: "shell.nav.profile" },
   { id: "sessions", icon: DevicesIcon, href: "/sessions", labelKey: "shell.nav.sessions" },
+  {
+    id: "students",
+    href: "/students",
+    labelKey: "shell.nav.students",
+    icon: BookIcon,
+    anyOf: ["students.read"],
+  },
   {
     id: "people",
     icon: PeopleIcon,

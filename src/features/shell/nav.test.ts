@@ -32,6 +32,7 @@ describe("visibleNav", () => {
         "/roles",
         "/academics/levels",
         "/settings",
+        "/students",
       ]).toContain(item.href);
   });
 });
