@@ -50,7 +50,8 @@ test.describe("class levels for an administrator", () => {
   });
 
   test("a new level is saved and appears in the list", async ({ page }) => {
-    const name = "Junior Secondary " + Math.random().toString(36).slice(2, 8);
+    // A unique name that cannot contain the seeded "Junior Secondary 1" (a random suffix could start with 1).
+    const name = "Trial level " + Math.random().toString(36).slice(2, 8);
     await page.goto("/academics/levels");
     await page.getByRole("button", { name: "Add a level" }).click();
     const dialog = page.getByRole("dialog", { name: "Add a class level" });
