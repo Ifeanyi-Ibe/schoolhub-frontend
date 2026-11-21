@@ -248,3 +248,8 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Parent cap target:** `/home`, `/profile`, `/sessions` 5 to 6 KB over the 160,000 B target. The cap holds.
 - **Part 3 (`/people` LCP):** not started.
 - **Rate-limit journey:** needs the backend started with `scripts/dev-backend.sh --real-limits` and `E2E_REAL_LIMITS=1`; passed once in that mode.
+
+## Part 3 (`/people` LCP): done
+
+- Root cause and fix: ADR 0014. `/people` LCP median 0.76 s (was 3.2 to 3.8 s), performance 90, accessibility 100.
+- Same gap on other signed-in screens (JavaScript-off check): `/home`, `/academics/levels`, `/settings`, and by the same pattern `/roles`, the academic setup screens, `/sessions`, `/profile`. Each needs its prefetched data passed as props. Not done.
