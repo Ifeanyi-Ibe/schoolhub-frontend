@@ -74,6 +74,18 @@
         },
         "/students/promotions": {
           "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
+        },
+        "/staff": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
+        },
+        "/staff/new": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
+        },
+        "/staff/0190a6c2-0000-7000-8000-000000000a01": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
+        },
+        "/my-classes": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
         }
       },
       "maxRouteSpecificGzipBytes": 40960,
