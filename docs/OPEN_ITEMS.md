@@ -259,3 +259,10 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **F3 gaps:** B-30 (file-content step has no declared request body), B-31 (no If-Match on student operations), B-32 (student views carry arm ids, not names), B-33 (job status and promotion outcomes are free strings). Each is designed around (see ADR 0015).
 - **F3 not verified:** promotion commit against the real backend (the journey stops at the preview, so no data changes); WebKit and Firefox runs for the students journeys.
 - **Carried over:** B-24 (user search 500), B-26 (component weight meaning), B-28 (settings PUT bodies untyped), B-29 (intermittent database protocol errors), parent `/home`, `/profile`, `/sessions` 5 to 6 KB over the 160,000 B target (cap holds), and the server-content gap on the other signed-in screens (Part 3 notes).
+
+## Open after F4 (2026-11-21)
+
+- **F4 gaps:** B-34 (staff `If-Match` described but not declared; also B-31 for students), B-35 (no `Idempotency-Key` on staff creates and actions; buttons are disabled while pending), B-36 (staff and leave status are free strings; the target status of deactivation is not stated), B-37 (assignment and teacher views carry ids, not names). Each is designed around (ADR 0016).
+- **F4 not verified:** Firefox and WebKit runs for the staff journeys; a real check that a deactivated member is refused at sign-in (the backend's behaviour is not in the contract).
+- **Real-backend data:** every real run leaves its accounts behind (131 accounts now). The people-list journey pages through them, so it is slower each run. The removal of that growth needs a backend cleanup or a filter (see B-24: the search answers 500).
+- **Carried over:** B-24, B-26, B-28, B-29 (intermittent database errors on login; once seen in the admin lock journey, not reproduced after), the parent 5 to 6 KB over target (the cap holds), and the server-content gap on the other signed-in screens.

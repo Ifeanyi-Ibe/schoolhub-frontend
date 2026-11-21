@@ -275,3 +275,27 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** `ImportJobView.status` is `{"type":"string"}` (the server's values are Queued, Validating, Validated, CommitQueued, Committing, Completed, Failed). `PromotionRequest.outcomes` has no item type.
 - **Design-around:** the screens use the server's values as listed in `src/features/students/rules.ts` (IMPORT_WORKING, IMPORT_FINISHED). Promotion outcomes are sent as null (the server decides).
 - **Status:** Open. Declare the status enum and the outcome items, as for B-22 and B-25.
+
+### B-34 — The staff update says If-Match carries the rowVersion, but declares no header
+
+- **Contract:** `PUT /api/v1/staff/{id}` has the summary "Replace a staff record's details (If-Match carries the rowVersion from the last read)", and `StaffView.rowVersion` exists. No operation declares an `If-Match` parameter. The same is true of `PATCH /api/v1/students/{id}` (B-31).
+- **Design-around:** no `If-Match` is sent (`writePolicyHeaders` follows the declared parameters). Two people saving the same record: the later save wins, and the screen shows the server's state after the save.
+- **Status:** Open. Declare `If-Match` on the staff and student updates, as the summaries already say (see also B-05, B-31).
+
+### B-35 — Staff writes declare no Idempotency-Key
+
+- **Contract:** `POST /api/v1/staff`, `POST /api/v1/staff/{id}/leave`, `POST /api/v1/staff/{id}/invite-user`, and the deactivate and reactivate operations declare no `Idempotency-Key`. Other creates in the contract do (for example student registration).
+- **Design-around:** each button is disabled while its request is pending, so a double click sends one request. A retry after a dropped connection can still create a second record or leave request; the screens do not retry these writes.
+- **Status:** Open. Declare `Idempotency-Key` on these creates and actions, so a retry is safe.
+
+### B-36 — Staff and leave status values are free strings, and deactivation has no status mapping
+
+- **Contract:** `StaffView.status` and `StaffListItem.status` are `string` (the list filter declares Active, OnLeave, Resigned, Terminated). `LeaveView.status` is a `string` with no values. `POST /api/v1/staff/{id}/deactivate` answers a `StaffView` but the contract does not say which status it sets.
+- **Design-around:** a leave request is pending until `decidedAt` is set; the status text is shown but not used to decide anything. Both deactivate and reactivate stay available; the API decides whether the action applies.
+- **Status:** Open. Declare the status enums for `StaffView` and `LeaveView`, and state the status each action sets.
+
+### B-37 — Assignment and teacher views carry ids, not names
+
+- **Contract:** `AssignmentView`, `ArmTeacherView` and `MyAssignmentsView` carry `classArmId` and `subjectId` (ids). `ArmTeacherView` carries `fullName` and `staffNo` but no class or subject name.
+- **Design-around:** the assignments panel and "My classes" look names up in the academic setup (`useArmOptions`, `subjectsQuery`), which needs `academics.read`. Without it an arm shows as "A class arm" and a subject as "A subject".
+- **Status:** Open. Add the arm and subject names to these views (see also B-32).
