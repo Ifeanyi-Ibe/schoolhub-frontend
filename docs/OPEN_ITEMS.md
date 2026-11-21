@@ -253,3 +253,9 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 
 - Root cause and fix: ADR 0014. `/people` LCP median 0.76 s (was 3.2 to 3.8 s), performance 90, accessibility 100.
 - Same gap on other signed-in screens (JavaScript-off check): `/home`, `/academics/levels`, `/settings`, and by the same pattern `/roles`, the academic setup screens, `/sessions`, `/profile`. Each needs its prefetched data passed as props. Not done.
+
+## Open after F3 (2026-11-21)
+
+- **F3 gaps:** B-30 (file-content step has no declared request body), B-31 (no If-Match on student operations), B-32 (student views carry arm ids, not names), B-33 (job status and promotion outcomes are free strings). Each is designed around (see ADR 0015).
+- **F3 not verified:** promotion commit against the real backend (the journey stops at the preview, so no data changes); WebKit and Firefox runs for the students journeys.
+- **Carried over:** B-24 (user search 500), B-26 (component weight meaning), B-28 (settings PUT bodies untyped), B-29 (intermittent database protocol errors), parent `/home`, `/profile`, `/sessions` 5 to 6 KB over the 160,000 B target (cap holds), and the server-content gap on the other signed-in screens (Part 3 notes).

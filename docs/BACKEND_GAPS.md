@@ -251,3 +251,27 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** `PUT /api/v1/settings/school-profile`, `/branding` and `/policies` declare the request body as `{"type":"object"}` with no properties. The reads (`SchoolProfileView`, `BrandingSettingsView`, `PoliciesView`) are typed.
 - **Design-around:** the settings screens send back the full view they read, with the same field names. The real-backend journey writes each view back with its current values (no change) and checks the backend answers 200 and reads the same values. The request type is cast in `src/features/settings/api.ts` and not hand-typed.
 - **Status:** Open. Ask the backend to declare the three request bodies as the view shapes (or the request schemas), so the client can type them.
+
+### B-30 — The file-content step has no declared request body
+
+- **Contract:** `PUT /api/v1/files/{id}/content` declares no request body, but the step sends the file's bytes (the `uploadUrl` from `presign-upload`, with the file's own content type). The response is 204.
+- **Design-around:** the bytes are sent through the BFF with the file's content type and not hand-typed. The test double allows this one operation to carry a raw body (`e2e/contract.ts`).
+- **Status:** Open. Declare the request body (`application/octet-stream` or the file's types) so the upload is typed.
+
+### B-31 — No student operation declares If-Match
+
+- **Contract:** no student, guardian or document operation declares `If-Match`, although `StudentView.rowVersion` exists.
+- **Design-around:** no `If-Match` is sent. Edits show the server's state after each save; concurrent edits are not detected in the UI.
+- **Status:** Open. Declare `If-Match` on student and guardian updates (see also B-05).
+
+### B-32 — Student records carry class arm ids, not names
+
+- **Contract:** `StudentListItem.currentClassArmId` and `StudentView.currentClassArmId` are ids. The list cannot filter by class arm by name, and a profile cannot show the arm's name.
+- **Design-around:** the arm is not shown on the list or the profile; the transfer and reinstatement pickers show level and arm names from the academic setup.
+- **Status:** Open. Add the arm's name (and level name) to these views.
+
+### B-33 — Import job status and the promotion outcomes are free strings
+
+- **Contract:** `ImportJobView.status` is `{"type":"string"}` (the server's values are Queued, Validating, Validated, CommitQueued, Committing, Completed, Failed). `PromotionRequest.outcomes` has no item type.
+- **Design-around:** the screens use the server's values as listed in `src/features/students/rules.ts` (IMPORT_WORKING, IMPORT_FINISHED). Promotion outcomes are sent as null (the server decides).
+- **Status:** Open. Declare the status enum and the outcome items, as for B-22 and B-25.
