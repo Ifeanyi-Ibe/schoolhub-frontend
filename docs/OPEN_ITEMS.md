@@ -282,7 +282,7 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 
 ## Open after F6, staff side (2026-11-21)
 
-- **F6 parent slice:** not started. Wards switcher, invoices per ward, pay by card (initialise, redirect to the gateway's authorisation URL, verify on return: a payment is never shown as paid from the redirect alone), bank-transfer details with copy buttons, and receipts. It needs the server-rendered parent route and the light formatter (ADR 0013).
+- **F6 parent slice:** built (see PROGRESS, F6 parent slice). Open follow-ups: the bank-transfer account details (B-44) and a list of the parent's payments with receipts (B-45).
 - **F6 checkpoint:** the money-flow review is pending on the staff side.
-- **Contract gaps:** B-41 (statuses free text), B-42 (no grants list), B-43 (synchronous invoice generation), and B-17 (statement, virtual accounts, payment plans, daily close).
+- **Contract gaps:** B-41 (statuses free text), B-42 (no grants list), B-43 (synchronous invoice generation), B-44 (no bank details for transfers), B-45 (no list of a parent's payments), and B-17 (statement, virtual accounts, payment plans, daily close).
 - **Not verified:** Firefox and WebKit runs for the fee journeys; the gateway flow (not in the test double yet).

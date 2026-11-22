@@ -1,5 +1,5 @@
 {
-  "/login": 163953,
+  "/login": 163807,
   "/home": 167060,
   "/profile": 167565,
   "/sessions": 167734,
@@ -24,5 +24,12 @@
   "/my-classes": 192168,
   "/attendance": 193784,
   "/attendance/register": 200271,
-  "/attendance/reports": 198217
+  "/attendance/reports": 198217,
+  "/wards": 171302,
+  "/wards/0190a6c2-0000-7000-8000-000000000e01": 173927,
+  "/fees": 197431,
+  "/fees/setup": 197060,
+  "/fees/invoices": 197752,
+  "/fees/payments": 197074,
+  "/fees/ledger": 194706
 }
