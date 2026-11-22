@@ -44,7 +44,12 @@ export function AppShell({
 
   const sessionEnded = me.error instanceof ApiError && me.error.problem.status === 401;
   useEffect(() => {
-    if (sessionEnded) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+    if (!sessionEnded) return;
+    // The session ended: the device keeps no attendance records (ADR 0017, shared phones).
+    void import("@/features/attendance/offline/db")
+      .then((m) => m.wipeAttendanceStore())
+      .catch(() => undefined);
+    router.replace(`/login?next=${encodeURIComponent(pathname)}`);
   }, [sessionEnded, pathname, router]);
 
   const readOnly = billingSuspended || Boolean(tenant.data?.suspended);
@@ -56,6 +61,14 @@ export function AppShell({
     : null;
 
   async function onSignOut() {
+    // Marks that are not yet sent would be deleted with the device's records: say so, and let the teacher decide.
+    const pending = await import("@/features/attendance/offline/db")
+      .then(async (m) => (await m.attendanceDb()).queue.count())
+      .catch(() => 0);
+    if (pending > 0 && !window.confirm(t("signOutUnsynced", { count: pending }))) return;
+    await import("@/features/attendance/offline/db")
+      .then((m) => m.wipeAttendanceStore())
+      .catch(() => undefined);
     await signOut({ queryClient }).catch(() => undefined);
     router.replace("/login?signedOut=1");
   }

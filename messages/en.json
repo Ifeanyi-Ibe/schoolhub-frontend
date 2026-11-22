@@ -182,7 +182,8 @@
       "settings": "Settings",
       "students": "Students",
       "staff": "Staff",
-      "my-classes": "My classes"
+      "my-classes": "My classes",
+      "attendance": "Attendance"
     },
     "billingTitle": "Read-only: this school's account is suspended",
     "billingBody": "You can view information, but changes are turned off. Ask your school administrator to restore the account.",
@@ -190,7 +191,8 @@
     "pastDueBody": "Full access continues for now. Ask your school administrator about the balance.",
     "sessionEnded": "Your session has ended. Please sign in again.",
     "loading": "Loading your account…",
-    "loadFailed": "We could not load your account. Please try again."
+    "loadFailed": "We could not load your account. Please try again.",
+    "signOutUnsynced": "{count, plural, one {One attendance mark on this device has not been sent.} other {# attendance marks on this device have not been sent.}} Signing out deletes them from this device. Sign out anyway?"
   },
   "home": {
     "welcome": "Welcome, {name}",
@@ -1303,6 +1305,118 @@
       "intro": "Your class arms and subjects for the session you choose.",
       "emptyTitle": "No assignments in this session",
       "emptyBody": "Your administrator assigns classes and subjects. Ask them if something is missing."
+    }
+  },
+  "attendance": {
+    "title": "Attendance",
+    "noAccessTitle": "You cannot take attendance",
+    "noAccessBody": "Ask an administrator for the attendance permission if you need this area.",
+    "status": {
+      "Present": "Present",
+      "Absent": "Absent",
+      "Late": "Late",
+      "Excused": "Excused"
+    },
+    "home": {
+      "title": "Attendance",
+      "intro": "Take the register for each of your classes, check the days, and see who was absent.",
+      "reports": "Reports",
+      "date": "Date",
+      "takeRegister": "Take register",
+      "armFallback": "A class arm",
+      "noClassesTitle": "No classes assigned",
+      "noClassesBody": "Your administrator assigns your classes. Attendance appears here once they are."
+    },
+    "register": {
+      "title": "Register: {arm}",
+      "intro": "Register for {date}. Mark each student Present, Absent, Late or Excused.",
+      "backToHome": "Back to attendance",
+      "armFallback": "this class",
+      "list": "Students",
+      "studentN": "Student {n}",
+      "statusFor": "Status for {student}",
+      "arrival": "Arrival time",
+      "arrivalHint": "24-hour time, such as 08:35.",
+      "save": "Save on this device",
+      "saved": "Register saved on this device.",
+      "savedOffline": "Saved on this device. It will be sent when you are back online.",
+      "nothingToSave": "Mark at least one student before saving.",
+      "notSchoolDay": "This is not a school day. The server refuses marks on a non-school day unless an administrator allows them.",
+      "locked": "This register is locked. Reopening it needs the edit-past permission and a reason.",
+      "sessionStatus": "Register status: {status}",
+      "offlineNote": "You are offline. Marks are saved on this device and sent when you are back online. Names are not stored on the device, so rows show their order.",
+      "offlineNoRegisterTitle": "This register is not on this device",
+      "offlineNoRegisterBody": "Open this register once while you are online. After that you can mark it offline.",
+      "chooseTitle": "Choose a class and a date",
+      "chooseBody": "Pick a class from Attendance to take its register."
+    },
+    "submit": {
+      "action": "Submit register",
+      "done": "Register submitted. {alerts, plural, =0 {No absence alerts were raised.} one {One absence alert was raised.} other {# absence alerts were raised.}}",
+      "already": "This register was already submitted.",
+      "syncFirst": "Send the marks on this device before submitting. Refused rows need a decision first.",
+      "incomplete": "Mark every student before you submit. Save progress on this device at any time."
+    },
+    "refused": {
+      "title": "Marks the server did not accept",
+      "body": "These marks are kept on this device until you resend or discard them. Nothing is dropped silently.",
+      "row": "{student}: {reason}",
+      "whole": "The whole save was refused ({code}).",
+      "resend": "Resend",
+      "discard": "Discard these marks"
+    },
+    "sync": {
+      "online": "Online",
+      "offline": "Offline",
+      "pending": "{count, plural, one {# mark waiting to be sent} other {# marks waiting to be sent}}",
+      "unsynced": "{count, plural, one {# mark on this device is not yet sent.} other {# marks on this device are not yet sent.}}",
+      "now": "Sync now",
+      "summary": "Sent: {applied} saved, {ignored} already newer on the server, {refused} need attention.",
+      "offlineStill": "Still offline or the server did not answer. The marks stay on this device.",
+      "serverBusy": "The server is busy. The marks stay on this device and will be sent again.",
+      "sessionEnded": "Your session ended. The marks stay on this device until you sign in again.",
+      "storeNotReady": "The device's attendance store is still opening. Try again in a moment; nothing was lost."
+    },
+    "reopen": {
+      "action": "Reopen register",
+      "title": "Reopen this register",
+      "body": "Reopening is recorded in the audit trail with your reason.",
+      "reason": "Reason for reopening",
+      "reasonRequired": "Give a reason for reopening this register.",
+      "confirm": "Reopen register"
+    },
+    "reports": {
+      "title": "Attendance reports",
+      "intro": "Reports for your own classes.",
+      "class": "Class",
+      "section": "Report",
+      "sections": {
+        "absentees": "Absentees",
+        "classSummary": "Class summary",
+        "termSummary": "Term summary"
+      },
+      "day": "Day",
+      "from": "From",
+      "to": "To",
+      "term": "Term",
+      "rangeOrder": "The end date cannot be before the start date.",
+      "name": "Name",
+      "admission": "Admission number",
+      "period": "Period",
+      "daily": "Daily",
+      "note": "Note",
+      "date": "Date",
+      "unmarked": "Unmarked",
+      "rate": "Attendance rate",
+      "noAbsenteesTitle": "No absentees on this day",
+      "noAbsenteesBody": "Every marked student was present, late or excused, or the register is not yet taken.",
+      "export": "Download spreadsheet",
+      "exportFailed": "The spreadsheet could not be downloaded. Try again."
+    },
+    "errors": {
+      "statusRequired": "Mark every student before saving.",
+      "arrivalOnlyWhenLate": "An arrival time is only for a late student.",
+      "arrivalFormat": "Enter the arrival time as HH:MM, such as 08:35."
     }
   }
 }

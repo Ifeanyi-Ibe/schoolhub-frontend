@@ -35,6 +35,7 @@ describe("visibleNav", () => {
         "/students",
         "/staff",
         "/my-classes",
+        "/attendance",
       ]).toContain(item.href);
   });
 });

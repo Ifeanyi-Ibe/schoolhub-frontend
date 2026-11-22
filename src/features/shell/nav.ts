@@ -3,6 +3,7 @@ import {
   AcademicIcon,
   BookIcon,
   BriefcaseIcon,
+  CalendarIcon,
   DevicesIcon,
   HomeIcon,
   PeopleIcon,
@@ -34,6 +35,13 @@ export const NAV_ITEMS: readonly NavItem[] = [
     labelKey: "shell.nav.students",
     icon: BookIcon,
     anyOf: ["students.read"],
+  },
+  {
+    id: "attendance",
+    href: "/attendance",
+    labelKey: "shell.nav.attendance",
+    icon: CalendarIcon,
+    anyOf: ["attendance.mark"],
   },
   {
     id: "staff",
