@@ -119,10 +119,19 @@ export async function openSheet(key: SheetKey, idempotencyKey: string): Promise<
   );
 }
 
-/** Saves the changed cells. The answer says how many were applied, ignored and rejected, and why. */
+/**
+ * Saves the changed cells. The answer says how many were applied, ignored and rejected, and why. A cell saved from the
+ * device's queue carries the time it was entered, and the server keeps the newer value (ADR 0023).
+ */
 export async function saveScores(
   sheetId: string,
-  rows: Array<{ studentId: string; componentId: string; score: string | null; absent: boolean }>,
+  rows: Array<{
+    studentId: string;
+    componentId: string;
+    score: string | null;
+    absent: boolean;
+    clientUpdatedAt?: string | null;
+  }>,
   idempotencyKey: string,
 ): Promise<RecordScoresOutcome> {
   writePolicyHeaders({
@@ -139,7 +148,7 @@ export async function saveScores(
           componentId: r.componentId,
           score: r.score,
           absent: r.absent,
-          clientUpdatedAt: null,
+          clientUpdatedAt: r.clientUpdatedAt ?? null,
         })),
       },
     }),

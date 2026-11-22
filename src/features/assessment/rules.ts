@@ -113,3 +113,60 @@ export function reopenReasonProblem(text: string): string | null {
   if (s.length > 300) return "tooLong";
   return null;
 }
+
+/** The key a sheet is queued and cached under: term, class arm and subject (ADR 0023). */
+export function sheetKeyOf(key: { termId: string; classArmId: string; subjectId: string }): string {
+  return `${key.termId}|${key.classArmId}|${key.subjectId}`;
+}
+
+/**
+ * What the server said about one row. The backend has written results with different capitals ("Applied",
+ * "IgnoredNewerExists"), so the first word is compared in lower case. Anything else is a refusal the teacher must see.
+ */
+export function scoreRowKind(result: string): "applied" | "ignored" | "refused" {
+  const word = result.toLowerCase();
+  if (word.startsWith("applied")) return "applied";
+  if (word.startsWith("ignored")) return "ignored";
+  return "refused";
+}
+
+/** Lays queued cells over a draft, in the order they were queued, so the screen shows what is still on this device. */
+export function overlayRows(
+  draft: ScoreDraft,
+  rows: ReadonlyArray<{
+    studentId: string;
+    componentId: string;
+    score: string | null;
+    absent: boolean;
+  }>,
+): ScoreDraft {
+  const next = new Map(draft);
+  for (const r of rows) {
+    next.set(cellKey(r.studentId, r.componentId), { score: r.score ?? "", absent: r.absent });
+  }
+  return next;
+}
+
+/**
+ * The cells that differ from a base draft: the server's values with the cells still queued on this device laid over them.
+ * Only these are sent or queued, so a cell is never sent twice.
+ */
+export function changedAgainst(
+  base: ScoreDraft,
+  draft: ScoreDraft,
+): Array<{ studentId: string; componentId: string; score: string | null; absent: boolean }> {
+  const out: Array<{
+    studentId: string;
+    componentId: string;
+    score: string | null;
+    absent: boolean;
+  }> = [];
+  for (const [key, cell] of draft) {
+    const before = base.get(key) ?? { score: "", absent: false };
+    if (before.score === cell.score.trim() && before.absent === cell.absent) continue;
+    const [studentId = "", componentId = ""] = key.split("|");
+    const score = cell.absent || cell.score.trim() === "" ? null : cell.score.trim();
+    out.push({ studentId, componentId, score, absent: cell.absent });
+  }
+  return out;
+}
