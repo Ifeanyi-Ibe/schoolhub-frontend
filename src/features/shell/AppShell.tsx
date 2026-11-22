@@ -46,8 +46,8 @@ export function AppShell({
   useEffect(() => {
     if (!sessionEnded) return;
     // The session ended: the device keeps no attendance records (ADR 0017, shared phones).
-    void import("@/features/attendance/offline/db")
-      .then((m) => m.wipeAttendanceStore())
+    void import("@/features/shell/offline-stores")
+      .then((m) => m.wipeStores())
       .catch(() => undefined);
     router.replace(`/login?next=${encodeURIComponent(pathname)}`);
   }, [sessionEnded, pathname, router]);
@@ -62,12 +62,10 @@ export function AppShell({
 
   async function onSignOut() {
     // Marks that are not yet sent would be deleted with the device's records: say so, and let the teacher decide.
-    const pending = await import("@/features/attendance/offline/db")
-      .then(async (m) => (await m.attendanceDb()).queue.count())
-      .catch(() => 0);
+    const pending = await import("@/features/shell/offline-stores").then((m) => m.unsynced());
     if (pending > 0 && !window.confirm(t("signOutUnsynced", { count: pending }))) return;
-    await import("@/features/attendance/offline/db")
-      .then((m) => m.wipeAttendanceStore())
+    await import("@/features/shell/offline-stores")
+      .then((m) => m.wipeStores())
       .catch(() => undefined);
     await signOut({ queryClient }).catch(() => undefined);
     router.replace("/login?signedOut=1");
