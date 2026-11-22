@@ -59,6 +59,13 @@ export const NAV_ITEMS: readonly NavItem[] = [
     anyOf: ["fees.reports.read", "fees.structures.manage"],
   },
   {
+    id: "scores",
+    href: "/scores",
+    labelKey: "shell.nav.scores",
+    icon: GradeIcon,
+    anyOf: ["results.scores.enter", "results.approve"],
+  },
+  {
     id: "staff",
     href: "/staff",
     labelKey: "shell.nav.staff",

@@ -185,7 +185,8 @@
       "my-classes": "My classes",
       "attendance": "Attendance",
       "fees": "Fees",
-      "wards": "Your children"
+      "wards": "Your children",
+      "scores": "Score sheets"
     },
     "billingTitle": "Read-only: this school's account is suspended",
     "billingBody": "You can view information, but changes are turned off. Ask your school administrator to restore the account.",
@@ -1722,5 +1723,73 @@
     "reference": "Reference: {reference}",
     "missingReference": "This page needs a payment reference from the payment page.",
     "loadError": "We could not load this. Check your connection and try again."
+  },
+  "scores": {
+    "title": "Score sheets",
+    "intro": "Enter the scores for the classes and subjects you teach. Each change is saved by the school, and what you see is the school's answer. Submitting locks the sheet.",
+    "readOnly": "This school is read-only right now. Scores cannot be changed.",
+    "offline": "You are offline. Scores cannot be saved until the connection returns.",
+    "loadError": "The score sheets could not be loaded. Try again.",
+    "noAccessTitle": "You cannot enter scores",
+    "noAccessBody": "Your account has no score entry or approval permission.",
+    "pick": {
+      "classSubject": "Class and subject",
+      "term": "Term"
+    },
+    "none": {
+      "title": "No subjects assigned",
+      "body": "You have no subject assignments for the current session. Ask the school administrator."
+    },
+    "noSheet": {
+      "title": "No score sheet yet",
+      "body": "Open a sheet for this class, subject and term to start entering scores."
+    },
+    "open": "Open score sheet",
+    "opening": "Opening",
+    "noScheme": "The school has no default assessment scheme, so the components cannot be shown.",
+    "noStudents": {
+      "title": "No students on this sheet",
+      "body": "The class has no students enrolled for this term."
+    },
+    "status": {
+      "Draft": "Draft",
+      "Submitted": "Submitted",
+      "Approved": "Approved",
+      "Published": "Published"
+    },
+    "cell": {
+      "label": "{component}, maximum {max}",
+      "absent": "Absent"
+    },
+    "problem": {
+      "format": "Use a number with at most one decimal place.",
+      "negative": "A score cannot be negative.",
+      "range": "A score cannot be above the maximum of {max}.",
+      "absentWithScore": "An absent student has no score. Clear the score or untick Absent."
+    },
+    "fixFirst": "Fix the highlighted scores before saving.",
+    "save": "Save scores",
+    "saving": "Saving",
+    "outcome": "Saved: {applied} applied, {ignored} ignored, {rejected} rejected.",
+    "refusedRow": "Not saved: {reason}",
+    "submit": "Submit for approval",
+    "submitConfirm": "Submitting locks this sheet until it is approved or reopened.",
+    "submitNow": "Confirm submit",
+    "submitting": "Submitting",
+    "cancel": "Cancel",
+    "approve": "Approve sheet",
+    "approving": "Approving",
+    "reopen": "Reopen sheet",
+    "reopening": "Reopening",
+    "reopenReason": "Reason for reopening",
+    "reopenProblem": {
+      "required": "Give a reason for reopening.",
+      "tooLong": "The reason is too long. Keep it under 300 characters."
+    },
+    "state": {
+      "loading": "Loading score sheets",
+      "refused": "The school refused this change ({code}). Nothing was saved.",
+      "forbidden": "You do not have permission to do this."
+    }
   }
 }
