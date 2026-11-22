@@ -4,6 +4,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
 import { handleAttendance } from "./fake-attendance.ts";
+import { handleFees } from "./fake-fees.ts";
 import { handleStaff } from "./fake-staff.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
@@ -592,6 +593,21 @@ export function startFakeApi(): Promise<Server> {
     )
       return;
 
+    // Fees and payments: items, structures, discounts, invoices, payments, reversals, unallocated money and reports.
+    if (
+      handleFees({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+        label: label ?? "",
+        idempotencyKey: req.headers["idempotency-key"] as string | undefined,
+      })
+    )
+      return;
+
     // Attendance: the register, submit and reopen, the absentees and the summaries.
     if (
       handleAttendance({
@@ -661,8 +677,24 @@ export function startFakeApi(): Promise<Server> {
                 "attendance.mark",
                 "attendance.edit.past",
                 "attendance.export",
+                "fees.structures.manage",
+                "fees.invoices.create",
+                "fees.invoices.void",
+                "fees.payments.record",
+                "fees.payments.reverse",
+                "fees.payments.approve",
+                "fees.discounts.approve",
+                "fees.reports.read",
               ]
-            : ["me.profile"],
+            : label === "approver"
+              ? [
+                  "me.profile",
+                  "fees.reports.read",
+                  "fees.payments.record",
+                  "fees.payments.approve",
+                  "fees.discounts.approve",
+                ]
+              : ["me.profile"],
       });
     }
 
