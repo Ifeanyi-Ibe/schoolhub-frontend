@@ -81,6 +81,35 @@ test.describe("score sheets for a teacher", () => {
     await page.getByRole("button", { name: "Reopen sheet" }).click();
     await expect(page.getByText("Draft", { exact: true }).first()).toBeVisible();
   });
+
+  test.describe("while offline", () => {
+    // The offline banner's chunk cannot load without a connection: expected here, as in the other offline journeys.
+    test.use({ allowOfflineNetwork: true });
+
+    test("a teacher saves scores on this device while offline, and they are sent when the connection returns", async ({
+      page,
+      context,
+    }, testInfo) => {
+      test.skip(testInfo.project.name !== "desktop", "stateful: runs once, on the desktop project");
+      // Runs after the approver test has reopened the sheet, so it is a draft again.
+      await signInAs(context, "teacher");
+      await page.goto("/scores");
+      await expect(page.getByRole("heading", { level: 2 })).toContainText("Mathematics");
+      await context.setOffline(true);
+      await expect(
+        page.getByText("You are offline. Scores you enter are kept on this device"),
+      ).toBeVisible();
+      await page.getByRole("textbox", { name: "Test, maximum 20" }).first().fill("14");
+      await page.getByRole("button", { name: "Save on this device" }).click();
+      await expect(page.getByText("Saved on this device: 1 scores")).toBeVisible();
+      await expect(page.getByRole("textbox", { name: "Test, maximum 20" }).first()).toHaveValue(
+        "14",
+      );
+      await context.setOffline(false);
+      await expect(page.getByText("Sent: 1 saved")).toBeVisible();
+      await expect(page.getByText("Waiting to send")).toHaveCount(0);
+    });
+  });
 });
 
 test.describe("score sheets: access, accessibility and offline", () => {
@@ -113,13 +142,18 @@ test.describe("score sheets: access, accessibility and offline", () => {
     // Leaving the network drops the prefetches Next starts for the navigation links: expected while offline.
     test.use({ allowOfflineNetwork: true });
 
-    test("a teacher is told scores cannot be saved while offline", async ({ page, context }) => {
+    test("a teacher is told scores are kept on this device while offline", async ({
+      page,
+      context,
+    }) => {
       await signInAs(context, "teacher");
       await page.goto("/scores");
       await expect(page.getByRole("heading", { name: "Score sheets", exact: true })).toBeVisible();
       await context.setOffline(true);
       await expect(
-        page.getByText("You are offline. Scores cannot be saved until the connection returns."),
+        page.getByText(
+          "You are offline. Scores you enter are kept on this device and sent when the connection returns. Opening, submitting and approving need a connection.",
+        ),
       ).toBeVisible();
       await context.setOffline(false);
     });

@@ -49,6 +49,8 @@ const STUDENTS = [
 interface StoredCell {
   score: string | null;
   absent: boolean;
+  /** When the cell was last written (the client time when it came from a queue). Last write wins (ADR 0023). */
+  updatedAt: string;
 }
 
 interface StoredSheet {
@@ -188,6 +190,10 @@ export function handleAssessment(call: AssessmentCall): boolean {
       const score = row.score === null || row.score === undefined ? "" : String(row.score);
       const component = components.find((c) => c.id === componentId);
       const known = STUDENTS.some((s) => s.studentId === studentId) && component !== undefined;
+      const clientAt = typeof row.clientUpdatedAt === "string" ? row.clientUpdatedAt : null;
+      const stored = sheet.cells.get(cellKey(studentId, componentId));
+      if (known && clientAt && stored && stored.updatedAt > clientAt)
+        return { studentId, componentId, result: "IgnoredNewerExists", reason: null };
       if (!known)
         return {
           studentId,
@@ -220,16 +226,18 @@ export function handleAssessment(call: AssessmentCall): boolean {
       sheet.cells.set(cellKey(studentId, componentId), {
         score: absent || tenths === null ? null : score.trim(),
         absent,
+        updatedAt: clientAt ?? new Date().toISOString(),
       });
       return { studentId, componentId, result: "applied", reason: null };
     });
     const applied = outcomes.filter((o) => o.result === "applied").length;
-    const rejected = outcomes.length - applied;
+    const ignored = outcomes.filter((o) => o.result === "IgnoredNewerExists").length;
+    const rejected = outcomes.length - applied - ignored;
     send(res, 200, {
       sheetId: sheet.id,
       status: sheet.status,
       applied,
-      ignored: 0,
+      ignored,
       rejected,
       rows: outcomes,
     });
