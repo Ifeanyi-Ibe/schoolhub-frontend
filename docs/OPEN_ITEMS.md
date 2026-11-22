@@ -296,3 +296,10 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Plan name:** the F7 plan calls the withheld state `results.withheld_fees`. The contract uses `feesWithheld` on report cards, `withheld` in the publish answer, and `assessment.card_withheld` for a refused download. Slice 4 follows the contract.
 - **F6 checkpoint:** the money-flow review is still pending on the staff side.
 - **Not verified:** Firefox and WebKit runs for the score screen.
+
+## Open after F7, slice 2 (2026-11-22)
+
+- **Shared sync listener:** the attendance engine's `useSyncOnReturn` did not run when the score screen's browser test returned to the connection. The score screen sends on its own connection state instead (ADR 0023). Attendance uses the shared listener and passes its browser test, so the cause is not known. Find out whether the shared hook has a defect before anything else depends on it.
+- **Reload while offline:** a sheet is not kept on the device, so a page reloaded while offline cannot open its sheet. The queued cells are kept and sent when the screen opens online.
+- **Two devices, one cell:** a cell edited on two devices is settled by the entry time the server records (last write wins). Nothing shows the teacher that another device changed it.
+- **F7 slices 3 to 5** remain: computation, broadsheet and student results with domains and remarks; report cards; amendments and the parent's results.
