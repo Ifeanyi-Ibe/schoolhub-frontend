@@ -36,6 +36,11 @@ describe("visibleNav", () => {
         "/staff",
         "/my-classes",
         "/attendance",
+        "/fees",
+        "/fees/setup",
+        "/fees/invoices",
+        "/fees/payments",
+        "/fees/ledger",
       ]).toContain(item.href);
   });
 });
