@@ -86,7 +86,9 @@ export function RegisterView() {
     retry: false,
   });
   // Offline, the last online answer is not used: the rows fall back to the device's roster order.
-  const data = online ? reg.data : undefined;
+  // Names come from the in-memory query cache (this session's last online load). They are never written to the device
+  // (ADR 0017); a reload while offline has no cache, so the rows fall back to the device's roster order.
+  const data = reg.data;
   const offline = useOfflineRegister(key);
   // The teacher's unsaved edits. Everything else is derived: the server's marks, then the queued marks on top.
   const [edits, setEdits] = useState<Record<string, Partial<MarkDraft>>>({});

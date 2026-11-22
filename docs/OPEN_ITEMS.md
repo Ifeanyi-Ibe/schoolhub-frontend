@@ -269,7 +269,7 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 
 ## Open after F5 (2026-11-21)
 
-- **Decision needed: names on the device while offline.** ADR 0017 keeps names off the device, so an offline register shows rows by order. Showing names needs an encrypted local roster with a key policy, which CLAUDE.md does not yet allow. This is the main open decision of F5.
+- **Offline names, decided (ADR 0017):** names stay in the session's memory only and are never written to the device. A reload while offline shows rows by order. Encrypting a roster on the device would need a key policy first; not built.
 - **Parent view of a ward's attendance:** not built. The endpoint is typed; the screen needs the server-rendered parent route and the light formatter (ADR 0013).
 - **Past-day saves:** the server needs a reason (B-39); the screen sends the register's reason but does not ask for one. A prompt is needed before a past register can be changed from the UI.
 - **Subject-period registers:** not built; the register is for the whole day.

@@ -183,9 +183,10 @@ test.describe("attendance offline", () => {
     await expect.poll(() => rosterStored(page)).toBe(true);
     await context.setOffline(true);
     await expect(page.getByText("You are offline.", { exact: false }).first()).toBeVisible();
-    await expect(page.getByText("Student 1", { exact: true })).toBeVisible();
+    // Names stay on screen for this session's last online load; they are not written to the device.
+    await expect(page.getByText("Ada Okafor")).toBeVisible();
     await page
-      .getByRole("group", { name: "Status for Student 1" })
+      .getByRole("group", { name: "Status for Ada Okafor" })
       .getByRole("button", { name: "Late" })
       .click();
     await page.getByLabel("Arrival time").fill("08:35");

@@ -1344,7 +1344,7 @@
       "notSchoolDay": "This is not a school day. The server refuses marks on a non-school day unless an administrator allows them.",
       "locked": "This register is locked. Reopening it needs the edit-past permission and a reason.",
       "sessionStatus": "Register status: {status}",
-      "offlineNote": "You are offline. Marks are saved on this device and sent when you are back online. Names are not stored on the device, so rows show their order.",
+      "offlineNote": "You are offline. Marks are saved on this device and sent when you are back online. Names stay in this session only and are never stored on the device.",
       "offlineNoRegisterTitle": "This register is not on this device",
       "offlineNoRegisterBody": "Open this register once while you are online. After that you can mark it offline.",
       "chooseTitle": "Choose a class and a date",

@@ -12,11 +12,7 @@ ignored and rejected rows. CLAUDE.md forbids storing personal data in IndexedDB,
 
 ## Decisions
 
-1. **The offline store holds no personal data.** The queue stores the register key (class arm, date, period), each
-   student's opaque id, status, arrival time, `clientId` and `clientUpdatedAt`. Names and admission numbers are not
-   stored, so an offline register is marked by row number in the order the server gave. Notes are not queued and are
-   not editable in this slice: they are free text and may hold personal data, and a note needs its own decision. **Open decision (see OPEN_ITEMS):**
-   showing names offline needs an encrypted local roster and a key policy, which CLAUDE.md does not yet allow.
+1. **The offline store holds no personal data, and names are never written to the device.** The queue stores the register key (class arm, date, period), each student's opaque id, status, arrival time, `clientId` and `clientUpdatedAt`. Names and admission numbers live only in the in-memory query cache for the current session, so a teacher who stays in the app while offline still sees names. A reload while offline has no cache, and the rows fall back to the server's order. Notes are not queued and are not editable in this slice (they are free text and need their own decision).
 2. **IndexedDB through a small typed wrapper, not Dexie** (ADR 0018, which amends this point). One database, two
    tables: `queue` (pending register saves) and `rosters` (the student-id order per register, to mark offline).
 3. **Foreground sync only, while an attendance screen is open.** The queue is flushed when the browser comes online,
@@ -40,7 +36,7 @@ ignored and rejected rows. CLAUDE.md forbids storing personal data in IndexedDB,
 
 ## Consequences
 
-- An offline register cannot show names. Teachers who work offline mark by row number, which is slower and error-prone.
-  The decision in point 1 is the one to revisit with the user.
+- A reload while offline shows rows by order. Within a session names stay on screen. Encrypting a roster on the device
+  would need a key policy that CLAUDE.md does not yet allow, so it is not built.
 - Sync is foreground-only: marks queued on a device wait until an attendance screen is open. The home screen shows the
   count of unsynced marks, and sign-out warns about them.
