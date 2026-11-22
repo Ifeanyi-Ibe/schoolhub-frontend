@@ -29,6 +29,10 @@ change, so it is split into slices that each pass the gates and can be reviewed 
    carries only component ids.
 7. **Term, arm and subject** come from the signed-in user's assignments (`GET /me/assignments`) for the current session,
    so a teacher sees only sheets they may enter. The list of terms comes from the session's terms.
+8. **Approvers choose among all classes and subjects.** The contract finds a sheet only by term, class and subject, and has
+   no list of sheets. A user with `results.approve` therefore picks any class and subject from the school's lists; a user
+   without it sees only their assignments. The server still decides what each user may do.
+9. **Unsaved scores warn before the page is left** (the browser's leave prompt). In-app navigation does not warn yet.
 
 ## Consequences
 

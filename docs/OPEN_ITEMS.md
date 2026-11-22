@@ -290,9 +290,9 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 ## Open after F7, slice 1 (2026-11-22)
 
 - **F7 slices 2 to 5 are not started** (ADR 0022): offline score entry with last-write-wins sync; computation job, class broadsheet and export, student results, domains and remarks; report cards (generate, list, download, publish); amendments with maker-checker, and the parent's results and report cards.
-- **Approver's sheets:** the screen lists the sheets for the user's own assignments. An approver who is not assigned to a class cannot reach its sheets in the UI. Decide whether approvers get a list of sheets by class and subject, or the screen stays assignment-based.
+- **Approver's sheets:** resolved (ADR 0022, decision 8): an approver chooses any class and subject.
 - **Real-backend workflow not verified:** opening, saving, submitting and approving on the real backend needs a teacher's assignment in the seed; the administrator has none. The workflow is covered by the browser journeys against the test double only.
-- **Unsaved changes:** navigating away from a score sheet with unsaved cells does not warn yet.
+- **Unsaved changes:** the browser's leave prompt covers closing or reloading the page (ADR 0022, decision 9). In-app navigation does not warn yet.
 - **Plan name:** the F7 plan calls the withheld state `results.withheld_fees`. The contract uses `feesWithheld` on report cards, `withheld` in the publish answer, and `assessment.card_withheld` for a refused download. Slice 4 follows the contract.
 - **F6 checkpoint:** the money-flow review is still pending on the staff side.
 - **Not verified:** Firefox and WebKit runs for the score screen.
