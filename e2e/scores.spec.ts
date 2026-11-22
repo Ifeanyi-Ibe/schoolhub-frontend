@@ -90,6 +90,18 @@ test.describe("score sheets: access, accessibility and offline", () => {
     await expect(page.getByText("You cannot enter scores")).toBeVisible();
   });
 
+  test("an approver with no teaching assignment can still choose any class and subject", async ({
+    page,
+    context,
+  }) => {
+    await signInAs(context, "approver");
+    await page.goto("/scores");
+    await expect(page.getByRole("heading", { name: "Score sheets", exact: true })).toBeVisible();
+    await expect(page.getByText("No subjects assigned")).toHaveCount(0);
+    await expect(page.getByRole("combobox", { name: "Class" })).toBeVisible();
+    await expect(page.getByRole("combobox", { name: "Subject" })).toBeVisible();
+  });
+
   test("the score screen is free of axe violations", async ({ page, context }) => {
     await signInAs(context, "teacher");
     await page.goto("/scores");
