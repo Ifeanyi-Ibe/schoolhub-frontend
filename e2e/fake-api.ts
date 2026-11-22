@@ -4,7 +4,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
 import { handleAttendance } from "./fake-attendance.ts";
-import { handleFees } from "./fake-fees.ts";
+import { handleFees, settleGatewayPayment } from "./fake-fees.ts";
 import { handleStaff } from "./fake-staff.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
@@ -386,6 +386,12 @@ export function startFakeApi(): Promise<Server> {
     const url = new URL(req.url ?? "/", FAKE_API_URL);
     const path = url.pathname;
 
+    // The card gateway: it takes the payment, then sends the parent back to the school (ADR 0021).
+    if (path === "/__gateway") {
+      const ref = url.searchParams.get("reference") ?? "";
+      res.writeHead(302, { Location: settleGatewayPayment(ref) }).end();
+      return;
+    }
     if (path === "/__received") {
       return send(res, 200, received.get(url.searchParams.get("path") ?? "") ?? {});
     }
@@ -686,15 +692,17 @@ export function startFakeApi(): Promise<Server> {
                 "fees.discounts.approve",
                 "fees.reports.read",
               ]
-            : label === "approver"
-              ? [
-                  "me.profile",
-                  "fees.reports.read",
-                  "fees.payments.record",
-                  "fees.payments.approve",
-                  "fees.discounts.approve",
-                ]
-              : ["me.profile"],
+            : label === "parent"
+              ? ["me.profile", "me.wards", "me.pay"]
+              : label === "approver"
+                ? [
+                    "me.profile",
+                    "fees.reports.read",
+                    "fees.payments.record",
+                    "fees.payments.approve",
+                    "fees.discounts.approve",
+                  ]
+                : ["me.profile"],
       });
     }
 

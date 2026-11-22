@@ -3,6 +3,7 @@
 // reversed only after a request by someone else is approved, and a refusal of a self-approval. State is in memory.
 import { randomUUID } from "node:crypto";
 import type { ServerResponse } from "node:http";
+import { SCHOOL_ORIGIN } from "./origin.ts";
 
 type Send = (
   res: ServerResponse,
@@ -142,6 +143,25 @@ const unallocated: Unallocated[] = [1, 2, 3, 4].map((n) => ({
   isOpen: true,
   assignedStudentId: null,
 }));
+// One invoice for the ward, so a parent journey does not depend on a bursar's journey running first.
+const seededInvoice: Invoice = {
+  id: "0190a6c2-0000-7000-8000-000000000f30",
+  invoiceNo: "INV-SEED",
+  studentId: FEE_STUDENT,
+  termId: TERM,
+  status: "Issued",
+  issuedAt: "2026-11-02T09:00:00.000Z",
+  dueDate: "2026-12-15",
+  subtotalKobo: 1500050,
+  discountKobo: 0,
+  adjustmentKobo: 0,
+  totalKobo: 1500050,
+  paidKobo: 0,
+  balanceKobo: 1500050,
+  voidReason: null,
+  lines: [{ description: "Tuition", amountKobo: 1500050 }],
+};
+invoices.push(seededInvoice);
 const idem = new Map<string, unknown>();
 let invoiceSeq = 1000;
 let receiptSeq = 1;
@@ -598,6 +618,83 @@ export function handleFees(call: FeesCall): boolean {
     });
     return true;
   }
+  // Parent (ADR 0021): the ward, the ward's invoices, online payment, its verification.
+  if (path === `/api/v1/me/wards/${FEE_STUDENT}` && method === "GET") {
+    send(res, 200, {
+      studentId: FEE_STUDENT,
+      admissionNo: "GFA/0101",
+      fullName: "Ada Okafor",
+      status: "Active",
+      currentClassArmId: null,
+      relationship: "Mother",
+    });
+    return true;
+  }
+  if (path === "/api/v1/me/wards" && method === "GET") {
+    send(res, 200, [
+      {
+        studentId: FEE_STUDENT,
+        admissionNo: "GFA/0101",
+        fullName: "Ada Okafor",
+        status: "Active",
+        currentClassArmId: null,
+        relationship: "Mother",
+      },
+    ]);
+    return true;
+  }
+  const wardInvoices = /^\/api\/v1\/me\/wards\/([^/]+)\/invoices$/.exec(path);
+  if (wardInvoices && method === "GET") {
+    const list = invoices.map(refreshInvoice).filter((i) => i.studentId === wardInvoices[1]);
+    send(res, 200, { items: list, page: 1, pageSize: 20, totalCount: list.length, totalPages: 1 });
+    return true;
+  }
+  if (path === "/api/v1/me/payments/initialize" && method === "POST") {
+    return (
+      replay(key, () => {
+        const reference = `GW-${randomUUID().slice(0, 8)}`;
+        const p: Payment = {
+          id: randomUUID(),
+          receiptNo: null,
+          studentId: String(body["studentId"]),
+          amountKobo: Number(body["amountKobo"]),
+          method: "Card",
+          reference,
+          status: "Pending",
+          paidAt: null,
+          gatewayTransactionId: null,
+          reversalRequested: false,
+          reversalReason: null,
+          reversedAt: null,
+          requestedBy: null,
+        };
+        payments.push(p);
+        return {
+          status: 200,
+          body: {
+            paymentId: p.id,
+            reference,
+            authorizationUrl: `http://127.0.0.1:${Number(process.env.FAKE_API_PORT ?? 5999)}/__gateway?reference=${encodeURIComponent(reference)}`,
+          },
+        };
+      }),
+      true
+    );
+  }
+  if (path === "/api/v1/payments/verify" && method === "GET") {
+    const ref = url.searchParams.get("reference") ?? "";
+    const p = payments.find((x) => x.reference === ref);
+    if (!p) return (send(res, 404, problem(404, "fees.payment_not_found", "Not found")), true);
+    send(res, 200, {
+      ...p,
+      receiptNo:
+        p.status === "Succeeded"
+          ? (p.receiptNo ?? `RCT-${String(receiptSeq++).padStart(5, "0")}`)
+          : p.receiptNo,
+    });
+    return true;
+  }
+
   if (path === "/api/v1/fees/reconciliation" && method === "GET") {
     send(res, 200, { students: 1, drift: [] });
     return true;
@@ -606,3 +703,14 @@ export function handleFees(call: FeesCall): boolean {
 }
 
 export const FEES_IDS = { SESSION, TERM, LEVEL, ITEM: items[0]!.id };
+
+/** The gateway has taken the card payment: the payment is settled and the parent goes back to the school. */
+export function settleGatewayPayment(reference: string): string {
+  const p = payments.find((x) => x.reference === reference);
+  if (p && p.status === "Pending") {
+    p.status = "Succeeded";
+    p.paidAt = new Date().toISOString();
+    p.receiptNo = p.receiptNo ?? `RCT-${String(receiptSeq++).padStart(5, "0")}`;
+  }
+  return `${SCHOOL_ORIGIN}/wards/return?reference=${encodeURIComponent(reference)}`;
+}
