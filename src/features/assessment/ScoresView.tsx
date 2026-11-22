@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -53,13 +53,9 @@ const STATUS_TONE: Record<string, StatusTone> = {
 
 const NO_KEY: SheetKey = { termId: "", classArmId: "", subjectId: "" };
 
-function pairValue(armId: string, subjectId: string): string {
-  return `${armId}|${subjectId}`;
-}
-
-function parsePair(value: string): { armId: string; subjectId: string } | null {
-  const [armId = "", subjectId = ""] = value.split("|");
-  return armId && subjectId ? { armId, subjectId } : null;
+/** The server's cells for a sheet, in the shape the draft and the change check use. */
+function sheetCells(sheet: ScoreSheetView) {
+  return sheet.students.flatMap((s) => s.cells.map((c) => ({ studentId: s.studentId, ...c })));
 }
 
 /**
@@ -81,19 +77,51 @@ export function ScoresView() {
   const arms = useQuery(armNamesQuery());
   const scheme = useQuery(defaultSchemeQuery());
 
-  const [pairChoice, setPairChoice] = useState("");
+  // Teachers choose among their own classes and subjects. An approver chooses among all of the school's, because the
+  // contract finds a sheet only by term, class and subject (ADR 0022, decision 8).
+  const browse = access.canApprove;
+  const armOptions: Array<{ id: string; name: string }> = browse
+    ? [...(arms.data?.entries() ?? [])]
+        .map(([id, name]) => ({ id, name }))
+        .sort((a, b) => a.name.localeCompare(b.name))
+    : [...new Set(teaching.map((a) => a.classArmId))].map((id) => ({
+        id,
+        name: arms.data?.get(id) ?? "",
+      }));
+  const [armChoice, setArmChoice] = useState("");
+  const armId = armOptions.some((o) => o.id === armChoice) ? armChoice : (armOptions[0]?.id ?? "");
+  const subjectOptions: Array<{ id: string; name: string }> = browse
+    ? (subjects.data ?? []).map((s) => ({ id: s.id, name: s.name }))
+    : teaching
+        .filter((a) => a.classArmId === armId && a.subjectId)
+        .map((a) => ({
+          id: a.subjectId ?? "",
+          name: subjects.data?.find((s) => s.id === a.subjectId)?.name ?? "",
+        }));
+  const [subjectChoice, setSubjectChoice] = useState("");
+  const subjectId = subjectOptions.some((o) => o.id === subjectChoice)
+    ? subjectChoice
+    : (subjectOptions[0]?.id ?? "");
   const [termChoice, setTermChoice] = useState("");
-  const pair =
-    pairChoice ||
-    (teaching[0] ? pairValue(teaching[0].classArmId, teaching[0].subjectId ?? "") : "");
   const current = terms.data?.find((x) => x.isCurrent) ?? terms.data?.[0];
   const termId = termChoice || current?.id || "";
-  const parsed = parsePair(pair);
   const key: SheetKey | null =
-    parsed && termId ? { termId, classArmId: parsed.armId, subjectId: parsed.subjectId } : null;
+    armId && subjectId && termId ? { termId, classArmId: armId, subjectId } : null;
   const sheet = useQuery({ ...sheetQuery(key ?? NO_KEY), enabled: key !== null });
 
   const [edits, setEdits] = useState<{ sheetId: string; draft: ScoreDraft } | null>(null);
+  // Unsaved cells: warn before the page is left. In-app navigation is not covered yet (OPEN_ITEMS).
+  const unsaved =
+    edits !== null && sheet.data
+      ? changedCells(sheetCells(sheet.data), edits.draft).length > 0
+      : false;
+  useEffect(() => {
+    if (!unsaved) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [unsaved]);
+
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [outcome, setOutcome] = useState<RecordScoresOutcome | null>(null);
@@ -241,24 +269,41 @@ export function ScoresView() {
 
       {assignments.isError ? (
         <ErrorState title={t("loadError")} onRetry={() => void assignments.refetch()} />
-      ) : assignments.data && teaching.length === 0 ? (
+      ) : assignments.data && !browse && teaching.length === 0 ? (
         <EmptyState title={t("none.title")} description={t("none.body")} />
       ) : (
         <Card className="flex flex-col gap-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             <Select
-              label={t("pick.classSubject")}
-              value={pair}
+              label={t("pick.class")}
+              value={armId}
               onChange={(e) => {
-                setPairChoice(e.target.value);
+                setArmChoice(e.target.value);
+                setSubjectChoice("");
                 setEdits(null);
                 setOutcome(null);
                 setMessage(null);
               }}
             >
-              {teaching.map((a) => (
-                <option key={a.id} value={pairValue(a.classArmId, a.subjectId ?? "")}>
-                  {`${armName(a.classArmId)} · ${subjectName(a.subjectId ?? "")}`}
+              {armOptions.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name}
+                </option>
+              ))}
+            </Select>
+            <Select
+              label={t("pick.subject")}
+              value={subjectId}
+              onChange={(e) => {
+                setSubjectChoice(e.target.value);
+                setEdits(null);
+                setOutcome(null);
+                setMessage(null);
+              }}
+            >
+              {subjectOptions.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name}
                 </option>
               ))}
             </Select>

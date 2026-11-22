@@ -1733,8 +1733,9 @@
     "noAccessTitle": "You cannot enter scores",
     "noAccessBody": "Your account has no score entry or approval permission.",
     "pick": {
-      "classSubject": "Class and subject",
-      "term": "Term"
+      "term": "Term",
+      "class": "Class",
+      "subject": "Subject"
     },
     "none": {
       "title": "No subjects assigned",
