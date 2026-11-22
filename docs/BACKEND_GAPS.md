@@ -300,3 +300,23 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** `AssignmentView`, `ArmTeacherView` and `MyAssignmentsView` carry `classArmId` and `subjectId` (ids). `ArmTeacherView` carries `fullName` and `staffNo` but no class or subject name.
 - **Design-around:** the assignments panel and "My classes" look names up in the academic setup (`useArmOptions`, `subjectsQuery`), which needs `academics.read`. Without it an arm shows as "A class arm" and a subject as "A subject".
 - **Status:** Open. Add the arm and subject names to these views (see also B-32).
+
+### B-38 — The row result of a register save is a free string, and the server's spelling differs from the spec's
+
+- **Contract:** `RowOutcome.result` is `{"type":"string"}`. The feature spec (section 6) names the results `applied`, `ignored_newer_exists` and `rejected{reason}`.
+- **Observed (2026-11-21):** the server answers `Applied`, and `IgnoredNewerExists` for a stale save. A refused row carries a reason.
+- **Design-around:** the screens compare the result by its letters only (`rowResult` in `src/features/attendance/rules.ts`), so either spelling reads the same. A result this screen does not recognise keeps its row in the queue for the teacher; nothing is dropped.
+- **Status:** Open. Declare the result as an enum with the server's spelling, so the client can type it.
+
+### B-39 — A save for a past day needs a reason, and the contract does not say so
+
+- **Contract:** `MarkRegisterRequest.reason` is nullable, and the PUT declares no error for a missing reason on a past register.
+- **Observed:** the server refuses a save for a day before today with `attendance.reason_required` unless `reason` is set.
+- **Design-around:** the screens send the register's own reason with every save (the offline queue keeps it with the register). The register screen does not ask the teacher for the reason on a past day yet (see OPEN_ITEMS).
+- **Status:** Open. Document the rule on the PUT, or accept the reason as a field of the past-day flow.
+
+### B-40 — The download route takes no query, so the term export is fetched through the BFF proxy
+
+- **Contract:** `GET /api/v1/attendance/class-arms/{id}/term-summary.xlsx` needs `termId` as a query parameter.
+- **Design-around:** the BFF download route refuses paths with a query (a deliberate rule). The export is a GET through the BFF proxy with the session (`downloadQueryFromApi` in `src/features/files/download.ts`), and its address carries ids only.
+- **Status:** Open for a decision: keep the proxy route for queried downloads, or let the download route take a validated query. The proxy route is the working choice until then.

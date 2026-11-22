@@ -266,3 +266,16 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **F4 not verified:** Firefox and WebKit runs for the staff journeys; a real check that a deactivated member is refused at sign-in (the backend's behaviour is not in the contract).
 - **Real-backend data:** every real run leaves its accounts behind (131 accounts now). The people-list journey pages through them, so it is slower each run. The removal of that growth needs a backend cleanup or a filter (see B-24: the search answers 500).
 - **Carried over:** B-24, B-26, B-28, B-29 (intermittent database errors on login; once seen in the admin lock journey, not reproduced after), the parent 5 to 6 KB over target (the cap holds), and the server-content gap on the other signed-in screens.
+
+## Open after F5 (2026-11-21)
+
+- **Decision needed: names on the device while offline.** ADR 0017 keeps names off the device, so an offline register shows rows by order. Showing names needs an encrypted local roster with a key policy, which CLAUDE.md does not yet allow. This is the main open decision of F5.
+- **Parent view of a ward's attendance:** not built. The endpoint is typed; the screen needs the server-rendered parent route and the light formatter (ADR 0013).
+- **Past-day saves:** the server needs a reason (B-39); the screen sends the register's reason but does not ask for one. A prompt is needed before a past register can be changed from the UI.
+- **Subject-period registers:** not built; the register is for the whole day.
+- **Home screen:** no count of unsynced marks (ADR 0018); the register shows it.
+- **Background Sync:** not used (ADR 0017). Marks queued on a device wait until a register is open.
+- **Offline without a service worker:** in the test server the lazily loaded offline banner cannot load once the network is off. The page now carries on without it (QuietBoundary), and the production service worker precaches the chunk, which is to be confirmed on a device.
+- **Real backend:** the attendance journeys run one register per run and create one e2e student per run.
+- **Firefox and WebKit:** not run for the attendance journeys.
+- **Carried over:** B-24, B-26, B-28, B-29, B-30 to B-40 (see BACKEND_GAPS), the parent 5 to 6 KB over target (the cap holds), and the server-content gap on the other signed-in screens.
