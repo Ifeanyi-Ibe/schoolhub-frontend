@@ -17,9 +17,14 @@ export const test = base.extend<{ allowOfflineNetwork: boolean }>({
       const expected = EXPECTED_BFF_STATUS.exec(msg.text());
       if (expected && msg.location().url.includes("/api/bff/")) return;
       if (allowOfflineNetwork && msg.text().includes("net::ERR_INTERNET_DISCONNECTED")) return;
+      // Offline with no service worker in the test server: a lazy chunk that was never fetched cannot load.
+      if (allowOfflineNetwork && /ChunkLoadError|Loading chunk \d+ failed/.test(msg.text())) return;
       problems.push(`console error: ${msg.text()} (${msg.location().url || "no url"})`);
     });
-    page.on("pageerror", (err) => problems.push(`uncaught page error: ${err.message}`));
+    page.on("pageerror", (err) => {
+      if (allowOfflineNetwork && /Loading chunk \d+ failed/.test(err.message)) return;
+      problems.push(`uncaught page error: ${err.message}`);
+    });
     // CSP violations are reported to the page as events, so they are surfaced as errors here.
     await page.addInitScript(() => {
       document.addEventListener("securitypolicyviolation", (e) => {

@@ -102,6 +102,14 @@ test.describe.serial("staff against the real backend", () => {
     ).json()) as Array<{ id: string }>;
     classArmId = arms[0]?.id ?? "";
     expect(classArmId, "the seed has a class arm").not.toBe("");
+    // A class arm of this run, so the form-teacher checks do not depend on an earlier run's assignments.
+    const arm = await request.post(url(`/api/v1/class-levels/${levels[0]!.id}/arms`), {
+      headers: jsonHeaders(admin),
+      data: { name: `E2E ${tag}`, capacity: 30, formTeacherStaffId: null },
+      failOnStatusCode: false,
+    });
+    expect(arm.status(), await arm.text()).toBe(201);
+    classArmId = ((await arm.json()) as { id: string }).id;
 
     const saved = await request.put(
       url(`/api/v1/staff/${staffId}/assignments?sessionId=${sessionId}`),
