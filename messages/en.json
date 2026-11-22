@@ -1728,7 +1728,7 @@
     "title": "Score sheets",
     "intro": "Enter the scores for the classes and subjects you teach. Each change is saved by the school, and what you see is the school's answer. Submitting locks the sheet.",
     "readOnly": "This school is read-only right now. Scores cannot be changed.",
-    "offline": "You are offline. Scores cannot be saved until the connection returns.",
+    "offline": "You are offline. Scores you enter are kept on this device and sent when the connection returns. Opening, submitting and approving need a connection.",
     "loadError": "The score sheets could not be loaded. Try again.",
     "noAccessTitle": "You cannot enter scores",
     "noAccessBody": "Your account has no score entry or approval permission.",
@@ -1791,6 +1791,22 @@
       "loading": "Loading score sheets",
       "refused": "The school refused this change ({code}). Nothing was saved.",
       "forbidden": "You do not have permission to do this."
+    },
+    "saveHere": "Save on this device",
+    "savedHere": "Saved on this device: {count} scores. They are sent when the connection returns.",
+    "saveHereFailed": "The scores could not be saved on this device. Nothing was lost; try again.",
+    "queue": {
+      "title": "Waiting to send",
+      "pending": "{count} scores are saved on this device and have not been sent yet.",
+      "refusedCell": "Not saved, {student}, {component}: {reason}",
+      "resend": "Resend",
+      "discard": "Discard",
+      "send": "Send now",
+      "submitFirst": "Send these scores before you submit the sheet."
+    },
+    "sync": {
+      "result": "Sent: {applied} saved, {ignored} already newer on the school's record, {refused} refused.",
+      "stopped": "Not sent yet: the connection or the school's system was unavailable. Nothing was lost."
     }
   }
 }

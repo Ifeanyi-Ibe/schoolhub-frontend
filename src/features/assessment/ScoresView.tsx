@@ -17,6 +17,8 @@ import { refusalText } from "@/features/students/refusal";
 import { newActionKey } from "@/lib/api/idempotency";
 import { ApiError } from "@/lib/api/unwrap";
 import { useAssessmentAccess } from "./access";
+import { useOfflineScores } from "./offline/engine";
+import type { ScoreFlushReport } from "./offline/sync";
 import {
   approveSheet,
   armNamesQuery,
@@ -35,8 +37,9 @@ import {
 } from "./api";
 import {
   KNOWN_SHEET_STATUSES,
+  changedAgainst,
+  overlayRows,
   cellKey,
-  changedCells,
   draftFromServer,
   reopenReasonProblem,
   scoreProblem,
@@ -109,12 +112,35 @@ export function ScoresView() {
     armId && subjectId && termId ? { termId, classArmId: armId, subjectId } : null;
   const sheet = useQuery({ ...sheetQuery(key ?? NO_KEY), enabled: key !== null });
 
+  // Score entry on this device (ADR 0023): cells saved while offline are queued here, and the screen shows them over the
+  // server's values until the server has answered.
+  const offline = useOfflineScores(key, sheet.data?.id ?? null);
+  const queuedRows = offline.items.flatMap((i) => i.rows);
+  const base: ScoreDraft = sheet.data
+    ? overlayRows(draftFromServer(sheetCells(sheet.data)), queuedRows)
+    : new Map();
+  const [syncReport, setSyncReport] = useState<ScoreFlushReport | null>(null);
+  /** Sends the queued saves. Refused cells stay in the queue with the server's reason. */
+  async function sendQueued() {
+    const report = await offline.flush();
+    if (report) {
+      setSyncReport(report);
+      await qc.invalidateQueries({ queryKey: sheetQuery(key ?? NO_KEY).queryKey });
+    }
+  }
+  // Sends the queue when the connection returns, and when the screen opens online (ADR 0023). Keyed on the connection, so
+  // it runs on the change, not on every render.
+  useEffect(() => {
+    // The flush settles after the server answers, so the state update follows an await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (online) void sendQueued();
+    // sendQueued reads the current queue when it runs; only the connection should start a send.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [online]);
   const [edits, setEdits] = useState<{ sheetId: string; draft: ScoreDraft } | null>(null);
   // Unsaved cells: warn before the page is left. In-app navigation is not covered yet (OPEN_ITEMS).
   const unsaved =
-    edits !== null && sheet.data
-      ? changedCells(sheetCells(sheet.data), edits.draft).length > 0
-      : false;
+    edits !== null && sheet.data ? changedAgainst(base, edits.draft).length > 0 : false;
   useEffect(() => {
     if (!unsaved) return;
     const warn = (e: BeforeUnloadEvent) => e.preventDefault();
@@ -142,18 +168,11 @@ export function ScoresView() {
       ? null
       : edits?.sheetId === sheetData.id
         ? edits.draft
-        : draftFromServer(
-            sheetData.students.flatMap((s) =>
-              s.cells.map((c) => ({ studentId: s.studentId, ...c })),
-            ),
-          );
+        : base;
   const actions = sheetData ? sheetActions(sheetData.status) : null;
   const components = [...(scheme.data?.components ?? [])].sort(
     (a, b) => Number(a.order) - Number(b.order),
   );
-  const serverCells = sheetData
-    ? sheetData.students.flatMap((s) => s.cells.map((c) => ({ studentId: s.studentId, ...c })))
-    : [];
 
   function armName(armId: string): string {
     return arms.data?.get(armId) ?? "";
@@ -191,7 +210,7 @@ export function ScoresView() {
         (s) => cellProblem(s.studentId, c.id, Number(c.maxScore)) !== null,
       ),
     );
-  const pendingRows = draft && sheetData ? changedCells(serverCells, draft) : [];
+  const pendingRows = draft && sheetData ? changedAgainst(base, draft) : [];
 
   async function open() {
     if (!key) return;
@@ -219,6 +238,32 @@ export function ScoresView() {
       await qc.invalidateQueries({ queryKey: sheetQuery(key ?? NO_KEY).queryKey });
     } catch (err) {
       setMessage(refusalText(err, tState));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  function studentName(studentId: string): string {
+    return sheetData?.students.find((x) => x.studentId === studentId)?.studentName ?? "";
+  }
+
+  function componentName(componentId: string): string {
+    return components.find((c) => c.id === componentId)?.name ?? "";
+  }
+
+  /** Saves the cells on this device. Nothing is sent; the queue sends them when the connection returns. */
+  async function saveOffline() {
+    if (!sheetData || pendingRows.length === 0) return;
+    setBusy("save");
+    setMessage(null);
+    setOutcome(null);
+    try {
+      const now = new Date().toISOString();
+      await offline.enqueue(pendingRows.map((r) => ({ ...r, clientUpdatedAt: now })));
+      setEdits(null);
+      setMessage(t("savedHere", { count: String(pendingRows.length) }));
+    } catch {
+      setMessage(t("saveHereFailed"));
     } finally {
       setBusy(null);
     }
@@ -383,7 +428,7 @@ export function ScoresView() {
                         absent: false,
                       };
                       const problem = cellProblem(s.studentId, c.id, Number(c.maxScore));
-                      const editable = actions?.canSave === true && writesAllowed;
+                      const editable = actions?.canSave === true && access.canEnter;
                       return (
                         <div key={c.id} className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
                           <Input
@@ -424,16 +469,95 @@ export function ScoresView() {
                 <p className="text-sm text-danger-foreground">{t("fixFirst")}</p>
               ) : null}
               <Button
-                onClick={save}
+                onClick={online ? save : saveOffline}
                 disabled={
-                  !writesAllowed || busy !== null || pendingRows.length === 0 || hasProblems
+                  (online ? !writesAllowed : !offline.ready) ||
+                  busy !== null ||
+                  pendingRows.length === 0 ||
+                  hasProblems
                 }
                 loading={busy === "save"}
                 loadingLabel={t("saving")}
               >
-                {t("save")}
+                {online ? t("save") : t("saveHere")}
               </Button>
             </div>
+          ) : null}
+
+          {syncReport ? (
+            <p role="status" className="text-sm text-foreground">
+              {syncReport.stopped !== "none"
+                ? t("sync.stopped")
+                : t("sync.result", {
+                    applied: String(syncReport.applied),
+                    ignored: String(syncReport.ignored),
+                    refused: String(syncReport.refused),
+                  })}
+            </p>
+          ) : null}
+          {offline.items.length > 0 ? (
+            <section
+              aria-labelledby="queue-title"
+              className="flex flex-col gap-3 rounded-control border border-border p-4"
+            >
+              <h3 id="queue-title" className="text-sm font-semibold text-foreground">
+                {t("queue.title")}
+              </h3>
+              <p className="text-sm text-foreground">
+                {t("queue.pending", {
+                  count: String(
+                    offline.items
+                      .filter((i) => i.state === "pending")
+                      .reduce((n, i) => n + i.rows.length, 0),
+                  ),
+                })}
+              </p>
+              {offline.items
+                .filter((i) => i.state === "needsAttention")
+                .map((item) => (
+                  <div key={item.id} className="flex flex-col gap-2">
+                    <ul className="flex flex-col gap-1 text-sm text-danger-foreground">
+                      {item.refused.map((r) => (
+                        <li key={`${r.studentId}-${r.componentId}`}>
+                          {t("queue.refusedCell", {
+                            student: studentName(r.studentId),
+                            component: componentName(r.componentId),
+                            reason: r.reason,
+                          })}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex flex-wrap gap-3">
+                      <Button
+                        variant="secondary"
+                        onClick={() => void offline.resend(item.id ?? 0)}
+                        disabled={!online || busy !== null}
+                      >
+                        {t("queue.resend")}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => void offline.discard(item.id ?? 0)}
+                        disabled={busy !== null}
+                      >
+                        {t("queue.discard")}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              {online && offline.items.some((i) => i.state === "pending") ? (
+                <div className="flex justify-end">
+                  <Button
+                    variant="secondary"
+                    onClick={() => void sendQueued()}
+                    disabled={busy !== null}
+                  >
+                    {t("queue.send")}
+                  </Button>
+                </div>
+              ) : null}
+              <p className="text-sm text-muted-foreground">{t("queue.submitFirst")}</p>
+            </section>
           ) : null}
 
           {outcome ? (
@@ -486,7 +610,7 @@ export function ScoresView() {
                   <Button
                     variant="secondary"
                     onClick={() => setConfirmSubmit(true)}
-                    disabled={!writesAllowed || busy !== null}
+                    disabled={!writesAllowed || busy !== null || offline.items.length > 0}
                   >
                     {t("submit")}
                   </Button>
