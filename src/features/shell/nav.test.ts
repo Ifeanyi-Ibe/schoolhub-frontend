@@ -37,6 +37,7 @@ describe("visibleNav", () => {
         "/my-classes",
         "/attendance",
         "/fees",
+        "/wards",
         "/fees/setup",
         "/fees/invoices",
         "/fees/payments",

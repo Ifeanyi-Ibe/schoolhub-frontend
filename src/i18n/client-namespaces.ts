@@ -46,6 +46,7 @@ export const LIGHT_MESSAGE_PATHS = [
   "sessions",
   "auth",
   "palette",
+  "wards",
 ] as const;
 
 /** Keeps only the given dotted paths, nested as in the source (e.g. "auth.login" keeps auth.login). */

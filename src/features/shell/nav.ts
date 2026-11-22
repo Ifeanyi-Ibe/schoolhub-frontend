@@ -45,6 +45,13 @@ export const NAV_ITEMS: readonly NavItem[] = [
     anyOf: ["attendance.mark"],
   },
   {
+    id: "wards",
+    href: "/wards",
+    labelKey: "shell.nav.wards",
+    icon: PeopleIcon,
+    anyOf: ["me.wards"],
+  },
+  {
     id: "fees",
     href: "/fees",
     labelKey: "shell.nav.fees",
