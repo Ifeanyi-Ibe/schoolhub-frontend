@@ -338,3 +338,15 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** `POST /api/v1/invoices/generate` (Idempotency-Key) answers `GenerateView` with the counts of created and skipped invoices. The feature plan expected a job with progress.
 - **Design-around:** the screen waits for the answer and shows the counts; the button is disabled while the request is pending. A large class may take long, and the screen shows the pending state for that time.
 - **Status:** Open for a decision: keep the synchronous answer (and bound its size), or add a job with progress like the import.
+
+### B-44 — The contract has no bank details for transfers
+
+- **Contract:** nothing in `docs/openapi/v1.json` gives the school's bank account name, number or bank, so a parent cannot be shown where to transfer money.
+- **Design-around (ADR 0021):** the parent's screen shows the school's support email and phone (from the tenant summary's branding, which the contract provides) and the ward's admission number with a copy button, which the parent quotes on the transfer. The screen does not show account numbers it cannot source.
+- **Status:** Open. When the contract provides account details, the screen will show them with copy buttons.
+
+### B-45 — The contract has no list of a parent's payments
+
+- **Contract:** the parent endpoints give the wards, a ward's invoices, online payment initialisation and verification by reference, and a receipt by payment id. No endpoint lists a parent's past payments.
+- **Design-around (ADR 0021):** a receipt is offered only on the return screen, for a payment the parent has just verified. A parent cannot review earlier payments in the app.
+- **Status:** Open. A list of a ward's payments (or of the parent's payments) would let the parent find and download earlier receipts.
