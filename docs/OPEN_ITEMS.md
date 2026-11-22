@@ -279,3 +279,10 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Real backend:** the attendance journeys run one register per run and create one e2e student per run.
 - **Firefox and WebKit:** not run for the attendance journeys.
 - **Carried over:** B-24, B-26, B-28, B-29, B-30 to B-40 (see BACKEND_GAPS), the parent 5 to 6 KB over target (the cap holds), and the server-content gap on the other signed-in screens.
+
+## Open after F6, staff side (2026-11-21)
+
+- **F6 parent slice:** not started. Wards switcher, invoices per ward, pay by card (initialise, redirect to the gateway's authorisation URL, verify on return: a payment is never shown as paid from the redirect alone), bank-transfer details with copy buttons, and receipts. It needs the server-rendered parent route and the light formatter (ADR 0013).
+- **F6 checkpoint:** the money-flow review is pending on the staff side.
+- **Contract gaps:** B-41 (statuses free text), B-42 (no grants list), B-43 (synchronous invoice generation), and B-17 (statement, virtual accounts, payment plans, daily close).
+- **Not verified:** Firefox and WebKit runs for the fee journeys; the gateway flow (not in the test double yet).

@@ -320,3 +320,21 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** `GET /api/v1/attendance/class-arms/{id}/term-summary.xlsx` needs `termId` as a query parameter.
 - **Design-around:** the BFF download route refuses paths with a query (a deliberate rule). The export is a GET through the BFF proxy with the session (`downloadQueryFromApi` in `src/features/files/download.ts`), and its address carries ids only.
 - **Status:** Open for a decision: keep the proxy route for queried downloads, or let the download route take a validated query. The proxy route is the working choice until then.
+
+### B-41 — Invoice, payment and structure statuses are free strings
+
+- **Contract:** `FeesInvoiceView.status`, `FeesPaymentView.status`, `FeesPaymentView.method`, `StructureView.status`, `StudentDiscountView.status` and `JobView.kind/status` are `string` with no values declared. The request bodies declare their enums (categories, discount kinds, adjustment kinds, payment methods), so only the responses are free.
+- **Design-around:** the screens label the values the backend uses (invoice: Draft, Issued, Paid, Overdue, Void; payment: Pending, Succeeded, Reversed, ReversalRequested, Failed) and show any other value as it arrives.
+- **Status:** Open. Declare the status enums on the responses, as for B-33.
+
+### B-42 — No list of student discount grants, so approval is possible only from the grant's answer
+
+- **Contract:** `POST /api/v1/students/{id}/discounts` answers the grant (with its `id`, which is the assignment id the approve path takes), and `POST /api/v1/students/{id}/discounts/{assignmentId}/approve` approves it. No operation lists a student's grants or the grants awaiting approval.
+- **Design-around:** the grant form shows the grant's status and offers Approve for that grant only, to a holder of the approve permission. A grant made on another screen cannot be approved from this one.
+- **Status:** Open. Add a list of grants (filtered by student and status) so a grant can be approved later.
+
+### B-43 — Invoice generation answers counts at once; there is no job or progress for it
+
+- **Contract:** `POST /api/v1/invoices/generate` (Idempotency-Key) answers `GenerateView` with the counts of created and skipped invoices. The feature plan expected a job with progress.
+- **Design-around:** the screen waits for the answer and shows the counts; the button is disabled while the request is pending. A large class may take long, and the screen shows the pending state for that time.
+- **Status:** Open for a decision: keep the synchronous answer (and bound its size), or add a job with progress like the import.
