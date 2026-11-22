@@ -6,6 +6,7 @@ import { randomUUID } from "node:crypto";
 import { handleAttendance } from "./fake-attendance.ts";
 import { handleFees, settleGatewayPayment } from "./fake-fees.ts";
 import { handleStaff } from "./fake-staff.ts";
+import { handleAssessment } from "./fake-assessment.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -640,6 +641,21 @@ export function startFakeApi(): Promise<Server> {
     )
       return;
 
+    // Score sheets (ADR 0022): open, enter, submit, approve, reopen, and the signed-in user's assignments.
+    if (
+      handleAssessment({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+        label: label ?? "",
+        components: ASSESSMENT.find((s) => s.isDefault)?.components ?? [],
+      })
+    )
+      return;
+
     if (path === "/api/v1/me") {
       return send(res, 200, {
         id: "00000000-0000-4000-8000-000000000001",
@@ -691,18 +707,24 @@ export function startFakeApi(): Promise<Server> {
                 "fees.payments.approve",
                 "fees.discounts.approve",
                 "fees.reports.read",
+                "results.scores.enter",
+                "results.approve",
+                "results.publish",
               ]
             : label === "parent"
               ? ["me.profile", "me.wards", "me.pay"]
-              : label === "approver"
-                ? [
-                    "me.profile",
-                    "fees.reports.read",
-                    "fees.payments.record",
-                    "fees.payments.approve",
-                    "fees.discounts.approve",
-                  ]
-                : ["me.profile"],
+              : label === "teacher"
+                ? ["me.profile", "results.scores.enter"]
+                : label === "approver"
+                  ? [
+                      "me.profile",
+                      "fees.reports.read",
+                      "fees.payments.record",
+                      "fees.payments.approve",
+                      "fees.discounts.approve",
+                      "results.approve",
+                    ]
+                  : ["me.profile"],
       });
     }
 
