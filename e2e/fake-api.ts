@@ -8,6 +8,7 @@ import { handleFees, settleGatewayPayment } from "./fake-fees.ts";
 import { handleStaff } from "./fake-staff.ts";
 import { handleAssessment } from "./fake-assessment.ts";
 import { handleResults } from "./fake-results.ts";
+import { handleInbox } from "./fake-inbox.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -660,6 +661,20 @@ export function startFakeApi(): Promise<Server> {
     )
       return;
 
+    // The staff inbox and notification preferences (ADR 0025).
+    if (
+      handleInbox({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+        label: label ?? "",
+      })
+    )
+      return;
+
     // Results (ADR 0024): the computation job, the broadsheet and export, student results, domains and remarks.
     if (
       handleResults({
@@ -730,11 +745,12 @@ export function startFakeApi(): Promise<Server> {
                 "results.publish",
                 "results.amend.request",
                 "results.amend.approve",
+                "me.notifications",
               ]
             : label === "parent"
               ? ["me.profile", "me.wards", "me.pay"]
               : label === "teacher"
-                ? ["me.profile", "results.scores.enter"]
+                ? ["me.profile", "results.scores.enter", "me.notifications"]
                 : label === "approver"
                   ? [
                       "me.profile",
@@ -744,6 +760,7 @@ export function startFakeApi(): Promise<Server> {
                       "fees.discounts.approve",
                       "results.approve",
                       "results.amend.approve",
+                      "me.notifications",
                     ]
                   : ["me.profile"],
       });
