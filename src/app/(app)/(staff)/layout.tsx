@@ -20,6 +20,7 @@ export default async function StaffLayout({ children }: { children: ReactNode })
     "reportCards",
     "amendments",
     "inbox",
+    "announcements",
   ]);
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>

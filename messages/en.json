@@ -1880,7 +1880,8 @@
       "label": "Related pages",
       "reportCards": "Report cards",
       "amendments": "Amendments",
-      "inbox": "Inbox"
+      "inbox": "Inbox",
+      "announcements": "Announcements"
     }
   },
   "reportCards": {
@@ -2018,6 +2019,91 @@
     "saving": "Saving",
     "state": {
       "loading": "Loading the inbox",
+      "refused": "The school refused this change ({code}). Nothing was saved."
+    }
+  },
+  "announcements": {
+    "title": "Announcements",
+    "intro": "Send a message to families and staff. You can check who will receive it, and what it costs in SMS units, before you send it.",
+    "offline": "You are offline. Announcements cannot be created, checked or sent until the connection returns.",
+    "loadError": "Announcements could not be loaded. Try again.",
+    "noAccessTitle": "You cannot send announcements",
+    "noAccessBody": "Your account has no announcements permission.",
+    "working": "Working",
+    "saved": "Saved.",
+    "compose": {
+      "new": "New announcement",
+      "edit": "Edit announcement",
+      "closed": "This announcement has been sent or cancelled and can no longer be changed.",
+      "title": "Title",
+      "body": "Message",
+      "audience": "Who receives it",
+      "ids": "Names or ids",
+      "idsHint": "Paste the ids, separated by commas.",
+      "channels": "How it is sent",
+      "check": "Check audience",
+      "create": "Save announcement",
+      "update": "Save changes"
+    },
+    "audience": {
+      "all": "Everyone",
+      "levels": "Class levels",
+      "arms": "Classes",
+      "staff": "Staff",
+      "custom": "Selected people"
+    },
+    "channel": {
+      "sms": "SMS",
+      "email": "Email",
+      "inapp": "In the app"
+    },
+    "problem": {
+      "titleRequired": "Give the announcement a title.",
+      "bodyRequired": "Write the message.",
+      "channelRequired": "Choose at least one way to send it.",
+      "idsRequired": "Choose who receives it."
+    },
+    "preview": {
+      "recipients": "Recipients",
+      "withPhone": "With a phone",
+      "withEmail": "With an email",
+      "estimate": "SMS units needed",
+      "available": "SMS units available",
+      "sufficient": "Enough SMS units",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "send": {
+      "blocked": "There are not enough SMS units for this announcement. Remove SMS or buy more units.",
+      "action": "Send announcement",
+      "confirm": "Sending cannot be undone. Send this announcement now?",
+      "now": "Send now",
+      "result": "Queued {queued}; in the app {inApp}; suppressed {suppressed}; duplicates {duplicates}."
+    },
+    "cancelBtn": "Cancel",
+    "cancel": {
+      "action": "Cancel announcement",
+      "confirm": "Cancel announcement",
+      "reason": "Reason (optional)"
+    },
+    "list": {
+      "title": "Announcements",
+      "isOpen": "Not yet sent",
+      "sent": "Sent {when}",
+      "cancelled": "Cancelled",
+      "meta": "{audience}, {recipients} recipients, status {status}, created {created}",
+      "openAction": "Open"
+    },
+    "empty": {
+      "title": "No announcements yet",
+      "body": "Announcements you write appear here."
+    },
+    "previous": "Previous",
+    "next": "Next",
+    "pages": "Announcement pages",
+    "pageOf": "Page {page} of {total}",
+    "state": {
+      "loading": "Loading announcements",
       "refused": "The school refused this change ({code}). Nothing was saved."
     }
   }
