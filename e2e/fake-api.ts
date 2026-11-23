@@ -9,6 +9,7 @@ import { handleStaff } from "./fake-staff.ts";
 import { handleAssessment } from "./fake-assessment.ts";
 import { handleResults } from "./fake-results.ts";
 import { handleInbox } from "./fake-inbox.ts";
+import { handleAnnouncements } from "./fake-announcements.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -661,6 +662,20 @@ export function startFakeApi(): Promise<Server> {
     )
       return;
 
+    // Announcements (ADR 0025, slice 2).
+    if (
+      handleAnnouncements({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+        label: label ?? "",
+      })
+    )
+      return;
+
     // The staff inbox and notification preferences (ADR 0025).
     if (
       handleInbox({
@@ -746,6 +761,7 @@ export function startFakeApi(): Promise<Server> {
                 "results.amend.request",
                 "results.amend.approve",
                 "me.notifications",
+                "announcements.send",
               ]
             : label === "parent"
               ? ["me.profile", "me.wards", "me.pay"]
