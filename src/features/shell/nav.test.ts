@@ -43,6 +43,9 @@ describe("visibleNav", () => {
         "/fees/payments",
         "/fees/ledger",
         "/scores",
+        "/results",
+        "/report-cards",
+        "/amendments",
       ]).toContain(item.href);
   });
 });

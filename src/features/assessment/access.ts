@@ -20,6 +20,8 @@ export function useAssessmentAccess() {
     canEnter: has(ASSESSMENT_PERMISSION.enter) && open,
     canApprove: has(ASSESSMENT_PERMISSION.approve) && open,
     canView: has(ASSESSMENT_PERMISSION.enter, ASSESSMENT_PERMISSION.approve),
+    canRequest: has("results.amend.request") && open,
+    canApproveAmend: has("results.amend.approve") && open,
     readOnlyNotice: readOnly || suspended,
   };
 }

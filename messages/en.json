@@ -186,7 +186,8 @@
       "attendance": "Attendance",
       "fees": "Fees",
       "wards": "Your children",
-      "scores": "Score sheets"
+      "scores": "Score sheets",
+      "results": "Results"
     },
     "billingTitle": "Read-only: this school's account is suspended",
     "billingBody": "You can view information, but changes are turned off. Ask your school administrator to restore the account.",
@@ -1808,5 +1809,175 @@
       "result": "Sent: {applied} saved, {ignored} already newer on the school's record, {refused} refused.",
       "stopped": "Not sent yet: the connection or the school's system was unavailable. Nothing was lost."
     }
+  },
+  "results": {
+    "title": "Results",
+    "intro": "The class broadsheet, as the school computes it. Computing results, and each student's domains and remarks, need a connection.",
+    "offline": "You are offline. Results and remarks cannot be changed until the connection returns.",
+    "loadError": "The results could not be loaded. Try again.",
+    "noAccessTitle": "You cannot see results",
+    "noAccessBody": "Your account has no score or results permission.",
+    "pick": {
+      "class": "Class",
+      "term": "Term"
+    },
+    "compute": {
+      "action": "Compute results",
+      "starting": "Starting",
+      "status": "Job status: {status}",
+      "progress": "{done} of {total} done",
+      "failed": "The computation failed: {error}",
+      "done": "Results are computed. The broadsheet below is up to date."
+    },
+    "export": {
+      "action": "Download broadsheet",
+      "working": "Downloading",
+      "fileName": "broadsheet.xlsx",
+      "failed": "The broadsheet could not be downloaded. Try again."
+    },
+    "empty": {
+      "title": "No results yet",
+      "body": "Results appear once the school has computed them for this class and term."
+    },
+    "broadsheet": {
+      "title": "Broadsheet",
+      "student": "Student",
+      "termTotal": "Term total",
+      "average": "Average",
+      "position": "Position",
+      "absent": "Absent"
+    },
+    "student": {
+      "summary": "Term total {total}, average {average}, position {position} of {outOf}."
+    },
+    "domains": {
+      "title": "Domains",
+      "intro": "Rate each trait from {min} to {max}. Leave a trait blank to keep it unrated.",
+      "save": "Save domains",
+      "saved": "Domains saved."
+    },
+    "rating": {
+      "required": "Enter a rating.",
+      "notWhole": "Use a whole number.",
+      "range": "Use a number from {min} to {max}."
+    },
+    "remarks": {
+      "title": "Remarks",
+      "teacher": "Teacher's remark",
+      "principal": "Principal's remark",
+      "saveTeacher": "Save teacher's remark",
+      "savePrincipal": "Save principal's remark",
+      "saved": "Remark saved.",
+      "tooLong": "Keep the remark to {max} characters."
+    },
+    "saving": "Saving",
+    "state": {
+      "loading": "Loading results",
+      "refused": "The school refused this change ({code}). Nothing was saved.",
+      "forbidden": "You do not have permission to do this."
+    },
+    "related": {
+      "label": "Related pages",
+      "reportCards": "Report cards",
+      "amendments": "Amendments"
+    }
+  },
+  "reportCards": {
+    "title": "Report cards",
+    "intro": "Generate the class's report cards, download each one, and publish them to families. Withheld cards stay hidden until the fees are cleared.",
+    "offline": "You are offline. Report cards cannot be generated or published until the connection returns.",
+    "loadError": "The report cards could not be loaded. Try again.",
+    "noAccessTitle": "You cannot see report cards",
+    "noAccessBody": "Your account has no score or results permission.",
+    "pick": {
+      "class": "Class",
+      "term": "Term"
+    },
+    "empty": {
+      "title": "No report cards yet",
+      "body": "Generate the cards for this class and term to see them here."
+    },
+    "generate": {
+      "title": "Generate",
+      "layout": "Layout",
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "force": "Generate even if some results are incomplete",
+      "forceHint": "Use only when the school has agreed to issue incomplete cards.",
+      "action": "Generate report cards",
+      "working": "Generating",
+      "result": "Generated {generated} cards; {skipped} skipped.",
+      "job": "Job status: {status}",
+      "progress": "{done} of {total} done",
+      "failed": "Generation failed: {error}"
+    },
+    "list": {
+      "title": "Cards",
+      "unknownStudent": "Student",
+      "status": "Status: {status}",
+      "withheld": "Withheld: school fees",
+      "meta": "{layout} layout, version {version}, generated {generated}",
+      "published": "published {when}"
+    },
+    "download": {
+      "action": "Download PDF",
+      "fileName": "report-card.pdf",
+      "failed": "The report card could not be downloaded. Try again."
+    },
+    "publish": {
+      "title": "Publish",
+      "intro": "Publishing shows each family the cards that are not withheld. This cannot be undone from this screen.",
+      "action": "Publish results",
+      "confirm": "Publish this class's report cards now?",
+      "now": "Publish now",
+      "working": "Publishing",
+      "cancel": "Cancel",
+      "result": "Published {published} cards; {withheld} withheld for school fees."
+    }
+  },
+  "amendments": {
+    "title": "Amendments",
+    "intro": "Change a score after the results are published. The change is requested, then approved by a second person.",
+    "offline": "You are offline. Amendments cannot be requested or decided until the connection returns.",
+    "loadError": "The amendments screen could not be loaded. Try again.",
+    "noAccessTitle": "You cannot amend results",
+    "noAccessBody": "Your account has no amendment permission.",
+    "pick": {
+      "class": "Class",
+      "term": "Term"
+    },
+    "request": {
+      "title": "Request a change",
+      "intro": "Give the reason. The approver needs the reference this screen gives you.",
+      "student": "Student",
+      "subject": "Subject",
+      "component": "Component",
+      "score": "New score",
+      "scoreRequired": "Enter the new score.",
+      "reason": "Reason for the change",
+      "action": "Request change",
+      "issued": "Request recorded. Status: {status}.",
+      "referenceLabel": "Reference",
+      "give": "Give this reference to the approver."
+    },
+    "problem": {
+      "format": "Use a number with at most one decimal place.",
+      "negative": "A score cannot be negative.",
+      "range": "A score cannot be above the maximum of {max}."
+    },
+    "reason": {
+      "required": "Give a reason.",
+      "tooLong": "The reason is too long. Keep it under 300 characters."
+    },
+    "decide": {
+      "title": "Approve or reject",
+      "intro": "Enter the reference the requester gave you.",
+      "reference": "Reference",
+      "reason": "Reason, if you reject",
+      "approve": "Approve change",
+      "reject": "Reject change",
+      "result": "Decision recorded. Status: {status}."
+    },
+    "saving": "Saving"
   }
 }
