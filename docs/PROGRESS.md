@@ -279,3 +279,10 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 - **Verification:** fast gate passes (708 unit and component tests; 4 notification rules tests). Browser: the notification journeys pass on desktop and mobile (8 runs; the editing, retry and reset journeys run once, on desktop, in order). Real backend (reads only): the templates, the message log, the statistics and the wallet answer as the contract says.
 - **Bundle (gzipped, 2026-11-23):** admin `/notifications` route-specific 29,419 B (cap 40,960 B).
 - **Not done:** the other F8 slices (dashboards, compliance, billing, platform administration, audit export, the parent's polish).
+
+## F8: the admin dashboard, slice 4 (2026-11-23)
+
+- **Built:** `/dashboard` for users with `dashboard.read`: the students (active, suspended, withdrawn, graduated, active by sex), fees (billed, collected and outstanding in naira from integer kobo, the share collected, the families who owe), and results (score sheets, approved sheets, classes published), for the current term. The term comes from the school's current session. The panels the server did not include are named, not guessed.
+- **Decisions:** ADR 0025. The teacher, bursar and parent dashboards compose several reads (B-15, B-16) and each costs budget on its own route, so they are the next dashboard work and are not built here.
+- **Verification:** fast gate passes (3 dashboard rule tests). Browser: the dashboard passes on desktop and mobile (6 runs, read only, including a plain user refused and an axe check). Real backend: the dashboard answers for the current term, or skips when the seed has none.
+- **Bundle (gzipped, 2026-11-23):** admin `/dashboard` route-specific 22,218 B (cap 40,960 B).
