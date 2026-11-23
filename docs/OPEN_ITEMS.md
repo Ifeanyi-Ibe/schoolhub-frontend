@@ -318,3 +318,10 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Parent inbox:** not built. It needs the light formatter and room in the parent budget (ADR 0025, decision 4).
 - **Inbox navigation:** the inbox is reached from the results screen. A navigation design that fits the parent budget is needed (ADR 0025, decision 6).
 - **F8 slices 2 to 8** remain: announcements, templates and messages, dashboards, compliance, billing (money-flow review first), platform administration, audit export, and the parent's polish.
+
+## Open after F8, slice 2 (2026-11-23)
+
+- **Scheduled announcements** are not built: the screen sends now or saves without a schedule.
+- **Audience ids** are typed by hand (pasted, comma-separated). A picker of classes and people is a follow-up.
+- **B-49:** audience, channel and status values are free strings in the contract.
+- **F8 slices 3 to 8** remain.

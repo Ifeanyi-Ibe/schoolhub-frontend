@@ -262,3 +262,12 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 - **Verification:** fast gate passes (699 unit and component tests; 4 inbox rules tests). Browser: the inbox journeys pass on desktop and mobile (6 runs; the two that change the shared messages and preferences run on desktop only). Real backend: the inbox and the preferences answer as the contract says (reads only).
 - **Bundle (gzipped, 2026-11-23):** admin `/inbox` route-specific 23,252 B (cap 40,960 B). Parent worst route unchanged at 173,995 B (cap 174,080 B). The navigation item was tried and removed for that reason.
 - **Not done:** the parent's inbox and preferences (ADR 0025, decision 4); slices 2 to 8 of F8.
+
+## F8: announcements, slice 2 (2026-11-23)
+
+- **Built:** `/announcements` for users with `announcements.send`. Write an announcement (title, message, who receives it, and how it is sent: SMS, email or in the app), save it, and check the audience before anything is sent: the recipients, those with a phone and with an email, the SMS units it would use and the units the school has. Sending needs a checked audience, a confirmation, and enough SMS units when SMS is chosen; the server's counts are shown after it answers. An announcement not yet sent or cancelled can be edited or cancelled (with an optional reason); its state is read from its timestamps.
+- **Decisions:** ADR 0025. Sending is never optimistic, and create and send carry an Idempotency-Key. Scheduled sends are not in this slice (the screen sends the announcement, or saves it without a schedule).
+- **Verification:** fast gate passes (announcement rules: 5 tests). Browser: the announcement journeys pass on desktop and mobile (6 runs; the desktop-only runs create, send and cancel the shared announcements). Real backend (reads only): the list answers as a page; the audience check answers the counts and sends nothing.
+- **Bundle (gzipped, 2026-11-23):** admin `/announcements` route-specific 29,594 B (cap 40,960 B).
+- **Gaps:** B-49 (audience, channel and status values are free strings). Scheduled sends are not built.
+- **Not done:** slices 3 to 8 of F8.

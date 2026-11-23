@@ -1,6 +1,6 @@
 # 0025: Notifications, dashboards, compliance, billing and platform administration (F8)
 
-- **Status:** Accepted, 2026-11-23. Slice 1 (the staff inbox and notification preferences) is built.
+- **Status:** Accepted, 2026-11-23. Slices 1 (the staff inbox and notification preferences) and 2 (announcements) are built.
 
 ## Context
 

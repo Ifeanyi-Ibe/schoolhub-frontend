@@ -368,3 +368,9 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** the parent's results (`GET /me/wards/{id}/results`) and report cards (`GET /me/wards/{id}/report-cards`) need a `termId`. Nothing a parent can call lists terms: `/sessions` and `/sessions/{id}/terms` are for staff. The tenant summary has no current term.
 - **Design-around:** none yet. The parent's results screen is deferred (ADR 0024, decision 6), so no parent screen asks for a term it cannot choose.
 - **Status:** Open. Ask the backend for the current term in the parent's ward summary, or a parent-readable term list.
+
+### B-49 — Announcement audiences, channels and statuses are free strings, and their values are not in the contract
+
+- **Contract:** `AnnouncementBody.audience`, `channels` and `AnnouncementView.status` are strings. The contract lists no values.
+- **Design-around (ADR 0025, slice 2):** the screen offers the audiences and channels the backend specification documents (all, levels, arms, staff, custom; sms, email, in-app). An audience or status the server sends that the screen does not know is shown as it arrives. Whether an announcement is open, sent or cancelled is read from its timestamps, not from its status word.
+- **Status:** Open. Ask the backend to document the values, and to type them as enumerations in the contract.
