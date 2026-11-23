@@ -11,6 +11,7 @@ import { handleResults } from "./fake-results.ts";
 import { handleInbox } from "./fake-inbox.ts";
 import { handleAnnouncements } from "./fake-announcements.ts";
 import { handleNotifications } from "./fake-notifications.ts";
+import { handleDashboard } from "./fake-dashboard.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -663,6 +664,19 @@ export function startFakeApi(): Promise<Server> {
     )
       return;
 
+    // The admin dashboard for the term (ADR 0025, slice 4).
+    if (
+      handleDashboard({
+        method: req.method ?? "GET",
+        path,
+        url,
+        res,
+        send,
+        label: label ?? "",
+      })
+    )
+      return;
+
     // Notification templates, the message log, statistics and the SMS wallet (ADR 0025, slice 3).
     if (
       handleNotifications({
@@ -780,6 +794,7 @@ export function startFakeApi(): Promise<Server> {
                 "notifications.templates.manage",
                 "notifications.messages.read",
                 "notifications.messages.retry",
+                "dashboard.read",
               ]
             : label === "parent"
               ? ["me.profile", "me.wards", "me.pay"]
