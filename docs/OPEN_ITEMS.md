@@ -312,3 +312,9 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Real-backend workflow for results, cards and amendments is not verified:** computing, generating, publishing and amending change the school's data, so only the reads are checked against the real backend. The broadsheet and card checks need a term in the seed; the one that does is skipped.
 - **Pickers:** the results, report card and amendment screens each keep a class and term picker. A shared picker is a follow-up.
 - **Shell ratchet:** the `/sessions` ceiling was raised to its measured value after the shell gained the results item and the offline sign-out protection. Recheck the ratchet if the shell changes again.
+
+## Open after F8, slice 1 (2026-11-23)
+
+- **Parent inbox:** not built. It needs the light formatter and room in the parent budget (ADR 0025, decision 4).
+- **Inbox navigation:** the inbox is reached from the results screen. A navigation design that fits the parent budget is needed (ADR 0025, decision 6).
+- **F8 slices 2 to 8** remain: announcements, templates and messages, dashboards, compliance, billing (money-flow review first), platform administration, audit export, and the parent's polish.
