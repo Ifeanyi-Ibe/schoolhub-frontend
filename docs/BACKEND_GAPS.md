@@ -350,3 +350,21 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** the parent endpoints give the wards, a ward's invoices, online payment initialisation and verification by reference, and a receipt by payment id. No endpoint lists a parent's past payments.
 - **Design-around (ADR 0021):** a receipt is offered only on the return screen, for a payment the parent has just verified. A parent cannot review earlier payments in the app.
 - **Status:** Open. A list of a ward's payments (or of the parent's payments) would let the parent find and download earlier receipts.
+
+### B-46 — Job status is a free string, and its values are not documented
+
+- **Contract:** `JobView.status` is a string. The computation and the report card generation both return jobs, and the contract does not list the status values.
+- **Design-around (ADR 0024, decision 2):** the screen shows the status as it arrives. A job is finished when every item is done, or when its status reads as completed or failed; an error is shown as the server's text.
+- **Status:** Open. Ask the backend to document the values (queued, running, completed, failed).
+
+### B-47 — No list of amendments
+
+- **Contract:** amendments can be requested, approved and rejected by id. No operation lists them, and the request answer is the only place the id appears.
+- **Design-around (ADR 0024, decision 5):** the requester is shown the reference and must give it to the approver, who enters it. A lost reference means a new request.
+- **Status:** Open. A list of amendments by class and term would let an approver find pending ones.
+
+### B-48 — A parent cannot find the current term, so the parent's results and report cards have no term to ask for
+
+- **Contract:** the parent's results (`GET /me/wards/{id}/results`) and report cards (`GET /me/wards/{id}/report-cards`) need a `termId`. Nothing a parent can call lists terms: `/sessions` and `/sessions/{id}/terms` are for staff. The tenant summary has no current term.
+- **Design-around:** none yet. The parent's results screen is deferred (ADR 0024, decision 6), so no parent screen asks for a term it cannot choose.
+- **Status:** Open. Ask the backend for the current term in the parent's ward summary, or a parent-readable term list.
