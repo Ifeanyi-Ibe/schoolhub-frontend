@@ -1882,7 +1882,8 @@
       "amendments": "Amendments",
       "inbox": "Inbox",
       "announcements": "Announcements",
-      "notifications": "Notifications"
+      "notifications": "Notifications",
+      "dashboard": "Dashboard"
     }
   },
   "reportCards": {
@@ -2179,6 +2180,47 @@
     "state": {
       "loading": "Loading notifications",
       "refused": "The school refused this change ({code}). Nothing was saved."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "intro": "The school this term.",
+    "generated": "As of {when}.",
+    "noAccessTitle": "You cannot see the dashboard",
+    "noAccessBody": "Your account has no dashboard permission.",
+    "loadError": "The dashboard could not be loaded. Try again.",
+    "noTerm": {
+      "title": "No current term",
+      "body": "Set the current term in academic sessions to see the dashboard."
+    },
+    "enrolment": {
+      "title": "Students",
+      "active": "Active",
+      "suspended": "Suspended",
+      "withdrawn": "Withdrawn",
+      "graduated": "Graduated",
+      "female": "Active girls",
+      "male": "Active boys"
+    },
+    "fees": {
+      "title": "Fees",
+      "billed": "Billed",
+      "collected": "Collected",
+      "outstanding": "Outstanding",
+      "collectedPercent": "Collected",
+      "debtors": "Families who owe"
+    },
+    "results": {
+      "title": "Results",
+      "sheets": "Score sheets",
+      "approved": "Approved sheets",
+      "published": "Classes published"
+    },
+    "notIncluded": {
+      "title": "Not in this view"
+    },
+    "state": {
+      "loading": "Loading the dashboard"
     }
   }
 }
