@@ -19,6 +19,7 @@ export interface AssessmentCall {
   send: Send;
   label: string;
   components: ReadonlyArray<{ id: string; name: string; maxScore: number; order: number }>;
+  termIds?: readonly string[];
 }
 
 const problem = (status: number, code: string, title: string) => ({
@@ -53,7 +54,7 @@ interface StoredCell {
   updatedAt: string;
 }
 
-interface StoredSheet {
+export interface StoredSheet {
   id: string;
   termId: string;
   classArmId: string;
@@ -103,8 +104,42 @@ function parseTenths(text: string): number | "format" | null {
   return Number(m[1]) * 10 + (m[2] === undefined ? 0 : Number(m[2]));
 }
 
+export const ASSESSMENT_SHEET_ID = "0190a6c2-0000-7000-8000-000000000c01";
+
+/** Every sheet, for the results double. */
+export function allSheets(): StoredSheet[] {
+  return [...sheets.values()];
+}
+
+export function sheetStudents() {
+  return STUDENTS;
+}
+
+/** One blank draft sheet for the current term, so the browser journeys start from a sheet that exists (the fake resets per run). */
+function seedTerms(termIds: readonly string[]) {
+  // Every term of the session gets its sheet: other journeys change which term is current, and the screens follow it.
+  termIds.forEach((termId, i) => {
+    const key = sheetKey(termId, ASSESSMENT_ARM, ASSESSMENT_SUBJECT);
+    if (sheets.has(key)) return;
+    sheets.set(key, {
+      id:
+        i === 0
+          ? ASSESSMENT_SHEET_ID
+          : `0190a6c2-0000-7000-8000-${String(0xc00 + i).padStart(12, "0")}`,
+      termId,
+      classArmId: ASSESSMENT_ARM,
+      subjectId: ASSESSMENT_SUBJECT,
+      status: "Draft",
+      submittedAt: null,
+      approvedAt: null,
+      cells: new Map(),
+    });
+  });
+}
+
 export function handleAssessment(call: AssessmentCall): boolean {
   const { method, path, url, body, res, send, label, components } = call;
+  seedTerms(call.termIds ?? []);
 
   if (path === "/api/v1/me/assignments" && method === "GET") {
     const assignments =

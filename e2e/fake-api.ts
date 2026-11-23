@@ -7,6 +7,7 @@ import { handleAttendance } from "./fake-attendance.ts";
 import { handleFees, settleGatewayPayment } from "./fake-fees.ts";
 import { handleStaff } from "./fake-staff.ts";
 import { handleAssessment } from "./fake-assessment.ts";
+import { handleResults } from "./fake-results.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -652,6 +653,23 @@ export function startFakeApi(): Promise<Server> {
         send,
         label: label ?? "",
         components: ASSESSMENT.find((s) => s.isDefault)?.components ?? [],
+        termIds: TERMS.filter((x) => x.sessionId === "0190a6c2-0000-7000-8000-000000000801").map(
+          (x) => x.id,
+        ),
+      })
+    )
+      return;
+
+    // Results (ADR 0024): the computation job, the broadsheet and export, student results, domains and remarks.
+    if (
+      handleResults({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+        label: label ?? "",
       })
     )
       return;
@@ -710,6 +728,8 @@ export function startFakeApi(): Promise<Server> {
                 "results.scores.enter",
                 "results.approve",
                 "results.publish",
+                "results.amend.request",
+                "results.amend.approve",
               ]
             : label === "parent"
               ? ["me.profile", "me.wards", "me.pay"]
@@ -723,6 +743,7 @@ export function startFakeApi(): Promise<Server> {
                       "fees.payments.approve",
                       "fees.discounts.approve",
                       "results.approve",
+                      "results.amend.approve",
                     ]
                   : ["me.profile"],
       });
