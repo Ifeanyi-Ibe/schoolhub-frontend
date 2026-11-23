@@ -271,3 +271,11 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 - **Bundle (gzipped, 2026-11-23):** admin `/announcements` route-specific 29,594 B (cap 40,960 B).
 - **Gaps:** B-49 (audience, channel and status values are free strings). Scheduled sends are not built.
 - **Not done:** slices 3 to 8 of F8.
+
+## F8: templates, message log, statistics and SMS wallet, slice 3 (2026-11-23)
+
+- **Built:** `/notifications` for users with the notification permissions. Templates: edit the subject and message of each template, preview it with sample values, and put a changed template back to the school's default text. Message log: filter by status and channel, see the last error and attempts, retry a message that failed and was never delivered (one key per retry). Statistics: messages and the delivery rate for 7, 30 or 90 days. SMS wallet: balance, reserved and available units, and the recent entries.
+- **Decisions:** ADR 0025. Retry is offered from the server's fields (a last error and no delivery), not from a status word. Money is not involved: the wallet is in SMS units, as the server sends them.
+- **Verification:** fast gate passes (708 unit and component tests; 4 notification rules tests). Browser: the notification journeys pass on desktop and mobile (8 runs; the editing, retry and reset journeys run once, on desktop, in order). Real backend (reads only): the templates, the message log, the statistics and the wallet answer as the contract says.
+- **Bundle (gzipped, 2026-11-23):** admin `/notifications` route-specific 29,419 B (cap 40,960 B).
+- **Not done:** the other F8 slices (dashboards, compliance, billing, platform administration, audit export, the parent's polish).
