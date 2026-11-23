@@ -10,6 +10,7 @@ import { handleAssessment } from "./fake-assessment.ts";
 import { handleResults } from "./fake-results.ts";
 import { handleInbox } from "./fake-inbox.ts";
 import { handleAnnouncements } from "./fake-announcements.ts";
+import { handleNotifications } from "./fake-notifications.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -662,6 +663,20 @@ export function startFakeApi(): Promise<Server> {
     )
       return;
 
+    // Notification templates, the message log, statistics and the SMS wallet (ADR 0025, slice 3).
+    if (
+      handleNotifications({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+        label: label ?? "",
+      })
+    )
+      return;
+
     // Announcements (ADR 0025, slice 2).
     if (
       handleAnnouncements({
@@ -762,6 +777,9 @@ export function startFakeApi(): Promise<Server> {
                 "results.amend.approve",
                 "me.notifications",
                 "announcements.send",
+                "notifications.templates.manage",
+                "notifications.messages.read",
+                "notifications.messages.retry",
               ]
             : label === "parent"
               ? ["me.profile", "me.wards", "me.pay"]
