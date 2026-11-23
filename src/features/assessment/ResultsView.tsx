@@ -144,6 +144,9 @@ export function ResultsView() {
         <Link href="/announcements" className="text-brand underline underline-offset-4">
           {t("related.announcements")}
         </Link>
+        <Link href="/notifications" className="text-brand underline underline-offset-4">
+          {t("related.notifications")}
+        </Link>
       </nav>
       {!online ? (
         <p

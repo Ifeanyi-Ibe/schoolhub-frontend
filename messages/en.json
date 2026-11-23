@@ -1881,7 +1881,8 @@
       "reportCards": "Report cards",
       "amendments": "Amendments",
       "inbox": "Inbox",
-      "announcements": "Announcements"
+      "announcements": "Announcements",
+      "notifications": "Notifications"
     }
   },
   "reportCards": {
@@ -2104,6 +2105,79 @@
     "pageOf": "Page {page} of {total}",
     "state": {
       "loading": "Loading announcements",
+      "refused": "The school refused this change ({code}). Nothing was saved."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "intro": "Edit the messages the school sends, check the log and retry failed ones, and see the SMS units left.",
+    "offline": "You are offline. Templates cannot be saved and messages cannot be retried until the connection returns.",
+    "noAccessTitle": "You cannot manage notifications",
+    "noAccessBody": "Your account has no notification permission.",
+    "loadError": "Notifications could not be loaded. Try again.",
+    "working": "Working",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "templates": {
+      "title": "Message templates",
+      "intro": "The text of each message. Variables in braces are filled in when the message is sent.",
+      "customised": "Changed by the school",
+      "default": "Default text",
+      "variables": "Variables: {variables}",
+      "edit": "Edit",
+      "subject": "Subject (optional)",
+      "body": "Message",
+      "preview": "Preview",
+      "save": "Save template",
+      "saved": "Template saved.",
+      "resetDone": "Template returned to the default text.",
+      "reset": {
+        "action": "Use default text"
+      }
+    },
+    "problem": {
+      "bodyRequired": "Write the message."
+    },
+    "messages": {
+      "retried": "The message has been queued again."
+    },
+    "log": {
+      "title": "Message log",
+      "status": "Status",
+      "channel": "Channel",
+      "any": "All",
+      "statusSent": "Sent",
+      "statusFailed": "Failed",
+      "statusQueued": "Queued",
+      "channelSms": "SMS",
+      "channelEmail": "Email",
+      "channelInApp": "In the app",
+      "meta": "{channel}, {category}, attempts {attempts}, created {created}",
+      "error": "Last error: {error}",
+      "retry": "Retry",
+      "pages": "Message log pages",
+      "empty": {
+        "title": "No messages",
+        "body": "Messages sent by the school appear here."
+      }
+    },
+    "stats": {
+      "title": "Delivery",
+      "window": "Period",
+      "days": "Last {days} days",
+      "total": "Messages",
+      "success": "Delivered"
+    },
+    "wallet": {
+      "title": "SMS units",
+      "balance": "Balance",
+      "reserved": "Reserved",
+      "available": "Available",
+      "entry": "{kind}: {units} units, {when}"
+    },
+    "state": {
+      "loading": "Loading notifications",
       "refused": "The school refused this change ({code}). Nothing was saved."
     }
   }
