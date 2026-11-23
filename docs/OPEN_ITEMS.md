@@ -303,3 +303,12 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Reload while offline:** a sheet is not kept on the device, so a page reloaded while offline cannot open its sheet. The queued cells are kept and sent when the screen opens online.
 - **Two devices, one cell:** a cell edited on two devices is settled by the entry time the server records (last write wins). Nothing shows the teacher that another device changed it.
 - **F7 slices 3 to 5** remain: computation, broadsheet and student results with domains and remarks; report cards; amendments and the parent's results.
+
+## Open after F7, slices 3 to 5 (2026-11-23)
+
+- **Parent results and report cards are not built (B-48).** No parent endpoint lists terms, and the results and cards need one. Ask the backend for the current term in the ward summary. Then build the screen at `/wards/[id]/results`, with its own namespace and budget check (ADR 0024, decision 6).
+- **Amendments cannot be found by an approver (B-47).** The reference passes from the requester to the approver by hand.
+- **Job status values (B-46).** The screen shows the status as it arrives; finished is decided from the item counts and from words in the status.
+- **Real-backend workflow for results, cards and amendments is not verified:** computing, generating, publishing and amending change the school's data, so only the reads are checked against the real backend. The broadsheet and card checks need a term in the seed; the one that does is skipped.
+- **Pickers:** the results, report card and amendment screens each keep a class and term picker. A shared picker is a follow-up.
+- **Shell ratchet:** the `/sessions` ceiling was raised to its measured value after the shell gained the results item and the offline sign-out protection. Recheck the ratchet if the shell changes again.
