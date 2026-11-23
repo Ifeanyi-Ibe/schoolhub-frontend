@@ -134,6 +134,9 @@
         },
         "/announcements": {
           "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
+        },
+        "/notifications": {
+          "cookie": "sh_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig; sh_rt=rt:admin:1"
         }
       },
       "maxRouteSpecificGzipBytes": 40960,
