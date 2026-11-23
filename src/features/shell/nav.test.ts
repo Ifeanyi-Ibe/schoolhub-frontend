@@ -46,6 +46,7 @@ describe("visibleNav", () => {
         "/results",
         "/report-cards",
         "/amendments",
+        "/inbox",
       ]).toContain(item.href);
   });
 });

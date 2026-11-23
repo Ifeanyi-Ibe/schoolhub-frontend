@@ -138,6 +138,9 @@ export function ResultsView() {
         <Link href="/amendments" className="text-brand underline underline-offset-4">
           {t("related.amendments")}
         </Link>
+        <Link href="/inbox" className="text-brand underline underline-offset-4">
+          {t("related.inbox")}
+        </Link>
       </nav>
       {!online ? (
         <p

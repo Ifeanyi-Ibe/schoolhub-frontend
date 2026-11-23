@@ -1879,7 +1879,8 @@
     "related": {
       "label": "Related pages",
       "reportCards": "Report cards",
-      "amendments": "Amendments"
+      "amendments": "Amendments",
+      "inbox": "Inbox"
     }
   },
   "reportCards": {
@@ -1979,5 +1980,45 @@
       "result": "Decision recorded. Status: {status}."
     },
     "saving": "Saving"
+  },
+  "inbox": {
+    "title": "Inbox",
+    "intro": "Messages from the school. You have {unread} unread.",
+    "offline": "You are offline. Messages can be marked as read when the connection returns.",
+    "loadError": "The inbox could not be loaded. Try again.",
+    "noAccessTitle": "You cannot read the inbox",
+    "noAccessBody": "Your account has no notifications permission.",
+    "filter": {
+      "unreadOnly": "Show unread only"
+    },
+    "markAll": "Mark all as read",
+    "markOne": "Mark as read",
+    "markedAll": "{count} messages marked as read.",
+    "noSubject": "School message",
+    "unread": "Unread",
+    "read": "Read",
+    "meta": "{category}, {when}",
+    "empty": {
+      "title": "Nothing here",
+      "body": "New messages from the school appear here."
+    },
+    "previous": "Previous",
+    "next": "Next",
+    "pages": "Inbox pages",
+    "pageOf": "Page {page} of {total}",
+    "prefs": {
+      "title": "Notification preferences",
+      "intro": "Choose how you hear about each kind of message. Required messages cannot be turned off.",
+      "category": "Category",
+      "cell": "{category} by {channel}",
+      "required": "Required",
+      "save": "Save preferences",
+      "saved": "Preferences saved."
+    },
+    "saving": "Saving",
+    "state": {
+      "loading": "Loading the inbox",
+      "refused": "The school refused this change ({code}). Nothing was saved."
+    }
   }
 }
