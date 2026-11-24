@@ -1885,7 +1885,8 @@
       "notifications": "Notifications",
       "dashboard": "Dashboard",
       "compliance": "Compliance",
-      "billing": "Billing"
+      "billing": "Billing",
+      "audit": "Audit log"
     }
   },
   "reportCards": {
@@ -2353,6 +2354,69 @@
     },
     "state": {
       "loading": "Loading billing",
+      "refused": "The school refused this change ({code}). Nothing was saved."
+    }
+  },
+  "audit": {
+    "title": "Audit log",
+    "intro": "Every change the school's records have seen, who made it and whether it was allowed. Read it to answer a question; export it to keep a copy.",
+    "offline": "You are offline. The log and exports need a connection.",
+    "loadError": "The audit log could not be loaded. Try again.",
+    "noAccessTitle": "You cannot see the audit log",
+    "noAccessBody": "Your account has no audit permission.",
+    "working": "Working",
+    "previous": "Previous",
+    "next": "Next",
+    "pageNumber": "Page {page}",
+    "filter": {
+      "action": "Action",
+      "entityType": "Kind of record",
+      "outcome": "Outcome",
+      "from": "From",
+      "to": "To",
+      "apply": "Show",
+      "any": "Any",
+      "reversed": "The end date is before the start date."
+    },
+    "outcome": {
+      "Success": "Allowed",
+      "Denied": "Refused",
+      "Failed": "Failed"
+    },
+    "actor": {
+      "User": "a person",
+      "System": "the system",
+      "Platform": "SchoolHub",
+      "Webhook": "a message service",
+      "Support": "SchoolHub support"
+    },
+    "list": {
+      "title": "Entries",
+      "meta": "{when}, {action}, by {actor}, {outcome}",
+      "pages": "Audit log pages"
+    },
+    "empty": {
+      "title": "No entries",
+      "body": "Nothing matches these filters."
+    },
+    "export": {
+      "title": "Export",
+      "intro": "A CSV of the entries that match the filters. The school keeps the copy; it is built in the background.",
+      "start": "Start export",
+      "status": "Export {status}",
+      "states": {
+        "Queued": "waiting to start",
+        "Running": "being built",
+        "Completed": "ready",
+        "Failed": "failed"
+      },
+      "error": "The export failed: {code}",
+      "download": "Download CSV",
+      "fileName": "audit-log.csv",
+      "failed": "The export could not be downloaded. Try again."
+    },
+    "state": {
+      "loading": "Loading the audit log",
       "refused": "The school refused this change ({code}). Nothing was saved."
     }
   }
