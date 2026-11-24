@@ -302,3 +302,14 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 - **Money-flow checkpoint: pending review** (ADR 0026). The decisions are recorded there; the review is the user's.
 - **Verification:** fast gate passes (2 billing rule tests). Browser: the billing screen passes on desktop and mobile (8 runs; the payment journey runs once, on desktop). Real backend (reads only): the subscription and the invoices answer. Payment is not run against the real backend.
 - **Bundle (gzipped, 2026-11-24):** admin `/billing` route-specific 28,277 B (cap 40,960 B).
+
+## F8: audit log and export, slice 8 (2026-11-24)
+
+- **Built:** `/audit` for users with `audit.read`: the log filtered by action, kind of record, outcome and dates, paged by cursor. An export of the log for the same filters is built by the server in the background; the screen polls it until the server says it is completed or failed, and downloads the CSV when it is ready.
+- **Verification:** fast gate passes (audit rules: 2 tests). Browser: the audit journeys pass on desktop and mobile (6 runs). A parallel-run fault in the test double, where a second export replaced the first, was fixed in the double (it keeps every export by id, as the server does); the journeys were not changed.
+- **Real backend:** not exercised for exports (an export records the school's audit data); the log's list is read-only.
+- **Bundle (gzipped, 2026-11-24):** admin `/audit` route-specific 24,003 B (cap 40,960 B).
+
+## F8: platform administration and parent polish, slices 7 and 9 (2026-11-24)
+
+- **Not built.** Decisions and reasons are in ADR 0027: the platform sign-in changes BFF session handling and needs the security review; the parent's inbox, dashboard and results need budget room that the cap does not allow.
