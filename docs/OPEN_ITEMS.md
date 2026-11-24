@@ -331,3 +331,9 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Subject types** are typed by the school (B-50).
 - **Erasure and export** are checked against the test double only. The real backend is not asked to erase or export a person, because that changes real records.
 - **F8 slices 6 to 9** remain.
+
+## Open after F8, slice 6 (2026-11-24)
+
+- **Money-flow review for billing (ADR 0026) is pending**, and needs the user's sign-off before billing is relied on.
+- **The suspension banner** does not link to the billing screen yet.
+- **F8 slices 7 to 9** remain: platform administration (its own sign-in and MFA), audit export, and the parent's polish.
