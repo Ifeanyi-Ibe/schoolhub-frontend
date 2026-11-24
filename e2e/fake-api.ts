@@ -12,6 +12,7 @@ import { handleInbox } from "./fake-inbox.ts";
 import { handleAnnouncements } from "./fake-announcements.ts";
 import { handleNotifications } from "./fake-notifications.ts";
 import { handleDashboard } from "./fake-dashboard.ts";
+import { handleCompliance } from "./fake-compliance.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -664,6 +665,20 @@ export function startFakeApi(): Promise<Server> {
     )
       return;
 
+    // Compliance: consents, data requests with maker-checker, and the school export (ADR 0025, slice 5).
+    if (
+      handleCompliance({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+        label: label ?? "",
+      })
+    )
+      return;
+
     // The admin dashboard for the term (ADR 0025, slice 4).
     if (
       handleDashboard({
@@ -795,6 +810,7 @@ export function startFakeApi(): Promise<Server> {
                 "notifications.messages.read",
                 "notifications.messages.retry",
                 "dashboard.read",
+                "compliance.manage",
               ]
             : label === "parent"
               ? ["me.profile", "me.wards", "me.pay"]
