@@ -2419,5 +2419,86 @@
       "loading": "Loading the audit log",
       "refused": "The school refused this change ({code}). Nothing was saved."
     }
+  },
+  "platform": {
+    "signIn": {
+      "title": "Platform sign-in",
+      "intro": "For SchoolHub staff only. Two-step sign-in is required.",
+      "identifier": "Email or user name",
+      "password": "Password",
+      "continue": "Continue",
+      "code": "Code from your authenticator",
+      "signIn": "Sign in",
+      "working": "Working",
+      "failed": "The sign-in did not work. Check your details and try again.",
+      "rateLimited": "Too many attempts. Try again in {seconds} seconds.",
+      "enrolNotAvailable": "Two-step sign-in has not been set up for this account. Set it up with the platform team. This screen cannot set it up yet."
+    },
+    "signOut": {
+      "action": "Sign out"
+    },
+    "session": {
+      "title": "Sign in to the platform",
+      "body": "Your platform session has ended, or you have not signed in to the platform.",
+      "action": "Go to sign-in"
+    },
+    "tenants": {
+      "title": "Schools",
+      "intro": "Every school on SchoolHub, and its status.",
+      "status": "Status",
+      "anyStatus": "All statuses",
+      "loadError": "The schools could not be loaded. Try again.",
+      "loading": "Loading schools",
+      "empty": {
+        "title": "No schools",
+        "body": "No school matches this status."
+      },
+      "row": "{slug}, {status}, plan {plan}",
+      "previous": "Previous",
+      "next": "Next",
+      "pages": "Pages of schools",
+      "pageOf": "Page {page} of {total}"
+    },
+    "tenant": {
+      "back": "All schools",
+      "loadError": "The school could not be loaded. Try again.",
+      "loading": "Loading",
+      "summary": "{slug}, {status}",
+      "plan": "Plan: {plan}",
+      "created": "Created {when}",
+      "reason": "Reason: {reason}",
+      "suspend": {
+        "title": "Suspend this school",
+        "reason": "Reason (required)",
+        "reasonRequired": "Give a reason.",
+        "action": "Suspend"
+      },
+      "reactivate": "Reactivate",
+      "working": "Working",
+      "done": {
+        "suspend": "The school is suspended.",
+        "reactivate": "The school is active again."
+      },
+      "refused": "The platform refused this change ({code}). Nothing was saved.",
+      "signedOut": "Your platform session has ended. Sign in again."
+    },
+    "metrics": {
+      "title": "Platform",
+      "intro": "The state of every school on SchoolHub.",
+      "loadError": "The metrics could not be loaded. Try again.",
+      "loading": "Loading",
+      "mrr": "Monthly recurring revenue",
+      "churn": "Churned in 30 days",
+      "openInvoices": "Open invoices",
+      "openKobo": "Owed on open invoices",
+      "overdue": "Overdue invoices"
+    },
+    "status": {
+      "Trial": "Trial",
+      "Active": "Active",
+      "PastDue": "Past due",
+      "Suspended": "Suspended",
+      "Cancelled": "Cancelled"
+    }
   }
 }
