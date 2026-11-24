@@ -1884,7 +1884,8 @@
       "announcements": "Announcements",
       "notifications": "Notifications",
       "dashboard": "Dashboard",
-      "compliance": "Compliance"
+      "compliance": "Compliance",
+      "billing": "Billing"
     }
   },
   "reportCards": {
@@ -2307,6 +2308,52 @@
       "exportFileName": "subject-data.json",
       "zip": "Download school export",
       "zipFileName": "school-export.zip"
+    }
+  },
+  "billing": {
+    "title": "Billing",
+    "intro": "The school's subscription to SchoolHub, and its invoices. Paying an invoice is recorded by the server; nothing is shown as paid until it says so.",
+    "offline": "You are offline. Invoices cannot be paid until the connection returns.",
+    "suspended": "The school is suspended for non-payment. Pay the outstanding invoices to restore access.",
+    "loadError": "Billing could not be loaded. Try again.",
+    "noAccessTitle": "You cannot see billing",
+    "noAccessBody": "Only the school's administrators can see billing.",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "cancel": "Cancel",
+    "subscription": {
+      "title": "Subscription",
+      "plan": "Plan",
+      "price": "Price",
+      "status": "Status",
+      "outstanding": "Owed",
+      "oldestDue": "Oldest unpaid invoice due",
+      "graceEnds": "Grace period ends"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "empty": {
+        "title": "No invoices",
+        "body": "The school has no invoices yet."
+      },
+      "period": "{start} to {due} (due)",
+      "paid": "Paid {when}",
+      "unpaid": "Not yet paid",
+      "reference": "Reference {reference}",
+      "pages": "Invoice pages"
+    },
+    "pay": {
+      "action": "Pay this invoice",
+      "confirm": "Pay {amount} now? The payment is recorded by the server.",
+      "now": "Pay now",
+      "working": "Paying",
+      "unavailable": "The payment service is unavailable right now. Nothing was paid. Try again shortly.",
+      "result": "Invoice {status}. School account: {tenant}."
+    },
+    "state": {
+      "loading": "Loading billing",
+      "refused": "The school refused this change ({code}). Nothing was saved."
     }
   }
 }

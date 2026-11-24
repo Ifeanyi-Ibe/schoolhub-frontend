@@ -24,6 +24,7 @@ export default async function StaffLayout({ children }: { children: ReactNode })
     "notifications",
     "dashboard",
     "compliance",
+    "billing",
   ]);
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
