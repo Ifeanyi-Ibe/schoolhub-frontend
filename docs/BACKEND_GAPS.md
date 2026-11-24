@@ -384,4 +384,9 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 ### B-51 — Platform and school tokens must be refused on each other's routes
 
 - **Need (security review, docs/security/platform-review-2026-11-24.md, F5):** the platform routes (`/api/v1/platform/...`) must refuse a school access token, and the school routes must refuse a platform token. The BFF now keeps school tokens off the platform area (F1), but the API is the final gate.
-- **Status:** Open. Ask the backend to confirm both directions with a test, and to document it. The platform screens are released only after this is confirmed against the real backend.
+- **Status:** Landed and verified (2026-11-24). The real-backend check (`e2e-real/platform-journeys.spec.ts`) shows a school token refused on `api/v1/platform/tenants` (401 or 403) and a platform token refused on `api/v1/students` (401 or 403).
+
+### B-52 — Platform two-step sign-in enrolment is not in the BFF
+
+- **Need:** a platform user without an authenticator must enrol (`mfa/enrollment`, `mfa/enrollment/confirm`) before signing in. The contract provides both; the BFF's platform routes do not yet carry them, and the screen says so instead of faking enrolment.
+- **Status:** Open. Build the enrolment routes in `src/server/platform-routes.ts` with the same cookie and failure rules as sign-in (ADR 0027).

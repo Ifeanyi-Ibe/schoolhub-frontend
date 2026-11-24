@@ -352,3 +352,9 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - Platform sign-in: stays unbuilt until the security review (ADR 0027).
 - Parent polish: stays blocked; a budget proposal is the next step (ADR 0027).
 - Scheduled announcements and the audience picker: deferred to a follow-up slice (no contract blocker).
+
+## Open after slice 7 (2026-11-24)
+
+- **Platform enrolment (B-52)** is not built: a user without an authenticator is told so.
+- **Platform billing sweep and SMS top-up** screens are not built.
+- **Parent polish (slice 9)** is blocked on the parent budget.

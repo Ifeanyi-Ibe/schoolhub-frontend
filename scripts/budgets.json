@@ -154,6 +154,21 @@
       "maxRouteSpecificGzipBytes": 40960,
       "shellRoutes": ["/home", "/profile", "/sessions"],
       "ratchetToleranceGzipBytes": 256
+    },
+    "platform": {
+      "budgetGzipBytes": 204800,
+      "routes": {
+        "/platform/sign-in": {},
+        "/platform/tenants": {
+          "cookie": "sh_p_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJwbGF0Zm9ybSIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig"
+        },
+        "/platform/tenants/0190a6c2-0000-7000-8000-000000005001": {
+          "cookie": "sh_p_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJwbGF0Zm9ybSIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig"
+        },
+        "/platform/metrics": {
+          "cookie": "sh_p_at=eyJhbGciOiJub25lIn0.eyJzdWIiOiJwbGF0Zm9ybSIsInRpZCI6ImdyZWVuZmllbGQiLCJleHAiOjQxMDI0NDQ4MDB9.sig"
+        }
+      }
     }
   }
 }

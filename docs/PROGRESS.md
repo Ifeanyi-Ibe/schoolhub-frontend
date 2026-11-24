@@ -319,3 +319,12 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 - **Defect:** a send in the attendance or score queue that was in flight when the connection dropped could stall indefinitely, and the queue runs one send at a time, so later syncs waited behind it. A full-run attendance journey failed this way intermittently (it passes alone).
 - **Fix:** every queued send is bounded at 15 seconds (`src/lib/async/timeout.ts`); a stalled send counts as an unreachable connection, and the queue keeps every item for the next attempt.
 - **Budget:** the attendance register route rose by 328 B gzipped from the bounded send; its ratchet ceiling was re-baselined from 200,271 B to 200,599 B for this reason.
+
+## F8: platform administration, slice 7 (2026-11-24)
+
+- **Built:** the platform area at `/platform`: staff sign-in with the password then the authenticator code (no platform session before the code is accepted), the schools (filter by status, paged), one school (suspend with a reason, reactivate), and the platform metrics. Platform calls go through their own BFF routes (`/api/bff/platform/...`) with their own cookies (`sh_p_*`); a school session cannot read the platform.
+- **Security:** the review (ADR 0027, `docs/security/platform-review-2026-11-24.md`) is approved with conditions; each condition is met and tested (see ADR 0027, "Conditions met").
+- **Verification:** unit tests for the cookies, the sign-in steps, the routes and the proxy; browser journeys on desktop and mobile (11 runs; the status change runs on desktop only); a real-backend journey signs in as platform staff with the password and the code, reads the schools and metrics, and checks token separation both ways (B-51 landed).
+- **Not built:** enrolment of a platform user's authenticator (B-52); platform billing sweep and SMS top-up screens (their operations are in the contract; they follow the same routes).
+- **Budget:** the platform group's worst route is 167,710 B (cap 204,800 B). The parent group's worst route is 173,630 B (cap 174,080 B), unchanged in cost.
+- **Parent polish (slice 9):** still blocked on budget (ADR 0027, decision 5).

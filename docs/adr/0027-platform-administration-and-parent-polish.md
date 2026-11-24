@@ -1,6 +1,6 @@
 # 0027: Platform administration and the parent's polish (F8, slices 7 and 9)
 
-- **Status:** Security review done 2026-11-24: approved with conditions (docs/security/platform-review-2026-11-24.md). F1 is fixed; F2 to F4, F6, F7 are conditions of the build; F5 is open as B-51. The platform area is not yet built.
+- **Status:** Security review done 2026-11-24: approved with conditions. The platform area is built (slice 7) with the conditions met; enrolment is open as B-52. Parent polish is still blocked on budget (decision 5).
 
 ## Context
 
@@ -30,3 +30,17 @@ billing sweep and top up a school's SMS credits. Slice 9 is the parent's polish:
 
 - **Platform administration stays unbuilt until the security review approves decisions 1 and 2.** Building the sign-in before review would put untested session handling in front of tenant data. The review is the user's to give.
 - **Parent polish stays blocked on budget.** No cap raise. The next step is a separate proposal to split the parent wards detail (the page at the cap), which I can draft once the user agrees to that direction.
+
+## Conditions met (2026-11-24)
+
+| Finding | Condition                                                         | Where it is shown                                                        |
+| ------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| F1      | School proxy refuses platform paths                               | `request-guards.test.ts` (platform path refused)                         |
+| F2      | Separate `sh_p_*` cookies, no school cookie read for platform     | `platform-session.test.ts`                                               |
+| F3      | MFA before any platform access token; enrolment only to enrolment | `platform-auth.test.ts` (password step never sets access)                |
+| F4      | CSRF and origin guard on platform writes                          | `platform-routes.test.ts` (guard refuses without header)                 |
+| F5      | Token separation confirmed by the backend                         | B-51, `e2e-real/platform-journeys.spec.ts`                               |
+| F6      | Uniform login failures                                            | `platform-routes.test.ts` (uniform message)                              |
+| F7      | No token logged; screens log nothing beyond the redacting logger  | the logger's redaction, unchanged; the platform code writes no log lines |
+
+The platform's screens do not use the shared query client, so the platform stays out of the school's budget. A route-group layout was tried and moved the parent budget, so the platform pages render their own frame instead.
