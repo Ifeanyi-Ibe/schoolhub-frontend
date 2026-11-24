@@ -1883,7 +1883,8 @@
       "inbox": "Inbox",
       "announcements": "Announcements",
       "notifications": "Notifications",
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "compliance": "Compliance"
     }
   },
   "reportCards": {
@@ -2221,6 +2222,91 @@
     },
     "state": {
       "loading": "Loading the dashboard"
+    }
+  },
+  "compliance": {
+    "title": "Compliance",
+    "intro": "Consents, requests about a person's data, and the school's data export. A request is decided by a second person.",
+    "offline": "You are offline. Consents, requests and exports cannot be changed until the connection returns.",
+    "noAccessTitle": "You cannot manage compliance",
+    "noAccessBody": "Your account has no compliance permission.",
+    "working": "Working",
+    "refused": "The school refused this change ({code}). Nothing was saved.",
+    "state": {
+      "loading": "Loading",
+      "refused": "The school refused this change ({code}). Nothing was saved."
+    },
+    "subject": {
+      "type": "Kind of person or record",
+      "typeHint": "As the school records it, for example the type the consent was given for.",
+      "typeRequired": "Enter the kind of person or record.",
+      "id": "Their identifier",
+      "idRequired": "Enter their identifier."
+    },
+    "reason": {
+      "required": "Give a reason.",
+      "tooLong": "Keep the reason under 300 characters."
+    },
+    "consent": {
+      "title": "Consents",
+      "intro": "Find a person's consents, grant a new one, or withdraw one.",
+      "find": "Find consents",
+      "item": "{purpose} by {channel}: {state}",
+      "active": "active",
+      "withdrawn": "withdrawn",
+      "withdraw": "Withdraw",
+      "withdrawnDone": "Consent withdrawn.",
+      "none": "No consents recorded for this person.",
+      "purpose": "Purpose",
+      "channel": "Channel",
+      "source": "Where it was given",
+      "sourceRequired": "Say where the consent was given.",
+      "grant": "Record consent",
+      "granted": "Consent recorded."
+    },
+    "requests": {
+      "title": "Requests about a person's data",
+      "intro": "An export gives the person their data. An erasure removes it. A second person decides, and never the one who asked.",
+      "kind": "Request",
+      "kinds": {
+        "Export": "Export their data",
+        "Erase": "Erase their data"
+      },
+      "reason": "Reason",
+      "create": "Send request",
+      "created": "Request sent for a second person to decide.",
+      "filter": "Show",
+      "any": "All requests",
+      "statusOpen": "Waiting for a decision",
+      "empty": {
+        "title": "No requests",
+        "body": "Requests about a person's data appear here."
+      },
+      "item": "{kind}, {subject}, asked {requested}",
+      "status": "Status: {status}, asked by {requestedBy}",
+      "decidedAt": "Decided {when} by {by}. {note}",
+      "rejectNote": "Why it is refused",
+      "rejectNow": "Refuse request",
+      "reject": "Refuse",
+      "approve": "Approve",
+      "eraseNow": "Approve and erase",
+      "eraseWarning": "Erasing removes this person's data and cannot be undone.",
+      "decided": "Decision recorded. Status: {status}."
+    },
+    "export": {
+      "title": "School data export",
+      "intro": "A zip of the school's records and a list of its files. It is prepared in the background; check its status, then download it.",
+      "refresh": "Check status",
+      "start": "Start export",
+      "status": "Status: {status}",
+      "error": "The export failed: {error}"
+    },
+    "download": {
+      "failed": "The file could not be downloaded. Try again.",
+      "export": "Download their data",
+      "exportFileName": "subject-data.json",
+      "zip": "Download school export",
+      "zipFileName": "school-export.zip"
     }
   }
 }
