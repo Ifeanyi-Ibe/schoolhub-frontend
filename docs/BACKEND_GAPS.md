@@ -374,3 +374,9 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** `AnnouncementBody.audience`, `channels` and `AnnouncementView.status` are strings. The contract lists no values.
 - **Design-around (ADR 0025, slice 2):** the screen offers the audiences and channels the backend specification documents (all, levels, arms, staff, custom; sms, email, in-app). An audience or status the server sends that the screen does not know is shown as it arrives. Whether an announcement is open, sent or cancelled is read from its timestamps, not from its status word.
 - **Status:** Open. Ask the backend to document the values, and to type them as enumerations in the contract.
+
+### B-50 — Consent and data-request subject types are free strings, and their values are not documented
+
+- **Contract:** `subjectType` on consents and data requests is a string. The backend specification names no vocabulary for it, and the contract lists none.
+- **Design-around (ADR 0025, slice 5):** the screens take the subject type as the school types it, and say so. Purposes and channels are the contract's enumerations and are offered as choices.
+- **Status:** Open. Ask the backend to document the subject types and make them an enumeration.

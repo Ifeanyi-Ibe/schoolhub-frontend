@@ -325,3 +325,9 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Audience ids** are typed by hand (pasted, comma-separated). A picker of classes and people is a follow-up.
 - **B-49:** audience, channel and status values are free strings in the contract.
 - **F8 slices 3 to 8** remain.
+
+## Open after F8, slice 5 (2026-11-24)
+
+- **Subject types** are typed by the school (B-50).
+- **Erasure and export** are checked against the test double only. The real backend is not asked to erase or export a person, because that changes real records.
+- **F8 slices 6 to 9** remain.

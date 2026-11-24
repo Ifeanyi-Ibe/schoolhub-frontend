@@ -286,3 +286,12 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 - **Decisions:** ADR 0025. The teacher, bursar and parent dashboards compose several reads (B-15, B-16) and each costs budget on its own route, so they are the next dashboard work and are not built here.
 - **Verification:** fast gate passes (3 dashboard rule tests). Browser: the dashboard passes on desktop and mobile (6 runs, read only, including a plain user refused and an axe check). Real backend: the dashboard answers for the current term, or skips when the seed has none.
 - **Bundle (gzipped, 2026-11-23):** admin `/dashboard` route-specific 22,218 B (cap 40,960 B).
+
+## F8: compliance, slice 5 (2026-11-24)
+
+- **Built:** `/compliance` for users with `compliance.manage`. Consents: find a person's consents by subject type and id, record a consent (purpose and channel from the contract, and the source), and withdraw one. Data requests: send an export or an erasure request with a reason, list them, and decide them. A request is decided by a second person: the server refuses the requester, and the screen shows the refusal. An erasure asks for confirmation. A refused request needs a note. The school export: start it, check its status, and download the zip once it is complete.
+- **Decisions:** ADR 0025. Money is not involved. Each create carries an Idempotency-Key where the contract declares one. Subject types are typed by the school, because the contract documents none (B-50).
+- **Verification:** fast gate passes (3 compliance rule tests). Browser: the compliance journeys pass on desktop and mobile (7 runs; recording, requesting and exporting run once on desktop; the same account's approval is refused). Real backend (reads only): a consent lookup answers a page for an identifier that matches no one, and the data requests answer a page. An all-zero identifier is refused by the backend as empty, so the check uses a non-zero one.
+- **Bundle (gzipped, 2026-11-24):** admin `/compliance` route-specific 29,291 B (cap 40,960 B).
+- **Gaps:** B-50 (subject types are free strings).
+- **Not done:** billing (slice 6), platform administration (7), audit export (8), the parent's polish (9).
