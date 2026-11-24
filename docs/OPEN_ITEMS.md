@@ -358,3 +358,8 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Platform enrolment (B-52)** is not built: a user without an authenticator is told so.
 - **Platform billing sweep and SMS top-up** screens are not built.
 - **Parent polish (slice 9)** is blocked on the parent budget.
+
+## Open after the platform build (2026-11-24)
+
+- **next-intl ENVIRONMENT_FALLBACK log on platform pages:** the server logs this twice per platform page request during the browser journeys. The tests pass and no user sees an error. Ruled out so far: the sign-out control, the static prerender (the pages are dynamic now), and the locale lookup (a constant is used). Next step: render a platform page with the next-intl debug flag to find the component that calls a translation hook outside its provider.
+- **Attendance offline journey (intermittent under the full run):** it failed in two different steps across runs (the sync result, then the save-on-device message), and passes alone. The bounded send fixed the sync stall but not this. Next step: time the store's readiness against the first save in the full run.

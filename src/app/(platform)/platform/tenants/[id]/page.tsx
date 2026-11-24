@@ -1,4 +1,7 @@
 // One school on the platform: its status, and suspend or reactivate it (ADR 0027).
+// Rendered per request: the page depends on the platform cookies and the request's locale (ADR 0027).
+export const dynamic = "force-dynamic";
+
 import { PlatformPage } from "@/features/platform/PlatformPage";
 import { PlatformTenantView } from "@/features/platform/PlatformViews";
 
