@@ -25,3 +25,8 @@ billing sweep and top up a school's SMS credits. Slice 9 is the parent's polish:
 ## Consequences
 
 - F8 is complete for the staff area (slices 1 to 6 and 8). The platform area and the parent's polish remain open, each for a named reason.
+
+## Decisions (2026-11-24)
+
+- **Platform administration stays unbuilt until the security review approves decisions 1 and 2.** Building the sign-in before review would put untested session handling in front of tenant data. The review is the user's to give.
+- **Parent polish stays blocked on budget.** No cap raise. The next step is a separate proposal to split the parent wards detail (the page at the cap), which I can draft once the user agrees to that direction.

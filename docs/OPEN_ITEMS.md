@@ -343,3 +343,12 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 - **Security review (ADR 0027):** the platform sign-in and its BFF group need the user's review before slice 7 is built.
 - **Parent polish (ADR 0027, decision 5):** the parent inbox, dashboard, preferences and results need the parent budget reworked. Blocked until then.
 - **Billing money-flow review (ADR 0026)** is still pending.
+
+## Decisions made (2026-11-24)
+
+- Pay without naming an invoice: not offered (ADR 0026).
+- Second confirmation before showing the school active: not added; the server's answer is shown (ADR 0026).
+- Suspension banner link: decided, waiting for shell budget room (ADR 0026).
+- Platform sign-in: stays unbuilt until the security review (ADR 0027).
+- Parent polish: stays blocked; a budget proposal is the next step (ADR 0027).
+- Scheduled announcements and the audience picker: deferred to a follow-up slice (no contract blocker).

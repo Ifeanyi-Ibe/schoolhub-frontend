@@ -23,8 +23,10 @@ redirect to a gateway on this screen.
    path is covered by the test double, because a real payment moves real money.
 7. **Access follows `settings.manage`**, read from `GET /me`. The screen does not check a role name.
 
-## Open for the review
+## Decisions on the open points (2026-11-24)
 
-- Whether the screen should offer payment of the oldest invoice without choosing one (the contract accepts a missing invoice id).
-- Whether the platform should confirm a payment by a second call before the school's status is shown as active.
-- Whether the persistent suspension banner (CLAUDE.md, 402 `billing.suspended`) should link to this screen, which it does not yet.
+- **Pay without naming an invoice:** not offered. The screen pays the invoice the administrator chose, so the amount on the screen is the amount paid. The contract still accepts a missing id; the screen never sends one.
+- **Second confirmation of the payment before the school is shown as active:** not added. The server's answer is the source of truth, and the screen shows the server's invoice and school status as they are. A second call would repeat that answer.
+- **Suspension banner links to billing:** decided yes. The banner is part of the shell, so the link waits for room in the shell's budget (see ADR 0027); until then billing is reached from the related pages.
+
+The money-flow review itself is a sign-off by the user. These decisions are recorded for that review; they do not replace it.
