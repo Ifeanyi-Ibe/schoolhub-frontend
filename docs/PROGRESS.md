@@ -299,7 +299,7 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 ## F8: billing, slice 6 (2026-11-24)
 
 - **Built:** `/billing` for users with `settings.manage`: the school's subscription (plan, price, status, what is owed, the oldest unpaid due date, any grace period), a notice while the school is suspended for non-payment, and the invoices (period, due date, amount in naira, status, payment date and reference), paged. An unpaid invoice is paid after a confirmation; the server's answer is shown, and an unavailable payment service is reported as such.
-- **Money-flow checkpoint: pending review** (ADR 0026). The decisions are recorded there; the review is the user's.
+- **Money-flow checkpoint: approved by the user, 2026-11-24** (ADR 0026).
 - **Verification:** fast gate passes (2 billing rule tests). Browser: the billing screen passes on desktop and mobile (8 runs; the payment journey runs once, on desktop). Real backend (reads only): the subscription and the invoices answer. Payment is not run against the real backend.
 - **Bundle (gzipped, 2026-11-24):** admin `/billing` route-specific 28,277 B (cap 40,960 B).
 

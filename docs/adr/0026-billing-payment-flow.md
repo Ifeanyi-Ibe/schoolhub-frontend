@@ -1,6 +1,6 @@
 # 0026: The school's billing and the payment of its invoices (F8, slice 6)
 
-- **Status:** Accepted, 2026-11-24. The money-flow checkpoint for this flow is **pending review** (CLAUDE.md, F8 checkpoint).
+- **Status:** Accepted, 2026-11-24. The money-flow review was approved by the user on 2026-11-24.
 
 ## Context
 
