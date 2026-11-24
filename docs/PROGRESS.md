@@ -313,3 +313,9 @@ See `git log`. One concern per commit, conventional messages, each commit's mess
 ## F8: platform administration and parent polish, slices 7 and 9 (2026-11-24)
 
 - **Not built.** Decisions and reasons are in ADR 0027: the platform sign-in changes BFF session handling and needs the security review; the parent's inbox, dashboard and results need budget room that the cap does not allow.
+
+## Offline sync: bounded sends (2026-11-24)
+
+- **Defect:** a send in the attendance or score queue that was in flight when the connection dropped could stall indefinitely, and the queue runs one send at a time, so later syncs waited behind it. A full-run attendance journey failed this way intermittently (it passes alone).
+- **Fix:** every queued send is bounded at 15 seconds (`src/lib/async/timeout.ts`); a stalled send counts as an unreachable connection, and the queue keeps every item for the next attempt.
+- **Budget:** the attendance register route rose by 328 B gzipped from the bounded send; its ratchet ceiling was re-baselined from 200,271 B to 200,599 B for this reason.
