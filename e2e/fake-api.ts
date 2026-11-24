@@ -13,6 +13,7 @@ import { handleAnnouncements } from "./fake-announcements.ts";
 import { handleNotifications } from "./fake-notifications.ts";
 import { handleDashboard } from "./fake-dashboard.ts";
 import { handleCompliance } from "./fake-compliance.ts";
+import { handleBilling } from "./fake-billing.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -661,6 +662,21 @@ export function startFakeApi(): Promise<Server> {
         termIds: TERMS.filter((x) => x.sessionId === "0190a6c2-0000-7000-8000-000000000801").map(
           (x) => x.id,
         ),
+      })
+    )
+      return;
+
+    // The school's subscription, invoices and payment (ADR 0025, slice 6).
+    if (
+      handleBilling({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+        label: label ?? "",
+        idempotencyKey: req.headers["idempotency-key"] as string | undefined,
       })
     )
       return;
