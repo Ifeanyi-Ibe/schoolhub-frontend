@@ -1,6 +1,6 @@
 # 0027: Platform administration and the parent's polish (F8, slices 7 and 9)
 
-- **Status:** Security review done 2026-11-24: approved with conditions. The platform area is built (slice 7) with the conditions met; enrolment is open as B-52. Parent polish is still blocked on budget (decision 5).
+- **Status:** Security review done 2026-11-24: approved with conditions. The platform area is built (slice 7) with the conditions met; enrolment (B-52), the billing sweep and the SMS top-up are built as well. Parent polish is still blocked on budget (decision 5).
 
 ## Context
 

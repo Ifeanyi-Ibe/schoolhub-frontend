@@ -599,6 +599,10 @@ export function startFakeApi(): Promise<Server> {
         res,
         send,
         label: label ?? "",
+        idempotencyKey:
+          typeof req.headers["idempotency-key"] === "string"
+            ? req.headers["idempotency-key"]
+            : undefined,
         fakeToken: fakeJwt,
       })
     )

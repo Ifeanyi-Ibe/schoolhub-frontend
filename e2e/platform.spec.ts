@@ -3,7 +3,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import type { BrowserContext, Page } from "@playwright/test";
 import { fakeJwt } from "./fake-api";
-import { PLATFORM_LOGIN, PLATFORM_MFA_CODE } from "./fake-platform";
+import { ENROL_LOGIN, PLATFORM_LOGIN, PLATFORM_MFA_CODE } from "./fake-platform";
 import { test, expect } from "./fixtures";
 import { COOKIE, SCHOOL_ORIGIN } from "./origin";
 
@@ -33,6 +33,26 @@ test.describe("the platform for a staff member", () => {
     await expect(
       page.getByText("The sign-in did not work. Check your details and try again."),
     ).toBeVisible();
+  });
+
+  test("a new staff member sets up the authenticator, sees the recovery codes once, and reaches the schools", async ({
+    page,
+  }) => {
+    await page.goto("/platform/sign-in");
+    await page.getByRole("textbox", { name: "Email or user name" }).fill(ENROL_LOGIN.identifier);
+    await page.getByLabel("Password").fill(ENROL_LOGIN.password);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByLabel("Secret for your authenticator app")).toHaveText(
+      "JBSWY3DPEHPK3PXP",
+    );
+    await page
+      .getByRole("textbox", { name: "Code from your authenticator" })
+      .fill(PLATFORM_MFA_CODE);
+    await page.getByRole("button", { name: "Confirm", exact: true }).click();
+    await expect(page.getByText("AAAA-1111")).toBeVisible();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await page.waitForURL(/\/platform\/tenants/);
+    await expect(page.getByText("Greenfield Academy")).toBeVisible();
   });
 
   test("the password and the code sign the staff member in, and the schools are listed", async ({
@@ -66,6 +86,37 @@ test.describe("the platform for a staff member", () => {
     await signInToPlatform(page);
     await page.goto("/platform/metrics");
     await expect(page.getByText("Monthly recurring revenue")).toBeVisible();
+  });
+
+  test("the billing sweep asks first, then shows what it did", async ({ page }) => {
+    await signInToPlatform(page);
+    await page.goto("/platform/metrics");
+    await page.getByRole("button", { name: "Run billing sweep", exact: true }).click();
+    await expect(page.getByText("Run the billing sweep for every school now?")).toBeVisible();
+    await page.getByRole("button", { name: "Run now", exact: true }).click();
+    await expect(
+      page.getByText("Schools 2; invoices issued 1; reminders sent 0; status changes 0; failed 0."),
+    ).toBeVisible();
+  });
+
+  test("SMS units need a whole number and a reason before they are added", async ({ page }) => {
+    await signInToPlatform(page);
+    await page.getByText("Riverside College").click();
+    await page.getByRole("button", { name: "Add units", exact: true }).click();
+    await expect(page.getByText("Enter a whole number of units.")).toBeVisible();
+    await expect(page.getByText("Give a reason.")).toBeVisible();
+  });
+
+  test("SMS units are added once, with a reason", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "stateful: changes a shared school's wallet");
+    await signInToPlatform(page);
+    await page.getByText("Riverside College").click();
+    await page.getByRole("textbox", { name: "Units to add" }).fill("50");
+    await page
+      .getByRole("textbox", { name: "Reason (kept with the credit)" })
+      .fill("Termly SMS bundle");
+    await page.getByRole("button", { name: "Add units", exact: true }).click();
+    await expect(page.getByText("50 SMS units added.")).toBeVisible();
   });
 
   test("the sign-in and the schools are free of axe violations", async ({ page }) => {

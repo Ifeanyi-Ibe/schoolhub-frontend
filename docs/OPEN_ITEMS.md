@@ -355,8 +355,8 @@ The people screen waits for two requests in sequence: the shell's `GET /me`, the
 
 ## Open after slice 7 (2026-11-24)
 
-- **Platform enrolment (B-52)** is not built: a user without an authenticator is told so.
-- **Platform billing sweep and SMS top-up** screens are not built.
+- **Platform enrolment (B-52)** is built and verified against the double. Not yet run against the real backend.
+- **Platform billing sweep and SMS top-up** are built and verified against the double. Not yet run against the real backend; the real-backend suite does not run either operation.
 - **Parent polish (slice 9)** is blocked on the parent budget.
 
 ## Open after the platform build (2026-11-24)

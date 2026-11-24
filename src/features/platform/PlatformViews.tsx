@@ -23,6 +23,7 @@ import {
   type TenantStatus,
 } from "./api";
 import { usePlatformData } from "./usePlatformData";
+import { BillingSweepCard, SmsTopUpCard } from "./PlatformOps";
 
 const STATUSES: TenantStatus[] = ["Trial", "Active", "PastDue", "Suspended", "Cancelled"];
 
@@ -204,6 +205,7 @@ export function PlatformTenantView({ id }: { id: string }) {
           </Button>
         </Card>
       ) : null}
+      <SmsTopUpCard tenantId={id} />
       {message ? (
         <p role="status" className="text-sm text-foreground">
           {message}
@@ -223,6 +225,7 @@ export function PlatformMetricsView() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t("title")} description={t("intro")} />
+      <BillingSweepCard />
       {!m ? (
         <SkeletonList rows={3} label={t("loading")} />
       ) : (

@@ -98,3 +98,61 @@ export function platformMetricsQuery() {
     queryFn: async () => unwrap(await platformClient.GET("/api/v1/platform/metrics")),
   };
 }
+
+export interface EnrolmentStart {
+  secret: string;
+  otpAuthUri: string;
+}
+
+/** Enrolment, start: the authenticator's secret and address (B-52). */
+export async function platformEnrolStart(): Promise<
+  { ok: true; value: EnrolmentStart } | { ok: false }
+> {
+  const res = await fetch("/api/bff/platform/auth/enrol/start", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { [CSRF_HEADER_NAME]: "1" },
+    cache: "no-store",
+  });
+  const data = (await res.json().catch(() => ({}))) as Partial<EnrolmentStart>;
+  if (!res.ok || !data.secret || !data.otpAuthUri) return { ok: false };
+  return { ok: true, value: { secret: data.secret, otpAuthUri: data.otpAuthUri } };
+}
+
+/** Enrolment, confirm: the first code. On success the session is set and the recovery codes are returned once. */
+export async function platformEnrolConfirm(
+  code: string,
+): Promise<{ ok: true; recoveryCodes: string[] } | { ok: false }> {
+  const res = await fetch("/api/bff/platform/auth/enrol/confirm", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "content-type": "application/json", [CSRF_HEADER_NAME]: "1" },
+    body: JSON.stringify({ code }),
+    cache: "no-store",
+  });
+  const data = (await res.json().catch(() => ({}))) as { recoveryCodes?: string[] };
+  if (!res.ok) return { ok: false };
+  return { ok: true, recoveryCodes: data.recoveryCodes ?? [] };
+}
+
+export type SweepReport = components["schemas"]["SweepReport"];
+
+/** Runs the billing sweep for every school (issues invoices, sends reminders, updates statuses). The answer is the sweep's counts. */
+export async function runBillingSweep(): Promise<SweepReport> {
+  return unwrap(await platformClient.POST("/api/v1/platform/billing/sweep"));
+}
+
+/** Adds SMS units to a school. One key per attempt, reused on retry; the reason is kept with the credit. */
+export async function topUpSms(
+  tenantId: string,
+  units: number,
+  reason: string,
+  idempotencyKey: string,
+) {
+  return unwrap(
+    await platformClient.POST("/api/v1/platform/tenants/{tenantId}/sms-credits", {
+      params: { path: { tenantId }, header: { "Idempotency-Key": idempotencyKey } },
+      body: { units, reason },
+    }),
+  );
+}

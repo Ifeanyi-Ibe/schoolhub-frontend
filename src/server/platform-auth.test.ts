@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { ApiClient, UpstreamCall } from "./api-client";
-import { platformLogin, platformMfaVerify } from "./platform-auth";
+import {
+  platformEnrolConfirm,
+  platformEnrolStart,
+  platformLogin,
+  platformMfaVerify,
+} from "./platform-auth";
 
 function api(
   answer: { status: number; body?: unknown; headers?: Record<string, string> },
@@ -129,5 +134,60 @@ describe("the platform MFA step", () => {
       true,
     );
     expect(out.step).toBe("failed");
+  });
+});
+
+describe("the platform enrolment step", () => {
+  it("starts with the enrolment cookie only, and returns the authenticator's secret", async () => {
+    const seen: UpstreamCall[] = [];
+    const out = await platformEnrolStart(
+      api({ status: 200, body: { secret: "S", otpAuthUri: "otpauth://x" } }, seen),
+      { cookieHeader: "__Host-sh_p_enr=e1", clientIp: null },
+      true,
+    );
+    expect(out).toEqual({ ok: true, secret: "S", otpAuthUri: "otpauth://x" });
+    expect(seen[0]?.path).toBe("api/v1/platform/auth/mfa/enrollment");
+  });
+
+  it("does not start without the enrolment cookie", async () => {
+    const seen: UpstreamCall[] = [];
+    const out = await platformEnrolStart(
+      api({ status: 200, body: {} }, seen),
+      { cookieHeader: "__Host-sh_p_mfa=m", clientIp: null },
+      true,
+    );
+    expect(out.ok).toBe(false);
+    expect(seen).toHaveLength(0);
+  });
+
+  it("confirms with the code, sets the session, clears the enrolment cookie, and returns the recovery codes once", async () => {
+    const out = await platformEnrolConfirm(
+      api({
+        status: 200,
+        body: {
+          accessToken: "a",
+          refreshToken: "r",
+          expiresIn: 900,
+          tokenType: "Bearer",
+          recoveryCodes: ["R1", "R2"],
+        },
+      }),
+      { cookieHeader: "__Host-sh_p_enr=e1", code: "123456", clientIp: null },
+      true,
+    );
+    expect(out.step).toBe("signedIn");
+    if (out.step !== "signedIn") return;
+    expect(out.setCookies.join(";")).toContain("__Host-sh_p_at=a");
+    expect(out.setCookies.join(";")).toContain("__Host-sh_p_enr=");
+    expect(out.recoveryCodes).toEqual(["R1", "R2"]);
+  });
+
+  it("sets nothing when the code is refused", async () => {
+    const out = await platformEnrolConfirm(
+      api({ status: 401, body: { code: "auth.mfa_invalid" } }),
+      { cookieHeader: "__Host-sh_p_enr=e1", code: "000000", clientIp: null },
+      true,
+    );
+    expect(out).toEqual({ step: "failed", setCookies: [] });
   });
 });

@@ -3,7 +3,13 @@
 // guard as the school's (finding F4). Failures are uniform (finding F6).
 import { problemResponse } from "./problem";
 import { checkMutationRequest } from "./request-guards";
-import { platformLogin, platformMfaVerify, type PlatformAuthStep } from "./platform-auth";
+import {
+  platformEnrolConfirm,
+  platformEnrolStart,
+  platformLogin,
+  platformMfaVerify,
+  type PlatformAuthStep,
+} from "./platform-auth";
 import { clearPlatformCookieHeaders, platformCookieNames } from "./platform-session";
 import { parseCookieHeader } from "./session";
 import { clientIpFromForwardedFor } from "./client-ip";
@@ -129,14 +135,18 @@ export async function handlePlatformProxy(
   ];
   if (!accessToken)
     return problemResponse(401, "platform.session_required", "Sign in", "Sign in to the platform.");
+  // The idempotency key is the one header a platform write needs besides its body (the contract declares it on the top-up).
+  const inbound = new Headers({
+    accept: request.headers.get("accept") ?? "application/json",
+    "content-type": request.headers.get("content-type") ?? "",
+  });
+  const idempotencyKey = request.headers.get("idempotency-key");
+  if (idempotencyKey) inbound.set("idempotency-key", idempotencyKey);
   const call: UpstreamCall = {
     method: request.method,
     path,
     search: new URL(request.url).search,
-    inbound: new Headers({
-      accept: request.headers.get("accept") ?? "application/json",
-      "content-type": request.headers.get("content-type") ?? "",
-    }),
+    inbound,
     body: request.method === "GET" ? null : await request.text(),
     accessToken,
     tenantSlug: null,
@@ -161,4 +171,53 @@ export async function handlePlatformProxy(
     );
   }
   return relay(upstream);
+}
+
+/** Enrolment, start: returns the secret and address for the user's authenticator. Needs the enrolment cookie. */
+export async function handlePlatformEnrolStart(request: Request, deps: BffDeps): Promise<Response> {
+  const refused = guard(request, deps);
+  if (refused) return refused;
+  const secure = isSecureOrigin(deps.env.APP_ORIGIN);
+  const clientIp = clientIpFromForwardedFor(
+    request.headers.get("x-forwarded-for"),
+    deps.env.TRUSTED_PROXY_COUNT,
+  );
+  const started = await platformEnrolStart(
+    deps.api,
+    { cookieHeader: request.headers.get("cookie"), clientIp },
+    secure,
+  );
+  if (!started.ok) return withCookies({ step: "failed", message: UNIFORM_LOGIN_FAILURE }, 401, []);
+  return withCookies(
+    { step: "enrolment", secret: started.secret, otpAuthUri: started.otpAuthUri },
+    200,
+    [],
+  );
+}
+
+/** Enrolment, confirm: the first code sets the session and returns the recovery codes, once. */
+export async function handlePlatformEnrolConfirm(
+  request: Request,
+  deps: BffDeps,
+): Promise<Response> {
+  const refused = guard(request, deps);
+  if (refused) return refused;
+  const body = await readBody(request);
+  const code = body?.code;
+  if (typeof code !== "string" || !/^\d{6}$/.test(code))
+    return withCookies({ step: "failed", message: UNIFORM_LOGIN_FAILURE }, 400, []);
+  const secure = isSecureOrigin(deps.env.APP_ORIGIN);
+  const clientIp = clientIpFromForwardedFor(
+    request.headers.get("x-forwarded-for"),
+    deps.env.TRUSTED_PROXY_COUNT,
+  );
+  const done = await platformEnrolConfirm(
+    deps.api,
+    { cookieHeader: request.headers.get("cookie"), code, clientIp },
+    secure,
+  );
+  if (done.step !== "signedIn")
+    return withCookies({ step: "failed", message: UNIFORM_LOGIN_FAILURE }, 401, []);
+  // The recovery codes are returned once, to the user who just enrolled. They are not logged, and not stored.
+  return withCookies({ step: "signedIn", recoveryCodes: done.recoveryCodes }, 200, done.setCookies);
 }

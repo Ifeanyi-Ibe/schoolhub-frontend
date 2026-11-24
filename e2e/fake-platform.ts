@@ -17,6 +17,7 @@ export interface PlatformCall {
   res: ServerResponse;
   send: Send;
   label: string;
+  idempotencyKey: string | undefined;
   fakeToken: (label: string) => string;
 }
 
@@ -30,6 +31,8 @@ const problem = (status: number, code: string, title: string) => ({
 
 export const PLATFORM_LOGIN = { identifier: "platform@test.invalid", password: "platform-pass" };
 export const PLATFORM_MFA_CODE = "123456";
+/** An account that has not yet set up its authenticator: it must enrol first (B-52). */
+export const ENROL_LOGIN = { identifier: "newstaff@test.invalid", password: "platform-pass" };
 
 interface Tenant {
   id: string;
@@ -65,10 +68,26 @@ const tenants: Tenant[] = [
   },
 ];
 
+const walletBalances = new Map<string, number>();
+const topUps = new Map<string, unknown>();
+
 export function handlePlatform(call: PlatformCall): boolean {
-  const { method, path, url, body, res, send, label, fakeToken } = call;
+  const { method, path, url, body, res, send, label, idempotencyKey, fakeToken } = call;
 
   if (path === "/api/v1/platform/auth/login" && method === "POST") {
+    if (body.identifier === ENROL_LOGIN.identifier && body.password === ENROL_LOGIN.password) {
+      send(res, 200, {
+        accessToken: "",
+        refreshToken: "",
+        expiresIn: 0,
+        tokenType: "Bearer",
+        mfaRequired: false,
+        mfaToken: null,
+        mfaEnrollmentRequired: true,
+        enrollmentToken: "platform-enrol-1",
+      });
+      return true;
+    }
     if (body.identifier !== PLATFORM_LOGIN.identifier || body.password !== PLATFORM_LOGIN.password)
       return (send(res, 401, problem(401, "auth.invalid", "Sign-in failed")), true);
     send(res, 200, {
@@ -80,6 +99,29 @@ export function handlePlatform(call: PlatformCall): boolean {
       mfaToken: "platform-mfa-challenge",
       mfaEnrollmentRequired: false,
       enrollmentToken: null,
+    });
+    return true;
+  }
+
+  if (path === "/api/v1/platform/auth/mfa/enrollment" && method === "POST") {
+    if (body.enrollmentToken !== "platform-enrol-1")
+      return (send(res, 401, problem(401, "auth.enrollment_invalid", "Enrolment expired")), true);
+    send(res, 200, {
+      secret: "JBSWY3DPEHPK3PXP",
+      otpAuthUri: "otpauth://totp/SchoolHub:newstaff?secret=JBSWY3DPEHPK3PXP",
+    });
+    return true;
+  }
+
+  if (path === "/api/v1/platform/auth/mfa/enrollment/confirm" && method === "POST") {
+    if (body.enrollmentToken !== "platform-enrol-1" || body.code !== PLATFORM_MFA_CODE)
+      return (send(res, 401, problem(401, "auth.mfa_invalid", "The code is not right")), true);
+    send(res, 200, {
+      accessToken: fakeToken("platform"),
+      refreshToken: "rt:platform:2",
+      expiresIn: 900,
+      tokenType: "Bearer",
+      recoveryCodes: ["AAAA-1111", "BBBB-2222"],
     });
     return true;
   }
@@ -144,6 +186,48 @@ export function handlePlatform(call: PlatformCall): boolean {
     t.status = "Active";
     t.statusReason = null;
     send(res, 200, t);
+    return true;
+  }
+
+  if (path === "/api/v1/platform/billing/sweep" && method === "POST") {
+    send(res, 200, {
+      schools: 2,
+      invoicesIssued: 1,
+      remindersSent: 0,
+      statusChanges: 0,
+      failed: 0,
+    });
+    return true;
+  }
+
+  const topUp = /^\/api\/v1\/platform\/tenants\/([^/]+)\/sms-credits$/.exec(path);
+  if (topUp && method === "POST") {
+    const t = tenants.find((x) => x.id === topUp[1]);
+    if (!t)
+      return (send(res, 404, problem(404, "platform.tenant_not_found", "School not found")), true);
+    if (!idempotencyKey || !/^[A-Za-z0-9_-]{8,128}$/.test(idempotencyKey))
+      return (
+        send(res, 400, problem(400, "idempotency.key_required", "Idempotency-Key is required")),
+        true
+      );
+    if (typeof body.units !== "number" || !Number.isInteger(body.units) || body.units <= 0)
+      return (
+        send(res, 400, problem(400, "validation.failed", "Units must be a whole number")),
+        true
+      );
+    if (typeof body.reason !== "string" || body.reason.trim() === "")
+      return (send(res, 400, problem(400, "validation.failed", "A reason is required")), true);
+    // The same key replays the stored answer and credits nothing twice (the contract idempotency rule).
+    const replay = topUps.get(idempotencyKey);
+    if (replay) {
+      send(res, 200, replay, { "Idempotency-Replayed": "true" });
+      return true;
+    }
+    const balance = (walletBalances.get(t.id) ?? 0) + body.units;
+    walletBalances.set(t.id, balance);
+    const wallet = { balance, reserved: 0, available: balance, recent: [] };
+    topUps.set(idempotencyKey, wallet);
+    send(res, 200, wallet);
     return true;
   }
 

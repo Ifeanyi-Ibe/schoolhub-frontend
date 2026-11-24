@@ -1,3 +1,4 @@
+import { handlePlatformEnrolConfirm } from "./platform-routes";
 import { describe, expect, it } from "vitest";
 import type { ApiClient } from "./api-client";
 import type { BffDeps } from "./bff-proxy";
@@ -131,5 +132,60 @@ describe("the platform proxy", () => {
     );
     expect(res.status).toBe(401);
     expect(res.headers.getSetCookie().join(";")).toContain("__Host-sh_p_at=");
+  });
+});
+
+describe("the platform enrolment routes", () => {
+  it("refuse an enrolment confirm without the CSRF header", async () => {
+    const req = new Request(`${ORIGIN}/api/bff/platform/auth/enrol/confirm`, {
+      method: "POST",
+      headers: { origin: ORIGIN },
+      body: "{}",
+    });
+    const res = await handlePlatformEnrolConfirm(req, deps(api({ status: 200 })));
+    expect(res.status).toBe(403);
+  });
+
+  it("return the recovery codes once, and never a token", async () => {
+    const res = await handlePlatformEnrolConfirm(
+      post(
+        "/api/bff/platform/auth/enrol/confirm",
+        { code: "123456" },
+        { cookie: "__Host-sh_p_enr=e1" },
+      ),
+      deps(
+        api({
+          status: 200,
+          body: {
+            accessToken: "LEAK-A",
+            refreshToken: "LEAK-R",
+            expiresIn: 900,
+            tokenType: "Bearer",
+            recoveryCodes: ["RC-1"],
+          },
+        }),
+      ),
+    );
+    const text = await res.text();
+    expect(res.status).toBe(200);
+    expect(text).not.toContain("LEAK-A");
+    expect(text).not.toContain("LEAK-R");
+    expect(JSON.parse(text).recoveryCodes).toEqual(["RC-1"]);
+    expect(res.headers.getSetCookie().join(";")).toContain("__Host-sh_p_at=LEAK-A");
+  });
+
+  it("refuse a malformed enrolment code without calling the API", async () => {
+    let called = false;
+    const res = await handlePlatformEnrolConfirm(
+      post("/api/bff/platform/auth/enrol/confirm", { code: "1" }),
+      deps({
+        async call() {
+          called = true;
+          return new Response(null, { status: 200 });
+        },
+      }),
+    );
+    expect(res.status).toBe(400);
+    expect(called).toBe(false);
   });
 });

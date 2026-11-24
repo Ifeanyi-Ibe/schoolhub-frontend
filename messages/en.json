@@ -2432,7 +2432,15 @@
       "working": "Working",
       "failed": "The sign-in did not work. Check your details and try again.",
       "rateLimited": "Too many attempts. Try again in {seconds} seconds.",
-      "enrolNotAvailable": "Two-step sign-in has not been set up for this account. Set it up with the platform team. This screen cannot set it up yet."
+      "enrolFailed": "The authenticator could not be set up. Check the code and try again.",
+      "enrol": {
+        "intro": "Set up your authenticator app with this secret, then enter the first six-digit code it shows.",
+        "secretLabel": "Secret for your authenticator app",
+        "code": "Code from your authenticator",
+        "confirm": "Confirm",
+        "recoveryIntro": "Save these recovery codes somewhere safe. Each works once, and they are not shown again.",
+        "continue": "Continue"
+      }
     },
     "signOut": {
       "action": "Sign out"
@@ -2499,6 +2507,30 @@
       "PastDue": "Past due",
       "Suspended": "Suspended",
       "Cancelled": "Cancelled"
+    },
+    "sweep": {
+      "title": "Billing sweep",
+      "intro": "Issue due invoices, send reminders, and update every school's billing status.",
+      "action": "Run billing sweep",
+      "confirm": "Run the billing sweep for every school now?",
+      "now": "Run now",
+      "cancel": "Cancel",
+      "working": "Working",
+      "done": "Schools {schools}; invoices issued {invoices}; reminders sent {reminders}; status changes {changes}; failed {failed}.",
+      "failed": "The sweep could not be run. Try again.",
+      "signedOut": "Your platform session has ended. Sign in again."
+    },
+    "topUp": {
+      "title": "Add SMS units",
+      "units": "Units to add",
+      "unitsRequired": "Enter a whole number of units.",
+      "reason": "Reason (kept with the credit)",
+      "reasonRequired": "Give a reason.",
+      "action": "Add units",
+      "working": "Working",
+      "done": "{units} SMS units added.",
+      "refused": "The platform refused this change ({code}). Nothing was saved.",
+      "signedOut": "Your platform session has ended. Sign in again."
     }
   }
 }
