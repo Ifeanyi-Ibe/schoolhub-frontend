@@ -14,6 +14,7 @@ import { handleNotifications } from "./fake-notifications.ts";
 import { handleDashboard } from "./fake-dashboard.ts";
 import { handleCompliance } from "./fake-compliance.ts";
 import { handleBilling } from "./fake-billing.ts";
+import { handleAudit } from "./fake-audit.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -666,6 +667,20 @@ export function startFakeApi(): Promise<Server> {
     )
       return;
 
+    // The audit log and its export (ADR 0025, slice 8).
+    if (
+      handleAudit({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+        label: label ?? "",
+      })
+    )
+      return;
+
     // The school's subscription, invoices and payment (ADR 0025, slice 6).
     if (
       handleBilling({
@@ -827,6 +842,7 @@ export function startFakeApi(): Promise<Server> {
                 "notifications.messages.retry",
                 "dashboard.read",
                 "compliance.manage",
+                "audit.read",
               ]
             : label === "parent"
               ? ["me.profile", "me.wards", "me.pay"]
