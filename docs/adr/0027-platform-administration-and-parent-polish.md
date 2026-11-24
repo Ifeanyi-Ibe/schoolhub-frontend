@@ -1,6 +1,6 @@
 # 0027: Platform administration and the parent's polish (F8, slices 7 and 9)
 
-- **Status:** Proposed, 2026-11-24. **Pending security review** for the platform sign-in (CLAUDE.md: a checkpoint for the BFF, cookies and session handling). Not built.
+- **Status:** Security review done 2026-11-24: approved with conditions (docs/security/platform-review-2026-11-24.md). F1 is fixed; F2 to F4, F6, F7 are conditions of the build; F5 is open as B-51. The platform area is not yet built.
 
 ## Context
 

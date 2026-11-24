@@ -59,6 +59,8 @@ const SAFE_SEGMENT = /^[A-Za-z0-9._~-]+$/;
 export function validateUpstreamSegments(segments: readonly string[]): string | null {
   if (segments.length < 3) return null;
   if (segments[0] !== "api" || segments[1] !== "v1") return null;
+  // The school proxy never carries a school token to the platform area (security review, ADR 0027, finding F1).
+  if (segments[2] === "platform") return null;
   for (const s of segments) {
     if (!SAFE_SEGMENT.test(s) || s === "." || s === "..") return null;
   }

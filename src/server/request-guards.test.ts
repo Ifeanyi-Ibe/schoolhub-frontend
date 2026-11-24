@@ -74,3 +74,14 @@ describe("validateUpstreamSegments", () => {
     expect(validateUpstreamSegments(["api", "v1", ""])).toBeNull();
   });
 });
+
+describe("the school proxy never reaches the platform area", () => {
+  it("refuses a platform path, so a school token is never sent to it", () => {
+    expect(validateUpstreamSegments(["api", "v1", "platform", "tenants"])).toBeNull();
+    expect(validateUpstreamSegments(["api", "v1", "platform", "auth", "login"])).toBeNull();
+  });
+
+  it("still passes an ordinary school path", () => {
+    expect(validateUpstreamSegments(["api", "v1", "students"])).toBe("api/v1/students");
+  });
+});

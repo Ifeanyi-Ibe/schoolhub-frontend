@@ -380,3 +380,8 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 - **Contract:** `subjectType` on consents and data requests is a string. The backend specification names no vocabulary for it, and the contract lists none.
 - **Design-around (ADR 0025, slice 5):** the screens take the subject type as the school types it, and say so. Purposes and channels are the contract's enumerations and are offered as choices.
 - **Status:** Open. Ask the backend to document the subject types and make them an enumeration.
+
+### B-51 — Platform and school tokens must be refused on each other's routes
+
+- **Need (security review, docs/security/platform-review-2026-11-24.md, F5):** the platform routes (`/api/v1/platform/...`) must refuse a school access token, and the school routes must refuse a platform token. The BFF now keeps school tokens off the platform area (F1), but the API is the final gate.
+- **Status:** Open. Ask the backend to confirm both directions with a test, and to document it. The platform screens are released only after this is confirmed against the real backend.
