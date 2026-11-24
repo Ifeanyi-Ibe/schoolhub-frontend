@@ -15,6 +15,7 @@ import { handleDashboard } from "./fake-dashboard.ts";
 import { handleCompliance } from "./fake-compliance.ts";
 import { handleBilling } from "./fake-billing.ts";
 import { handleAudit } from "./fake-audit.ts";
+import { handlePlatform } from "./fake-platform.ts";
 import { handleStudents } from "./fake-students.ts";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -587,6 +588,21 @@ export function startFakeApi(): Promise<Server> {
 
     if (path === "/api/v1/auth/logout" || path === "/api/v1/auth/logout-all")
       return res.writeHead(204).end();
+
+    // The platform area: its sign-in steps, schools and metrics (ADR 0027). Only the platform token passes its own routes.
+    if (
+      handlePlatform({
+        method: req.method ?? "GET",
+        path,
+        url,
+        body: body as Record<string, unknown>,
+        res,
+        send,
+        label: label ?? "",
+        fakeToken: fakeJwt,
+      })
+    )
+      return;
 
     // Authenticated surfaces below. No token is a 401.
     if (path.startsWith("/api/v1/") && !label)
