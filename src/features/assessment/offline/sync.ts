@@ -3,6 +3,10 @@
 // value for that cell, which is last write wins); a refused row stays queued with its reason until the teacher resends or
 // discards it. A failed connection or server leaves every item pending for the next attempt. Nothing is dropped silently.
 import { ApiError } from "@/lib/api/unwrap";
+import { withTimeout } from "@/lib/async/timeout";
+
+/** A send that gets no answer in this time is treated as an unreachable connection (see lib/async/timeout). */
+const SEND_LIMIT_MS = 15_000;
 import { newActionKey } from "@/lib/api/idempotency";
 import { saveScores, type RecordScoresOutcome } from "../api";
 import { scoreRowKind, sheetKeyOf } from "../rules";
@@ -78,16 +82,19 @@ let flushChain: Promise<void> = Promise.resolve();
 export function flushScoreQueue(
   db: ScoresDatabase,
   send: SendScores = (sheetId, rows, key) =>
-    saveScores(
-      sheetId,
-      rows.map((r) => ({
-        studentId: r.studentId,
-        componentId: r.componentId,
-        score: r.score,
-        absent: r.absent,
-        clientUpdatedAt: r.clientUpdatedAt,
-      })),
-      key,
+    withTimeout(
+      saveScores(
+        sheetId,
+        rows.map((r) => ({
+          studentId: r.studentId,
+          componentId: r.componentId,
+          score: r.score,
+          absent: r.absent,
+          clientUpdatedAt: r.clientUpdatedAt,
+        })),
+        key,
+      ),
+      SEND_LIMIT_MS,
     ),
 ): Promise<ScoreFlushReport> {
   const run = flushChain.then(() => flushOnce(db, send));

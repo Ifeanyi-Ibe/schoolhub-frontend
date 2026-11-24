@@ -3,6 +3,10 @@
 // teacher resends or discards it. A network or server failure leaves every item pending for the next attempt. Nothing
 // is dropped silently.
 import { ApiError } from "@/lib/api/unwrap";
+import { withTimeout } from "@/lib/async/timeout";
+
+/** A send that gets no answer in this time is treated as an unreachable connection (see lib/async/timeout). */
+const SEND_LIMIT_MS = 15_000;
 import { newActionKey } from "@/lib/api/idempotency";
 import { saveRegister, type MarkOutcome, type MarkRegisterRequest } from "../api";
 import { registerKey, rowResult, type QueuedMark, type RegisterKey } from "../rules";
@@ -77,7 +81,7 @@ export async function resendRefused(db: AttendanceDatabase, id: number): Promise
  */
 export function flushQueue(
   db: AttendanceDatabase,
-  send: SendRegister = saveRegister,
+  send: SendRegister = (...args) => withTimeout(saveRegister(...args), SEND_LIMIT_MS),
 ): Promise<FlushReport> {
   const run = flushChain.then(() => flushOnce(db, send));
   flushChain = run.then(
