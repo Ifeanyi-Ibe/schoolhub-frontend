@@ -389,4 +389,12 @@ Status key: **Blocking** = the feature cannot be built as specified. **Design-ar
 ### B-52 — Platform two-step sign-in enrolment is not in the BFF
 
 - **Need:** a platform user without an authenticator must enrol (`mfa/enrollment`, `mfa/enrollment/confirm`) before signing in. The contract provides both; the BFF's platform routes do not yet carry them, and the screen says so instead of faking enrolment.
-- **Status:** Open. Build the enrolment routes in `src/server/platform-routes.ts` with the same cookie and failure rules as sign-in (ADR 0027).
+- **Status:** Built in the BFF (`src/server/platform-routes.ts`, `src/server/platform-auth.ts`), with the same cookie and failure rules as sign-in (ADR 0027). Verified against the test double only; the real-backend enrolment check needs an account without an authenticator, which the seed does not provide.
+
+### B-53 — A replayed SMS top-up returns an empty body
+
+- **Contract:** `POST /api/v1/platform/tenants/{tenantId}/sms-credits` replays the stored answer when the same `Idempotency-Key` is sent with the same request. The stored answer is the `WalletView`, and the replay carries `Idempotency-Replayed: true`.
+- **Observed (real backend, 2026-11-25):** the first call answers 200 with the wallet (balance 50). The replay with the same key answers 200 with `Idempotency-Replayed: true`, `content-length: 0` and no body. No credit is made twice, but the client cannot read the wallet from the replay.
+- **Found by:** `e2e-real/platform-ops-journeys.spec.ts`, which asserts the replay body. The assertion is kept as the contract states it; the test fails until the backend returns the stored wallet.
+- **Design-around:** the UI shows the answer of the first call only, and it clears the key after success, so it never reads a replay. No screen depends on the replay body today.
+- **Status:** Open. Store the response body with the idempotency record and return it on replay.
